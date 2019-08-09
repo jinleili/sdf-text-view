@@ -1,0 +1,13 @@
+# 运行： $ cargo +nightly fmt
+#
+# 配置文档：https://github.com/rust-lang/rustfmt/blob/master/Configurations.md#control_brace_style
+# https://rust-lang.github.io/rustfmt/
+#
+
+reorder_imports = true
+
+newline_style = "Native"
+
+use_small_heuristics = "Max"
+
+fn_args_layout = "Compressed"

@@ -1,0 +1,113 @@
+// layout (local_size_x = 1, local_size_y = 1) in;
+
+layout(set = 0, binding = 0) uniform FluidUniform {
+    // 表示D2Q9离散速度模型速度空间的速度配置
+    vec2 e[9];
+    // lattice 在正规化坐标空间的大小
+    vec2 lattice_size;
+    vec2 lattice_num;
+    float weight[9];
+    // 0： f_tex10， 1: f_tex11
+    int swap;
+};
+
+// 中心点的参数：r = source f_i 0, g = dst f_i 0
+layout(binding = 1, rgba32f) uniform image2D f00;
+layout(binding = 2, rgba32f) uniform image2D f10;
+layout(binding = 3, rgba32f) uniform image2D f20;
+layout(binding = 4, rgba32f) uniform image2D f11;
+layout(binding = 5, rgba32f) uniform image2D f21;
+// rgb:表示宏观速度密度
+layout(binding = 6, rgba32f) uniform image2D macro_param;
+
+//弛豫时间
+const float dRevTau=1.0/0.75;    
+
+void setNormalBounceBack(int destIndex, int srcIndex, inout vec4 f1, inout vec4 f2) {
+    // vec4 f_dest = (destIndex <)
+}
+
+// float get(ivec uv, int direction) {
+//     // vec4 f_dest = (destIndex <)
+//     if (direction < 5) {
+//         return imageLoad(f11, uv * (-1)).b
+//     }
+// }
+
+void main() {
+	ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+
+    vec4 f0 = imageLoad(f00, uv);
+    vec4 f1, f2;
+    
+    f0.r = f0.g;
+    // 四周边界 
+    if (uv.x == 0 || uv.x == int(lattice_num.x - 1.0) || uv.y == 0 || uv.y == int(lattice_num.y - 1.0)) {
+        // imageLoad 坐标是左上角为（0， 0），右下角为（w, h)
+        f1 = vec4(0.0, 0.0, 0.0, 0.0);
+        f2 = vec4(0.0, 0.0, 0.0, 0.0);
+        
+        float f_1, f_2, f_3, f_4, f_5, f_6, f_7, f_8;
+        // 回弹方向的变量，应该到 src 上当前位置的 lattice 上的反方向的值
+        // 左边界
+        if (uv.x == 0) {
+            // f_3 = imageLoad(f11, ivec2(uv.x, uv.y)).b;
+            // f_7 = imageLoad(f21, ivec2(uv.x , uv.y)).b;
+            // f_6 = imageLoad(f21, ivec2(uv.x, uv.y)).g;
+            f_3 = imageLoad(f11, ivec2(uv.x + 1, uv.y)).b;
+            f_7 = imageLoad(f21, ivec2(uv.x + 1 , uv.y - 1)).b;
+            f_6 = imageLoad(f21, ivec2(uv.x + 1, uv.y + 1)).g;
+            f1.r = f_3;
+            f2.r = f_7;
+            f2.a = f_6;
+            f1.g = imageLoad(f11, uv * (-1)).g;
+            f1.a = imageLoad(f11, uv * (-1)).a;
+
+        } else if (uv.x >= int(lattice_num.x - 2.0)) {
+            // 右边界
+            // f_1 = imageLoad(f11, ivec2(uv.x, uv.y)).r;
+            // f_8 = imageLoad(f21, ivec2(uv.x, uv.y)).a;
+            // f_5 = imageLoad(f21, ivec2(uv.x, uv.y)).r;
+            f_1 = imageLoad(f11, ivec2(uv.x - 1, uv.y)).r;
+            f_8 = imageLoad(f21, ivec2(uv.x - 1, uv.y - 1)).a;
+            f_5 = imageLoad(f21, ivec2(uv.x - 1, uv.y + 1)).r;
+            f1.b = f_1;
+            f2.g = f_8;
+            f2.b = f_5;
+        } else if (uv.y <= 1) {
+            // 顶边界
+            // f_5 = imageLoad(f21, ivec2(uv.x, uv.y )).r;
+            // f_6 = imageLoad(f21, ivec2(uv.x, uv.y )).g;
+            // f_2 = imageLoad(f11, ivec2(uv.x, uv.y )).g;
+            f_5 = imageLoad(f21, ivec2(uv.x - 1, uv.y + 1 )).r;
+            f_6 = imageLoad(f21, ivec2(uv.x + 1, uv.y + 1 )).g;
+            f_2 = imageLoad(f11, ivec2(uv.x, uv.y + 1 )).g;
+            f1.a = f_2;
+            f2.b = f_5;
+            f2.a = f_6;
+        } else {
+            // f_7 = imageLoad(f21, ivec2(uv.x, uv.y)).b;
+            // f_8 = imageLoad(f21, ivec2(uv.x, uv.y)).a;
+            // f_4 = imageLoad(f11, ivec2(uv.x, uv.y)).a ;
+            f_7 = imageLoad(f21, ivec2(uv.x + 1, uv.y- 1)).b;
+            f_8 = imageLoad(f21, ivec2(uv.x - 1, uv.y- 1)).a;
+            f_4 = imageLoad(f11, ivec2(uv.x, uv.y- 1)).a ;
+            f1.g = f_4;
+            f2.r = f_7;
+            f2.g = f_8;
+        }
+    } 
+    else {
+        // imageLoad 坐标是左上角为（0， 0），右下角为（w, h)
+        f1 = vec4(imageLoad(f11, ivec2(uv.x - 1, uv.y )).r, imageLoad(f11, ivec2(uv.x, uv.y + 1)).g,
+                     imageLoad(f11, ivec2(uv.x + 1, uv.y)).b, imageLoad(f11, ivec2(uv.x, uv.y - 1)).a );
+        f2 = vec4(imageLoad(f21, ivec2(uv.x - 1, uv.y + 1 )).r, imageLoad(f21, ivec2(uv.x + 1, uv.y + 1)).g, 
+                    imageLoad(f21, ivec2(uv.x + 1, uv.y - 1)).b, imageLoad(f21, ivec2(uv.x - 1, uv.y - 1)).a);
+        
+    }
+
+    // 流体传播
+    imageStore(f10, uv, f1);
+    imageStore(f20, uv, f2);
+    imageStore(f00, uv, f0);
+}

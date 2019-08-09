@@ -1,0 +1,57 @@
+[package]
+name = "idroid"
+version = "0.1.0"
+authors = ["li jinlei <grenlight@icloud.com>"]
+edition = "2018"
+
+[lib]
+name = "idroid"
+
+# [target.'cfg(target_os = "ios")'.lib]
+# crate-type = ["staticlib"]
+# [target.'cfg(target_os = "macos")'.lib]
+crate-type = ["rlib"]
+# [target.'cfg(target_os = "android")'.lib]
+# crate-type = ["cdylib"]
+
+[features]
+default = []
+dx11 = ["wgpu/dx11"]
+dx12 = ["wgpu/dx12"]
+metal = ["wgpu/metal"]
+vulkan = ["wgpu/vulkan"]
+
+[dependencies]
+libc = "*"
+
+# wgpu = { git = "https://github.com/gfx-rs/wgpu", version = "0.2.3"}
+# wgpu-rs  is an idiomatic Rust wrapper over wgpu-native. 
+# wgpu = { git = "https://github.com/gfx-rs/wgpu-rs", branch = "master"}
+# 本地版本设置了 metal-auto-capture，且解决了 iOS 设备上 Undefined symbols for architecture arm64:
+#  "_MTLCopyAllDevices" bug
+wgpu = { path = "../wgpu-rs"}
+uni-view = { path="uni-view" }
+
+nalgebra-glm = "*"
+image = "0.20.1"
+env_logger = "0.5"
+log = "0.4"
+failure = "0.1"
+lazy_static = "*"
+
+[target.'cfg(target_os = "macos")'.dependencies]
+winit = "0.18"
+shaderc = "0.6"
+
+[build-dependencies]
+shaderc = "0.6"
+
+[dev-dependencies]
+env_logger = "0.5"
+lazy_static = "*"
+palette = "0.4"
+rand = "0.6"
+
+[target.'cfg(target_os = "macos")'.dev-dependencies]
+winit = "0.18"
+objc = "*"
