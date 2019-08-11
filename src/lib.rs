@@ -41,20 +41,11 @@ mod vertex;
 
 pub mod filters;
 
-mod page_turning;
-pub use page_turning::PageTurning;
-
-mod roll_animation;
-pub use roll_animation::RollAnimation;
-
-pub mod fluid;
-pub mod fluid2;
-
-mod brush;
-pub use brush::BrushView;
-
 // #[cfg(not(target_os = "ios"))]
 mod shader;
+
+mod sdf_text_view;
+pub use sdf_text_view::SDFTextView;
 
 #[cfg(not(target_os = "macos"))]
 #[no_mangle]

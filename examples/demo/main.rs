@@ -27,15 +27,8 @@ fn main() {
 
     // let screen_scale: fn() -> f32 = screen_scale;
     let v = AppView::new(window);
-    // let mut surfaceView = idroid::Triangle::new(idroid::AppViewWrapper(v));
-    // let mut surfaceView = idroid::Triangle::new(v);
-    // let mut surface_view = idroid::procedure_texture::Brick::new(v);
-    // let mut surface_view = idroid::filters::BlurFilter::new(v);
-    // let mut surface_view = idroid::PageTurning::new(v);
-    // let mut surface_view = idroid::RollAnimation::new(v);
-    // let mut surface_view = idroid::BrushView::new(v);
-    // let mut surface_view = idroid::filters::GrayFilter::new(v);
-    let mut surface_view = idroid::fluid2::PoiseuilleFlow::new(v);
+
+    let mut surface_view = idroid::SDFTextView::new(v);
 
     let mut running = true;
     let mut accumulator = Duration::new(0, 0);
