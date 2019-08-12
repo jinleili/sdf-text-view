@@ -5,8 +5,8 @@ authors = ["Li Jinlei <grenlight@icloud.com>"]
 
 
 [dependencies]
-# wgpu = { git = "https://github.com/gfx-rs/wgpu-rs", version = "*"}
-wgpu = { path = "../../wgpu-rs"}
+wgpu = { git = "https://github.com/gfx-rs/wgpu-rs", version = "0.2.2", rev = "e515a59309dbcbbdba20ed363cb88a0528fcfc15" }
+# wgpu = { path = "../../wgpu-rs"}
 libc = "*"
 lazy_static = "*"
 
@@ -14,7 +14,7 @@ lazy_static = "*"
 stdweb =  "*"
 
 [target.'cfg(target_os = "macos")'.dependencies]
-winit = "0.18"
+winit = "*"
 
 [target.'cfg(target_os = "ios")'.dependencies]
 objc = "*"

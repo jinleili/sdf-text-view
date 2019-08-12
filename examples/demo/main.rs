@@ -29,6 +29,7 @@ fn main() {
     let v = AppView::new(window);
 
     let mut surface_view = idroid::SDFTextView::new(v);
+    // let mut surface_view = idroid::filters::GrayFilter::new(v);
 
     let mut running = true;
     let mut accumulator = Duration::new(0, 0);

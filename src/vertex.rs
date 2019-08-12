@@ -4,7 +4,7 @@ pub trait Pos {
     fn attri_descriptor(offset: u32) -> Vec<wgpu::VertexAttributeDescriptor>;
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct PosTex {
     pos: [f32; 3],
     tex_coord: [f32; 2],
@@ -63,7 +63,7 @@ impl Pos for PosTex {
 
 //     }
 // }
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct PosWeight {
     pub pos: [f32; 3],
     // 离数学中心位置的权重

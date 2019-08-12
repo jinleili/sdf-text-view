@@ -26,25 +26,25 @@ libc = "*"
 
 # wgpu = { git = "https://github.com/gfx-rs/wgpu", version = "0.2.3"}
 # wgpu-rs  is an idiomatic Rust wrapper over wgpu-native. 
-# wgpu = { git = "https://github.com/gfx-rs/wgpu-rs", branch = "master"}
+wgpu = { git = "https://github.com/gfx-rs/wgpu-rs", version = "0.2.2", rev = "e515a59309dbcbbdba20ed363cb88a0528fcfc15" }
 # 本地版本设置了 metal-auto-capture，且解决了 iOS 设备上 Undefined symbols for architecture arm64:
 #  "_MTLCopyAllDevices" bug
-wgpu = { path = "../wgpu-rs"}
+# wgpu = { path = "../wgpu-rs"}
 uni-view = { path="uni-view" }
 
 nalgebra-glm = "*"
-image = "0.20.1"
+image = "0.22.1"
 env_logger = "0.5"
 log = "0.4"
 failure = "0.1"
 lazy_static = "*"
 
 [target.'cfg(target_os = "macos")'.dependencies]
-winit = "0.18"
-shaderc = "0.6"
+winit = "*"
+shaderc = "0.6.1"
 
 [build-dependencies]
-shaderc = "0.6"
+shaderc = "0.6.1"
 
 [dev-dependencies]
 env_logger = "0.5"
@@ -53,5 +53,5 @@ palette = "0.4"
 rand = "0.6"
 
 [target.'cfg(target_os = "macos")'.dev-dependencies]
-winit = "0.18"
+winit = "*"
 objc = "*"

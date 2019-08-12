@@ -8,8 +8,6 @@ use uni_view::{AppView, GPUContext};
 
 use nalgebra_glm as glm;
 
-use std::rc::Rc;
-
 use crate::node::NoneNode;
 
 pub struct SDFTextView {
@@ -58,6 +56,7 @@ impl SDFTextView {
                     },
                 ],
             });
+        // let mvp = crate::matrix_helper::ortho_pixel_mvp(app_view.sc_desc.width as f32, app_view.sc_desc.height as f32);
         let mvp = crate::matrix_helper::default_mvp(&app_view.sc_desc);
         let mvp_buf = crate::utils::create_uniform_buffer(&mut app_view.device, mvp);
         let bind_group = app_view.device.create_bind_group(&wgpu::BindGroupDescriptor {
@@ -81,6 +80,9 @@ impl SDFTextView {
         // Create the vertex and index buffers
         let vertex_size = std::mem::size_of::<PosTex>();
         let (vertex_data, index_data) = Plane::new(1, 1).generate_vertices();
+        // let index_data = [3, 1, 1, 1, 1, 1];
+        println!("vertex_data: {:?}", &vertex_data );
+
         let vertex_buf = app_view
             .device
             .create_buffer_mapped(vertex_data.len(), wgpu::BufferUsage::VERTEX)
@@ -101,14 +103,13 @@ impl SDFTextView {
             vertex_stage: shader.vertex_stage(),
             fragment_stage: shader.fragment_stage(),
             rasterization_state: wgpu::RasterizationStateDescriptor {
-                front_face: wgpu::FrontFace::Cw,
+                front_face: wgpu::FrontFace::Ccw,
                 cull_mode: wgpu::CullMode::None,
                 depth_bias: 0,
                 depth_bias_slope_scale: 0.0,
                 depth_bias_clamp: 0.0,
             },
             primitive_topology: wgpu::PrimitiveTopology::TriangleList,
-            // primitive_topology: wgpu::PrimitiveTopology::LineList,
             color_states: &[wgpu::ColorStateDescriptor {
                 format: app_view.sc_desc.format,
                 color_blend: wgpu::BlendDescriptor::REPLACE,
@@ -117,7 +118,7 @@ impl SDFTextView {
             }],
             // ??????
             depth_stencil_state: None,
-            index_format: wgpu::IndexFormat::Uint16,
+            index_format: wgpu::IndexFormat::Uint32,
             vertex_buffers: &[wgpu::VertexBufferDescriptor {
                 stride: vertex_size as wgpu::BufferAddress,
                 step_mode: wgpu::InputStepMode::Vertex,
@@ -174,6 +175,8 @@ impl SurfaceView for SDFTextView {
                 rpass.set_index_buffer(&self.index_buf, 0);
                 rpass.set_vertex_buffers(&[(&self.vertex_buf, 0)]);
                 rpass.draw_indexed(0..self.index_count as u32, 0, 0..1);
+                // rpass.draw_indexed(0..3, 0, 0..1);
+
             }
 
             self.app_view.device.get_queue().submit(&[encoder.finish()]);

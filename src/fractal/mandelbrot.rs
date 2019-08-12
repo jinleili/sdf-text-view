@@ -120,7 +120,7 @@ impl CanvasView for Mandelbrot {
             // ??????
             // depth_stencil_state: None,
             depth_stencil_state: Some(crate::depth_stencil::create_state_descriptor()),
-            index_format: wgpu::IndexFormat::Uint16,
+            index_format: wgpu::IndexFormat::Uint32,
             vertex_buffers: &[wgpu::VertexBufferDescriptor {
                 stride: vertex_size as wgpu::BufferAddress,
                 step_mode: wgpu::InputStepMode::Vertex,

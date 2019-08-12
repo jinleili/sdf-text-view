@@ -96,7 +96,7 @@ impl NoneNode {
             }],
             // ??????
             depth_stencil_state: None,
-            index_format: wgpu::IndexFormat::Uint16,
+            index_format: wgpu::IndexFormat::Uint32,
             vertex_buffers: &[wgpu::VertexBufferDescriptor {
                 stride: vertex_size as wgpu::BufferAddress,
                 step_mode: wgpu::InputStepMode::Vertex,

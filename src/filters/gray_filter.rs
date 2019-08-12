@@ -27,7 +27,7 @@ impl GrayFilter {
 
         // Create the texture
         let (texture_view, texture_extent, sampler) = texture::from_file_and_usage_write(
-            "iphone.png",
+            "face.png",
             &mut app_view.device,
             &mut encoder,
             true,

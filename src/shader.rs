@@ -39,10 +39,10 @@ impl Shader {
     #[allow(dead_code)]
     pub fn new_by_compute(name: &str, device: &mut wgpu::Device) -> Self {
         let binary_result = generate_shader_source(name, ShaderKind::Compute);
-        Shader::shader_by_bytes(binary_result.as_binary_u8(), device)
+        Shader::shader_by_bytes(binary_result.as_binary(), device)
     }
 
-    fn shader_by_bytes(bytes: &[u8], device: &mut wgpu::Device) -> Self {
+    fn shader_by_bytes(bytes: &[u32], device: &mut wgpu::Device) -> Self {
         let module = device.create_shader_module(bytes);
         Shader { vs_module: module, fs_module: None }
     }
@@ -80,7 +80,7 @@ pub fn load_general_glsl(
 
 #[cfg(target_os = "ios")]
 #[allow(dead_code)]
-fn generate_shader_source(name: &str, suffix: &str) -> Vec<u8> {
+fn generate_shader_source(name: &str, suffix: &str) -> Vec<u32> {
     let p = uni_view::fs::FileSystem::get_shader_path(name, suffix);
     println!("spv path: {:?}", &p);
     let mut f = std::fs::File::open(p).unwrap();
@@ -97,8 +97,8 @@ pub fn load_general_glsl(
 ) -> (wgpu::ShaderModule, wgpu::ShaderModule) {
     let vs_binary = generate_shader_source(name, ShaderKind::Vertex);
     let fs_binary = generate_shader_source(name, ShaderKind::Fragment);
-    let vs_module = device.create_shader_module(vs_binary.as_binary_u8());
-    let fs_module = device.create_shader_module(fs_binary.as_binary_u8());
+    let vs_module = device.create_shader_module(vs_binary.as_binary());
+    let fs_module = device.create_shader_module(fs_binary.as_binary());
 
     (vs_module, fs_module)
 }
