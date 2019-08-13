@@ -106,13 +106,7 @@ impl F32TexNode {
             sample_count: 1,
         });
 
-        F32TexNode {
-            vertex_buf,
-            index_buf,
-            index_count: index_data.len(),
-            bind_group,
-            pipeline,
-        }
+        F32TexNode { vertex_buf, index_buf, index_count: index_data.len(), bind_group, pipeline }
     }
 
     pub fn begin_render_pass(

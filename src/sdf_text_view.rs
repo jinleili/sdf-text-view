@@ -78,7 +78,7 @@ impl SDFTextView {
         let vertex_size = std::mem::size_of::<PosTex>();
         let (vertex_data, index_data) = Plane::new(1, 1).generate_vertices();
         // let index_data = [3, 1, 1, 1, 1, 1];
-        println!("vertex_data: {:?}", &vertex_data );
+        println!("vertex_data: {:?}", &vertex_data);
 
         let vertex_buf = app_view
             .device
@@ -173,7 +173,6 @@ impl SurfaceView for SDFTextView {
                 rpass.set_vertex_buffers(&[(&self.vertex_buf, 0)]);
                 rpass.draw_indexed(0..self.index_count as u32, 0, 0..1);
                 // rpass.draw_indexed(0..3, 0, 0..1);
-
             }
 
             self.app_view.device.get_queue().submit(&[encoder.finish()]);

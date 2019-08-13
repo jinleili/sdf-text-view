@@ -1,5 +1,5 @@
 use crate::math::Position;
-use crate::vertex::{PosWeight};
+use crate::vertex::PosWeight;
 
 // 线条的宽度应该是整数才有意义
 #[allow(dead_code)]

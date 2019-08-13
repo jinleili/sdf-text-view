@@ -1,4 +1,4 @@
-use crate::math::{ViewSize};
+use crate::math::ViewSize;
 use crate::utils::MVPUniform;
 use crate::vertex::{Pos, PosBrush};
 
@@ -20,8 +20,7 @@ impl PointNode {
         vertex_data: &Vec<PosBrush>,
     ) -> Self {
         use std::mem;
-        let _encoder =
-            device.create_command_encoder(&wgpu::CommandEncoderDescriptor { todo: 0 });
+        let _encoder = device.create_command_encoder(&wgpu::CommandEncoderDescriptor { todo: 0 });
         // Create pipeline layout
         let bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
             bindings: &[wgpu::BindGroupLayoutBinding {
