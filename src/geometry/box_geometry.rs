@@ -1,6 +1,7 @@
 #[allow(dead_code)]
 use crate::vertex::PosTex;
 
+#[allow(dead_code)]
 pub fn create_vertices() -> (Vec<PosTex>, Vec<u16>) {
     let vertex_data = [
         // top (0, 0, 1)

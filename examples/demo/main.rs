@@ -2,7 +2,7 @@ extern crate idroid;
 use idroid::{math::Position, SurfaceView};
 
 extern crate uni_view;
-use uni_view::{AppView, ViewSize};
+use uni_view::{AppView};
 
 extern crate lazy_static;
 extern crate objc;
@@ -10,7 +10,6 @@ extern crate objc;
 extern crate nalgebra_glm;
 use nalgebra_glm as glm;
 
-use log::info;
 use std::time::{Duration, Instant};
 
 fn main() {
@@ -39,7 +38,7 @@ fn main() {
     // test_projection();
     while running {
         events_loop.poll_events(|event| match event {
-            Event::WindowEvent { event: WindowEvent::Resized(size), .. } => {
+            Event::WindowEvent { event: WindowEvent::Resized(_size), .. } => {
                 // let physical = size.to_physical(window.get_hidpi_factor());
                 // println!("Resizing to {:?}", physical);
                 surface_view.resize();
@@ -81,8 +80,9 @@ fn main() {
     // let triangle = idroid::Triangle::new()
 }
 
+#[allow(dead_code)]
 fn test_projection() {
-    let mut vm_matrix = glm::TMat4::identity();
+    let vm_matrix = glm::TMat4::identity();
     // vm_matrix = glm::translate(&vm_matrix, &glm::vec3(0.0, 0.0, -10.0));
     let p_matrix: glm::TMat4<f32> = idroid::matrix_helper::ortho_pixel(400.0, 400.0);
     let v = glm::TVec4::new(100.0, -200.0, 0.0, 1.0);

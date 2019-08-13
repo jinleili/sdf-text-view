@@ -1,13 +1,15 @@
 use crate::math::Position;
-use crate::vertex::{Pos, PosWeight};
+use crate::vertex::{PosWeight};
 
 // 线条的宽度应该是整数才有意义
+#[allow(dead_code)]
 pub struct Line {
     start: Position,
     end: Position,
     width: u32,
 }
 
+#[allow(dead_code)]
 impl Line {
     pub fn new(start: Position, end: Position, width: u32) -> Self {
         Line { start, end, width }

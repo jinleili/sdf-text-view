@@ -6,9 +6,7 @@ use crate::SurfaceView;
 
 use uni_view::{AppView, GPUContext};
 
-use nalgebra_glm as glm;
-
-use crate::node::NoneNode;
+// use nalgebra_glm as glm;
 
 pub struct SDFTextView {
     app_view: AppView,
@@ -22,14 +20,13 @@ pub struct SDFTextView {
 
 impl SDFTextView {
     pub fn new(app_view: AppView) -> Self {
-        use std::mem;
         let mut app_view = app_view;
 
         let mut encoder =
             app_view.device.create_command_encoder(&wgpu::CommandEncoderDescriptor { todo: 0 });
 
         // Create the texture
-        let (texture_view, texture_extent, sampler) = texture::from_file_and_usage_write(
+        let (texture_view, _texture_extent, sampler) = texture::from_file_and_usage_write(
             "math.png",
             &mut app_view.device,
             &mut encoder,

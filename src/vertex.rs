@@ -11,6 +11,7 @@ pub struct PosTex {
 }
 
 impl PosTex {
+    #[allow(dead_code)]
     pub fn vertex_i(pos: [i8; 3], tc: [i8; 2]) -> PosTex {
         PosTex {
             pos: [pos[0] as f32, pos[1] as f32, pos[2] as f32],
@@ -70,6 +71,7 @@ pub struct PosWeight {
     pub weight: f32,
 }
 
+#[allow(dead_code)]
 impl PosWeight {
     pub fn new(pos: [f32; 3], weight: f32) -> Self {
         PosWeight { pos, weight }
@@ -105,6 +107,7 @@ pub struct PosBrush {
     params: [f32; 3],
 }
 
+#[allow(dead_code)]
 impl PosBrush {
     pub fn new(pos: [f32; 3], uv: [f32; 2], params: [f32; 3]) -> Self {
         PosBrush { pos, uv, params }

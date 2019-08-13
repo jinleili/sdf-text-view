@@ -1,6 +1,4 @@
 use crate::math::Position;
-use crate::AppViewWrapper;
-use std::time::{Duration, Instant};
 
 extern crate lazy_static;
 use lazy_static::*;
@@ -8,7 +6,7 @@ use lazy_static::*;
 use uni_view::{AppView, GPUContext};
 
 lazy_static! {
-    static ref instance: wgpu::Instance = wgpu::Instance::new();
+    static ref INSTANCE: wgpu::Instance = wgpu::Instance::new();
 }
 
 pub trait SurfaceView {
@@ -20,7 +18,6 @@ pub trait SurfaceView {
 }
 
 use crate::geometry::plane::Plane;
-use crate::math::ViewSize;
 use crate::utils::MVPUniform;
 use crate::vertex::{Pos, PosTex};
 
@@ -49,7 +46,7 @@ impl Triangle {
     pub fn new(app_view: AppView) -> Self {
         let mut app_view = app_view;
         // let mut device = app_view.get_device(&instance);
-        let size = app_view.get_view_size();
+        let _size = app_view.get_view_size();
         // let sc_desc = wgpu::SwapChainDescriptor {
         //     usage: wgpu::TextureUsage::OUTPUT_ATTACHMENT,
         //     format: wgpu::TextureFormat::Bgra8Unorm,
@@ -202,8 +199,8 @@ impl SurfaceView for Triangle {
         );
     }
 
-    fn update(&mut self, event: wgpu::winit::WindowEvent) {}
-    fn touch_moved(&mut self, position: Position) {}
+    fn update(&mut self, _event: wgpu::winit::WindowEvent) {}
+    fn touch_moved(&mut self, _position: Position) {}
 
     fn enter_frame(&mut self) {
         println!("--- enter frame ---");

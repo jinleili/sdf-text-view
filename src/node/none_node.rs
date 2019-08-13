@@ -2,6 +2,7 @@ use crate::geometry::plane::Plane;
 use crate::utils::{create_uniform_buffer, MVPUniform};
 use crate::vertex::{Pos, PosTex};
 
+#[allow(dead_code)]
 pub struct NoneNode {
     vertex_buf: wgpu::Buffer,
     index_buf: wgpu::Buffer,
@@ -11,6 +12,7 @@ pub struct NoneNode {
     pipeline: wgpu::RenderPipeline,
 }
 
+#[allow(dead_code)]
 impl NoneNode {
     pub fn new(
         sc_desc: &wgpu::SwapChainDescriptor, device: &mut wgpu::Device,

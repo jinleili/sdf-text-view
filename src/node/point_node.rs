@@ -1,11 +1,8 @@
-use crate::math::{Position, Rect, ViewSize};
+use crate::math::{ViewSize};
 use crate::utils::MVPUniform;
 use crate::vertex::{Pos, PosBrush};
 
-use crate::geometry::Line;
-
-use nalgebra_glm as glm;
-
+#[allow(dead_code)]
 pub struct PointNode {
     view_size: ViewSize,
     vertex_buf: wgpu::Buffer,
@@ -16,13 +13,14 @@ pub struct PointNode {
     depth_texture_view: wgpu::TextureView,
 }
 
+#[allow(dead_code)]
 impl PointNode {
     pub fn new(
         sc_desc: &wgpu::SwapChainDescriptor, device: &mut wgpu::Device, mvp: MVPUniform,
         vertex_data: &Vec<PosBrush>,
     ) -> Self {
         use std::mem;
-        let mut encoder =
+        let _encoder =
             device.create_command_encoder(&wgpu::CommandEncoderDescriptor { todo: 0 });
         // Create pipeline layout
         let bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {

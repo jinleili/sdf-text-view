@@ -3,6 +3,8 @@ pub mod gaussian;
 pub fn clear_color() -> wgpu::Color {
     wgpu::Color { r: 0.25, g: 0.25, b: 0.3, a: 1.0 }
 }
+
+#[allow(dead_code)]
 pub fn black_color() -> wgpu::Color {
     wgpu::Color { r: 0.0, g: 0.0, b: 0.0, a: 1.0 }
 }
@@ -106,6 +108,7 @@ where
         .fill_from_slice(&[uniforms])
 }
 
+#[allow(dead_code)]
 pub fn create_uniform_buffer2<T>(
     device: &mut wgpu::Device, encoder: &mut wgpu::CommandEncoder, uniforms: T,
     size: wgpu::BufferAddress,
@@ -122,6 +125,7 @@ where
     uniform_buffer
 }
 
+#[allow(dead_code)]
 pub fn create_storage_buffer<T>(
     device: &mut wgpu::Device, encoder: &mut wgpu::CommandEncoder, slice: &[T],
     size: wgpu::BufferAddress,

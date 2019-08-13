@@ -12,16 +12,19 @@ use std::f32::consts::PI;
 
 // 标准高斯函数
 // 标准正态分布是位置参数 μ=0，尺度参数σ^2 = 1的正态分布
+#[allow(dead_code)]
 pub fn standard(x: f32) -> f32 {
     let p = 1.0 / (2.0 * PI).sqrt();
     p * (-x.powf(2.0) / 2.0).exp()
 }
 
+#[allow(dead_code)]
 pub fn gaussian(x: f32, miu: f32, sigma: f32) -> f32 {
     let p = 1.0 / (sigma * (2.0 * PI).sqrt());
     p * (-(x - miu).powf(2.0) / (2.0 * sigma.powf(2.0)))
 }
 
+#[allow(dead_code)]
 pub fn lookup_table() -> [f32; 32] {
     let mut table = [0.0; 32];
     let first = standard(0.0);

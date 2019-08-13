@@ -8,10 +8,10 @@ pub struct F32TexNode {
     index_buf: wgpu::Buffer,
     index_count: usize,
     bind_group: wgpu::BindGroup,
-    mvp_buf: wgpu::Buffer,
     pipeline: wgpu::RenderPipeline,
 }
 
+#[allow(dead_code)]
 impl F32TexNode {
     pub fn new(
         sc_desc: &wgpu::SwapChainDescriptor, device: &mut wgpu::Device,
@@ -112,7 +112,6 @@ impl F32TexNode {
             index_count: index_data.len(),
             bind_group,
             pipeline,
-            mvp_buf,
         }
     }
 

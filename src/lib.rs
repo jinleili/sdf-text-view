@@ -34,12 +34,9 @@ mod geometry;
 pub mod math;
 pub mod matrix_helper;
 mod node;
-pub mod procedure_texture;
 mod texture;
 mod utils;
 mod vertex;
-
-pub mod filters;
 
 // #[cfg(not(target_os = "ios"))]
 mod shader;

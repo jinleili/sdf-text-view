@@ -3,6 +3,7 @@ use crate::utils::{create_uniform_buffer, MVPUniform};
 use crate::vertex::{Pos, PosTex};
 
 // 绘制 buffer 纹理
+#[allow(dead_code)]
 pub struct F32BufferNode {
     vertex_buf: wgpu::Buffer,
     index_buf: wgpu::Buffer,
@@ -12,6 +13,7 @@ pub struct F32BufferNode {
     pipeline: wgpu::RenderPipeline,
 }
 
+#[allow(dead_code)]
 impl F32BufferNode {
     pub fn new(
         sc_desc: &wgpu::SwapChainDescriptor, device: &mut wgpu::Device, src_buffer: &wgpu::Buffer,
