@@ -1,15 +1,18 @@
 use wgpu::{Extent3d, Sampler, TextureView};
+use image::GenericImageView;
+
 #[allow(dead_code)]
 pub fn from_file(
     image_name: &str, device: &mut wgpu::Device, encoder: &mut wgpu::CommandEncoder,
 ) -> (TextureView, Extent3d, Sampler) {
-    self::from_file_and_usage_write(image_name, device, encoder, false)
+    self::from_file_and_usage_write(image_name, device, encoder, false, false)
 }
 
+// is_gray_pic: 是否为单通道灰度纹理
 #[allow(dead_code)]
 pub fn from_file_and_usage_write(
     image_name: &str, device: &mut wgpu::Device, encoder: &mut wgpu::CommandEncoder,
-    usage_write: bool,
+    usage_write: bool, is_gray_pic: bool
 ) -> (TextureView, Extent3d, Sampler) {
     // 动态加载本地文件
     let path = uni_view::fs::FileSystem::get_texture_file_path(image_name);
@@ -19,8 +22,10 @@ pub fn from_file_and_usage_write(
         Err(e) => panic!("Unable to read {:?}: {:?}", path, e),
     };
 
-    let img = image::load_from_memory(&image_bytes).expect("Failed to load image.").to_rgba();
-    let (width, height) = img.dimensions();
+    let img_load = image::load_from_memory(&image_bytes).expect("Failed to load image.");
+    let img_raw = if is_gray_pic { img_load.to_luma().into_raw() } else { img_load.to_rgba().into_raw() };
+
+    let (width, height) = img_load.dimensions();
     let texture_extent = wgpu::Extent3d { width: width, height: height, depth: 1 };
     let usage = if usage_write {
         wgpu::TextureUsage::TRANSFER_DST
@@ -29,18 +34,24 @@ pub fn from_file_and_usage_write(
     } else {
         wgpu::TextureUsage::TRANSFER_DST | wgpu::TextureUsage::SAMPLED
     };
+    let (format, channel_count) = if is_gray_pic { 
+            (wgpu::TextureFormat::R8Unorm, 1)
+        } else { 
+            (wgpu::TextureFormat::Rgba8Unorm, 4)
+        };
+
     let texture = device.create_texture(&wgpu::TextureDescriptor {
         size: texture_extent,
         array_layer_count: 1,
         mip_level_count: 1,
         sample_count: 1,
         dimension: wgpu::TextureDimension::D2,
-        format: wgpu::TextureFormat::Rgba8Unorm,
+        format: format,
         usage: usage,
     });
     let texture_view = texture.create_default_view();
 
-    let texels: Vec<u8> = img.into_raw();
+    let texels: Vec<u8> = img_raw;
     let temp_buf = device
         .create_buffer_mapped(texels.len(), wgpu::BufferUsage::TRANSFER_SRC)
         .fill_from_slice(&texels);
@@ -48,7 +59,7 @@ pub fn from_file_and_usage_write(
         wgpu::BufferCopyView {
             buffer: &temp_buf,
             offset: 0,
-            row_pitch: 4 * width,
+            row_pitch: channel_count * width,
             image_height: height,
         },
         wgpu::TextureCopyView {

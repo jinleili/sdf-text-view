@@ -21,7 +21,7 @@ fn main() {
 
     let mut events_loop = EventsLoop::new();
     let window = Window::new(&events_loop).unwrap();
-    window.set_max_dimensions(Some((1400_u32, 700_u32).into()));
+    window.set_max_dimensions(Some((800_u32, 700_u32).into()));
     window.set_title("title");
 
     // let screen_scale: fn() -> f32 = screen_scale;

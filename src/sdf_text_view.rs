@@ -26,12 +26,13 @@ impl SDFTextView {
             app_view.device.create_command_encoder(&wgpu::CommandEncoderDescriptor { todo: 0 });
 
         // Create the texture
-        let (texture_view, _texture_extent, sampler) = texture::from_file_and_usage_write(
-            "math.png",
+        let (texture_view, _texture_extent, _sampler) = texture::from_file_and_usage_write(
+            "math_sdf.png",
             &mut app_view.device,
             &mut encoder,
-            true,
+            false, true
         );
+        let sampler = texture::bilinear_sampler(&app_view.device);
 
         let bind_group_layout =
             app_view.device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
@@ -77,8 +78,6 @@ impl SDFTextView {
         // Create the vertex and index buffers
         let vertex_size = std::mem::size_of::<PosTex>();
         let (vertex_data, index_data) = Plane::new(1, 1).generate_vertices();
-        // let index_data = [3, 1, 1, 1, 1, 1];
-        println!("vertex_data: {:?}", &vertex_data);
 
         let vertex_buf = app_view
             .device
@@ -95,6 +94,9 @@ impl SDFTextView {
             app_view.device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
                 bind_group_layouts: &[&bind_group_layout],
             });
+
+        let color_alpha_blend = crate::utils::color_alpha_blend();
+
         let pipeline = app_view.device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             layout: &pipeline_layout,
             vertex_stage: shader.vertex_stage(),
@@ -109,8 +111,8 @@ impl SDFTextView {
             primitive_topology: wgpu::PrimitiveTopology::TriangleList,
             color_states: &[wgpu::ColorStateDescriptor {
                 format: app_view.sc_desc.format,
-                color_blend: wgpu::BlendDescriptor::REPLACE,
-                alpha_blend: wgpu::BlendDescriptor::REPLACE,
+                color_blend: color_alpha_blend.0,
+                alpha_blend: color_alpha_blend.1,
                 write_mask: wgpu::ColorWrite::ALL,
             }],
             // ??????
