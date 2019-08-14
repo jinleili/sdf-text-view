@@ -1,4 +1,6 @@
 pub mod gaussian;
+pub mod depth_stencil;
+pub mod matrix_helper;
 
 pub fn clear_color() -> wgpu::Color {
     wgpu::Color { r: 0.25, g: 0.25, b: 0.3, a: 1.0 }
@@ -153,6 +155,7 @@ where
     (storage_buffer, staging_buffer)
 }
 
+#[allow(dead_code)]
 pub fn update_uniform<T>(device: &mut wgpu::Device, uniforms: T, destination: &wgpu::Buffer)
 where
     T: 'static + Copy,

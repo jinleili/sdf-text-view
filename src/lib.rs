@@ -1,66 +1,30 @@
-use std::ffi::{CStr, CString};
-use std::os::raw::c_char;
-
 extern crate libc;
-
-#[no_mangle]
-pub extern "C" fn rust_greeting(to: *const c_char) -> *mut c_char {
-    let c_str = unsafe { CStr::from_ptr(to) };
-    let recipient = match c_str.to_str() {
-        Err(_) => "there",
-        Ok(string) => string,
-    };
-
-    CString::new("Hello ".to_owned() + recipient).unwrap().into_raw()
-}
-
-#[no_mangle]
-pub extern "C" fn rust_greeting_free(s: *mut c_char) {
-    unsafe {
-        if s.is_null() {
-            return;
-        }
-        CString::from_raw(s)
-    };
-}
-
 pub use uni_view::*;
 
-mod surface_view;
-pub use surface_view::*;
-
-mod depth_stencil;
 mod geometry;
 pub mod math;
-pub mod matrix_helper;
 mod node;
 mod texture;
-mod utils;
-mod vertex;
 
-// #[cfg(not(target_os = "ios"))]
+mod utils;
+pub use utils::{depth_stencil, matrix_helper};
+
+mod vertex;
 mod shader;
 
 mod sdf_text_view;
 pub use sdf_text_view::SDFTextView;
 
-#[cfg(not(target_os = "macos"))]
-#[no_mangle]
-pub extern "C" fn create_triangle(view: uni_view::AppViewObj) -> *mut libc::c_void {
-    // let v = AppViewWrapper(view);
-    let rust_view = uni_view::AppView::new(view);
-    let obj = Triangle::new(rust_view);
-    box_obj(obj)
+use math::Position;
+
+pub trait SurfaceView {
+    fn resize(&mut self);
+    fn update(&mut self, event: wgpu::winit::WindowEvent);
+    fn touch_moved(&mut self, position: Position);
+
+    fn enter_frame(&mut self);
 }
 
-#[cfg(not(target_os = "macos"))]
-#[no_mangle]
-pub extern "C" fn create_fluid(view: uni_view::AppViewObj) -> *mut libc::c_void {
-    // let v = AppViewWrapper(view);
-    let rust_view = uni_view::AppView::new(view);
-    let obj = fluid2::PoiseuilleFlow::new(rust_view);
-    box_obj(obj)
-}
 
 #[cfg(not(target_os = "macos"))]
 #[no_mangle]
@@ -75,22 +39,6 @@ pub extern "C" fn create_blur_filter(view: uni_view::AppViewObj) -> *mut libc::c
 pub extern "C" fn create_gray_filter(view: uni_view::AppViewObj) -> *mut libc::c_void {
     let rust_view = uni_view::AppView::new(view);
     let obj = filters::GrayFilter::new(rust_view);
-    box_obj(obj)
-}
-
-#[cfg(not(target_os = "macos"))]
-#[no_mangle]
-pub extern "C" fn create_page_turning(view: uni_view::AppViewObj) -> *mut libc::c_void {
-    let rust_view = uni_view::AppView::new(view);
-    let obj = PageTurning::new(rust_view);
-    box_obj(obj)
-}
-
-#[cfg(not(target_os = "macos"))]
-#[no_mangle]
-pub extern "C" fn create_roll_animation(view: uni_view::AppViewObj) -> *mut libc::c_void {
-    let rust_view = uni_view::AppView::new(view);
-    let obj = RollAnimation::new(rust_view);
     box_obj(obj)
 }
 
