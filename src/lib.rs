@@ -3,7 +3,6 @@ pub use uni_view::*;
 
 mod geometry;
 pub mod math;
-mod node;
 mod texture;
 
 mod utils;

@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:brush.xcodeproj">
+      location = "self:/Users/grenlight/blog/vulkan/sdf-text-renderer/iOS/demo.xcodeproj">
    </FileRef>
 </Workspace>

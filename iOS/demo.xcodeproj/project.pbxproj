@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2156B9B2B179DE73667FB5C2 /* Pods_demo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63AB5C81079BA9C8BE1730CB /* Pods_demo.framework */; };
 		B82B5E312270567D007BD9FA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B82B5E302270567D007BD9FA /* AppDelegate.swift */; };
 		B82B5E332270567D007BD9FA /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B82B5E322270567D007BD9FA /* ViewController.swift */; };
 		B82B5E362270567D007BD9FA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B82B5E342270567D007BD9FA /* Main.storyboard */; };
@@ -21,7 +22,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		B82B5E2D2270567D007BD9FA /* brush.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = brush.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		099392C1873B4D95B60FDB59 /* Pods-demo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-demo.debug.xcconfig"; path = "Target Support Files/Pods-demo/Pods-demo.debug.xcconfig"; sourceTree = "<group>"; };
+		63AB5C81079BA9C8BE1730CB /* Pods_demo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_demo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B82B5E2D2270567D007BD9FA /* demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = demo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B82B5E302270567D007BD9FA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B82B5E322270567D007BD9FA /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		B82B5E352270567D007BD9FA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -30,7 +33,7 @@
 		B82B5E3C2270567E007BD9FA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B839DE9E229D248F00809873 /* libresolv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libresolv.tbd; path = usr/lib/libresolv.tbd; sourceTree = SDKROOT; };
 		B839DEA0229D3A4100809873 /* idroid.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = idroid.h; sourceTree = "<group>"; };
-		B839DEA1229D3A6A00809873 /* brush-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "brush-Bridging-Header.h"; sourceTree = "<group>"; };
+		B839DEA1229D3A6A00809873 /* demo-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "demo-Bridging-Header.h"; sourceTree = "<group>"; };
 		B839DEA7229D480C00809873 /* MetalView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MetalView.swift; sourceTree = "<group>"; };
 		B839DEA9229D482200809873 /* rs_glue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rs_glue.h; sourceTree = "<group>"; };
 		B839DEAA229D488300809873 /* MetalController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MetalController.swift; sourceTree = "<group>"; };
@@ -38,6 +41,7 @@
 		B839DEB622A550E700809873 /* shader-gen */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "shader-gen"; path = "../../shader-gen"; sourceTree = "<group>"; };
 		B844909A22B0EC6800398E55 /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = assets; path = ../../assets; sourceTree = "<group>"; };
 		B868742A22BB9B5700EBEC93 /* libidroid.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libidroid.a; path = "../target/aarch64-apple-ios/release/libidroid.a"; sourceTree = "<group>"; };
+		C71E08256A07426AE65D4EB0 /* Pods-demo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-demo.release.xcconfig"; path = "Target Support Files/Pods-demo/Pods-demo.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -47,6 +51,7 @@
 			files = (
 				B868742B22BB9B5700EBEC93 /* libidroid.a in Frameworks */,
 				B839DE9F229D249000809873 /* libresolv.tbd in Frameworks */,
+				2156B9B2B179DE73667FB5C2 /* Pods_demo.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -56,21 +61,22 @@
 		B82B5E242270567C007BD9FA = {
 			isa = PBXGroup;
 			children = (
-				B82B5E2F2270567D007BD9FA /* brush */,
+				B82B5E2F2270567D007BD9FA /* demo */,
 				B82B5E2E2270567D007BD9FA /* Products */,
 				B839DE9D229D248F00809873 /* Frameworks */,
+				BEBAFAA6E4D6FEC86602BFB7 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
 		B82B5E2E2270567D007BD9FA /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				B82B5E2D2270567D007BD9FA /* brush.app */,
+				B82B5E2D2270567D007BD9FA /* demo.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		B82B5E2F2270567D007BD9FA /* brush */ = {
+		B82B5E2F2270567D007BD9FA /* demo */ = {
 			isa = PBXGroup;
 			children = (
 				B82B5E302270567D007BD9FA /* AppDelegate.swift */,
@@ -83,11 +89,11 @@
 				B82B5E372270567E007BD9FA /* Assets.xcassets */,
 				B82B5E392270567E007BD9FA /* LaunchScreen.storyboard */,
 				B82B5E3C2270567E007BD9FA /* Info.plist */,
-				B839DEA1229D3A6A00809873 /* brush-Bridging-Header.h */,
+				B839DEA1229D3A6A00809873 /* demo-Bridging-Header.h */,
 				B844909A22B0EC6800398E55 /* assets */,
 				B839DEB622A550E700809873 /* shader-gen */,
 			);
-			path = brush;
+			path = demo;
 			sourceTree = "<group>";
 		};
 		B839DE9D229D248F00809873 /* Frameworks */ = {
@@ -96,28 +102,41 @@
 				B839DEB122A113A900809873 /* libidroid.a */,
 				B868742A22BB9B5700EBEC93 /* libidroid.a */,
 				B839DE9E229D248F00809873 /* libresolv.tbd */,
+				63AB5C81079BA9C8BE1730CB /* Pods_demo.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		BEBAFAA6E4D6FEC86602BFB7 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				099392C1873B4D95B60FDB59 /* Pods-demo.debug.xcconfig */,
+				C71E08256A07426AE65D4EB0 /* Pods-demo.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		B82B5E2C2270567D007BD9FA /* brush */ = {
+		B82B5E2C2270567D007BD9FA /* demo */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B82B5E3F2270567E007BD9FA /* Build configuration list for PBXNativeTarget "brush" */;
+			buildConfigurationList = B82B5E3F2270567E007BD9FA /* Build configuration list for PBXNativeTarget "demo" */;
 			buildPhases = (
+				BC4D635F94CA67ACC0149CB7 /* [CP] Check Pods Manifest.lock */,
 				B82B5E292270567D007BD9FA /* Sources */,
 				B82B5E2A2270567D007BD9FA /* Frameworks */,
 				B82B5E2B2270567D007BD9FA /* Resources */,
+				FEED01B508D424100AF80DAD /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = brush;
+			name = demo;
 			productName = brush;
-			productReference = B82B5E2D2270567D007BD9FA /* brush.app */;
+			productReference = B82B5E2D2270567D007BD9FA /* demo.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -136,7 +155,7 @@
 					};
 				};
 			};
-			buildConfigurationList = B82B5E282270567C007BD9FA /* Build configuration list for PBXProject "brush" */;
+			buildConfigurationList = B82B5E282270567C007BD9FA /* Build configuration list for PBXProject "demo" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -149,7 +168,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				B82B5E2C2270567D007BD9FA /* brush */,
+				B82B5E2C2270567D007BD9FA /* demo */,
 			);
 		};
 /* End PBXProject section */
@@ -168,6 +187,73 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		BC4D635F94CA67ACC0149CB7 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-demo-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		FEED01B508D424100AF80DAD /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-demo/Pods-demo-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
+				"${BUILT_PRODUCTS_DIR}/Differentiator/Differentiator.framework",
+				"${BUILT_PRODUCTS_DIR}/Kingfisher/Kingfisher.framework",
+				"${BUILT_PRODUCTS_DIR}/Moya/Moya.framework",
+				"${BUILT_PRODUCTS_DIR}/ObjectMapper/ObjectMapper.framework",
+				"${BUILT_PRODUCTS_DIR}/Result/Result.framework",
+				"${BUILT_PRODUCTS_DIR}/RxCocoa/RxCocoa.framework",
+				"${BUILT_PRODUCTS_DIR}/RxDataSources/RxDataSources.framework",
+				"${BUILT_PRODUCTS_DIR}/RxRelay/RxRelay.framework",
+				"${BUILT_PRODUCTS_DIR}/RxSwift/RxSwift.framework",
+				"${BUILT_PRODUCTS_DIR}/SnapKit/SnapKit.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Differentiator.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Kingfisher.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Moya.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ObjectMapper.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Result.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxCocoa.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxDataSources.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxRelay.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxSwift.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SnapKit.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-demo/Pods-demo-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		B82B5E292270567D007BD9FA /* Sources */ = {
@@ -321,13 +407,14 @@
 		};
 		B82B5E402270567E007BD9FA /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 099392C1873B4D95B60FDB59 /* Pods-demo.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = P3HQ9GDFCW;
 				ENABLE_BITCODE = NO;
-				INFOPLIST_FILE = brush/Info.plist;
+				INFOPLIST_FILE = demo/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -337,7 +424,7 @@
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_BUNDLE_IDENTIFIER = name.lijinlei.brush;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "brush/brush-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "demo/demo-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -347,13 +434,14 @@
 		};
 		B82B5E412270567E007BD9FA /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = C71E08256A07426AE65D4EB0 /* Pods-demo.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = P3HQ9GDFCW;
 				ENABLE_BITCODE = NO;
-				INFOPLIST_FILE = brush/Info.plist;
+				INFOPLIST_FILE = demo/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -363,7 +451,7 @@
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_BUNDLE_IDENTIFIER = name.lijinlei.brush;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "brush/brush-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "demo/demo-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = "arm64 arm64e";
@@ -373,7 +461,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		B82B5E282270567C007BD9FA /* Build configuration list for PBXProject "brush" */ = {
+		B82B5E282270567C007BD9FA /* Build configuration list for PBXProject "demo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B82B5E3D2270567E007BD9FA /* Debug */,
@@ -382,7 +470,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B82B5E3F2270567E007BD9FA /* Build configuration list for PBXNativeTarget "brush" */ = {
+		B82B5E3F2270567E007BD9FA /* Build configuration list for PBXNativeTarget "demo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B82B5E402270567E007BD9FA /* Debug */,

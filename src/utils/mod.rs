@@ -1,4 +1,3 @@
-pub mod gaussian;
 pub mod depth_stencil;
 pub mod matrix_helper;
 
