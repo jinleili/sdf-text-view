@@ -27,7 +27,7 @@ impl SDFTextView {
 
         // Create the texture
         let (texture_view, _texture_extent, _sampler) = texture::from_file_and_usage_write(
-            "math_sdf.png",
+            "math-sdf.png",
             &mut app_view.device,
             &mut encoder,
             false, true

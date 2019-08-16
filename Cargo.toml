@@ -45,6 +45,7 @@ shaderc = "0.6.1"
 
 [build-dependencies]
 shaderc = "0.6.1"
+sdf-generator = { path = "sdf-generator"}
 
 [dev-dependencies]
 env_logger = "0.5"
