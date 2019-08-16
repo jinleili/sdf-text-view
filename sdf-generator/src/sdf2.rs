@@ -63,7 +63,7 @@ impl SDF2 {
 
         // compute dt
         self.edt(&mut out);
-        
+
         // take square roots
         for i in 0..self.pixel_count {
             out[i] = out[i].sqrt();
@@ -76,9 +76,17 @@ impl SDF2 {
         }
 
         let scale = 255.0 / (max - min);
+        let mut up_scale = 127.0 / max;
+        let mut down_scale = 127.0 / (0.0 - min);
         for i in 0..self.pixel_count {
-            luma_channel[i] = ((out[i] - min) * scale) as u8;
+            if out[i] <= 0.0 {
+                luma_channel[i] = 128 - (out[i] * down_scale) as u8
+            } else {
+                luma_channel[i] = 127 - (out[i] * up_scale) as u8
+            }
+            // luma_channel[i] = ((out[i] - min) * scale) as u8;
         }
+        println!("-- {}, {}", up_scale, down_scale);
 
         let outf = File::create(&self.output_image_path).unwrap();
         let encoder = image::png::PNGEncoder::<std::fs::File>::new(outf);

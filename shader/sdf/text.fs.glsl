@@ -6,8 +6,8 @@ layout(set = 0, binding = 2) uniform sampler tex_sampler;
 
 const vec4 outline = vec4(1.0, 0.0, 0.0, 1.0);
 // Between 0 and 0.5, 0 = thick outline, 0.5 = no outline
-const float outline_mask = 0.2;
-const float stroke_mask = 0.99;
+const float outline_mask = 0.489;
+const float stroke_mask = 0.50;
 
 const bool show_outline = false;
 const bool show_shadow = false;
