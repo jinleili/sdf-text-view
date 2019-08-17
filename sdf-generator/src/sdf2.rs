@@ -53,10 +53,11 @@ impl SDF2 {
             for iy in 0..self.img_size.1 {
                 let luma = self.img.get_pixel(ix, iy)[0] as f32 / 255.0;
                 let index = self.img_index(ix as usize, iy as usize);
+                // shape bounds
                 if luma > 0.5 {
                     out[index] = INF;
                 } else {
-                    out[index] = 0.0;
+                    out[index] = 0.0; 
                 }
             }
         }
@@ -76,17 +77,15 @@ impl SDF2 {
         }
 
         let scale = 255.0 / (max - min);
-        let mut up_scale = 127.0 / max;
-        let mut down_scale = 127.0 / (0.0 - min);
+        
         for i in 0..self.pixel_count {
             if out[i] <= 0.0 {
-                luma_channel[i] = 128 - (out[i] * down_scale) as u8
+                luma_channel[i] = 128 - (out[i] * (127.0 / (0.0 - min))) as u8;
             } else {
-                luma_channel[i] = 127 - (out[i] * up_scale) as u8
+                luma_channel[i] = 128 - (out[i] * (128.0 / max)) as u8;
             }
             // luma_channel[i] = ((out[i] - min) * scale) as u8;
         }
-        println!("-- {}, {}", up_scale, down_scale);
 
         let outf = File::create(&self.output_image_path).unwrap();
         let encoder = image::png::PNGEncoder::<std::fs::File>::new(outf);

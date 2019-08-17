@@ -55,10 +55,10 @@ impl SDF {
             for iy in 0..self.img_size.1 {
                 let luma = self.img.get_pixel(ix, iy)[0] as f32 / 255.0;
                 let index = self.img_index(ix as usize, iy as usize);
-                if luma > 0.8 {
+                if luma > 0.98 {
                     grid_inner[index] = INF;
                     grid_outer[index] = 0.0;
-                } else if luma == 0.0 {
+                } else if luma < 0.1 {
                     grid_inner[index] = 0.0;
                     grid_outer[index] = INF;
                 } else {
@@ -73,8 +73,6 @@ impl SDF {
 
         for i in 0..self.pixel_count {
             let d = grid_outer[i].sqrt() - grid_inner[i].sqrt();
-            // let d = grid_inner[i].sqrt();
-
             luma_channel[i] = (255.0 - 255.0 * (d / self.radius + self.cutoff)).round() as u8;
             // luma_channel[i] = (255.0 * (d + 1.0) / 2.0) as u8;
             // if d < 0.4 {
