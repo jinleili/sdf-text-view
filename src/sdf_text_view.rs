@@ -27,7 +27,7 @@ impl SDFTextView {
 
         // Create the texture
         let (texture_view, _texture_extent, _sampler) = texture::from_file_and_usage_write(
-            "math-sdf.png",
+            "math-out3.png",
             &mut app_view.device,
             &mut encoder,
             false, true
@@ -41,16 +41,25 @@ impl SDFTextView {
                         binding: 0,
                         visibility: wgpu::ShaderStage::VERTEX,
                         ty: wgpu::BindingType::UniformBuffer,
+                        dynamic: false,
+                            multisampled: false,
+                            texture_dimension: wgpu::TextureViewDimension::D2,
                     },
                     wgpu::BindGroupLayoutBinding {
                         binding: 1,
                         visibility: wgpu::ShaderStage::FRAGMENT,
                         ty: wgpu::BindingType::SampledTexture,
+                        dynamic: false,
+                            multisampled: false,
+                            texture_dimension: wgpu::TextureViewDimension::D2,
                     },
                     wgpu::BindGroupLayoutBinding {
                         binding: 2,
                         visibility: wgpu::ShaderStage::FRAGMENT,
                         ty: wgpu::BindingType::Sampler,
+                        dynamic: false,
+                            multisampled: false,
+                            texture_dimension: wgpu::TextureViewDimension::D2,
                     },
                 ],
             });
@@ -101,13 +110,13 @@ impl SDFTextView {
             layout: &pipeline_layout,
             vertex_stage: shader.vertex_stage(),
             fragment_stage: shader.fragment_stage(),
-            rasterization_state: wgpu::RasterizationStateDescriptor {
+            rasterization_state: Some(wgpu::RasterizationStateDescriptor {
                 front_face: wgpu::FrontFace::Ccw,
                 cull_mode: wgpu::CullMode::None,
                 depth_bias: 0,
                 depth_bias_slope_scale: 0.0,
                 depth_bias_clamp: 0.0,
-            },
+            }),
             primitive_topology: wgpu::PrimitiveTopology::TriangleList,
             color_states: &[wgpu::ColorStateDescriptor {
                 format: app_view.sc_desc.format,
@@ -124,8 +133,10 @@ impl SDFTextView {
                 attributes: &PosTex::attri_descriptor(0),
             }],
             sample_count: 1,
+            sample_mask: !0,
+            alpha_to_coverage_enabled: false,
         });
-        app_view.device.get_queue().submit(&[encoder.finish()]);
+        app_view.device.get_queue().submit(&[encoder.finish(None)]);
 
         SDFTextView {
             app_view,
@@ -172,12 +183,12 @@ impl SurfaceView for SDFTextView {
                 rpass.set_pipeline(&self.pipeline);
                 rpass.set_bind_group(0, &self.bind_group, &[]);
                 rpass.set_index_buffer(&self.index_buf, 0);
-                rpass.set_vertex_buffers(&[(&self.vertex_buf, 0)]);
+                rpass.set_vertex_buffers(0, &[(&self.vertex_buf, 0)]);
                 rpass.draw_indexed(0..self.index_count as u32, 0, 0..1);
                 // rpass.draw_indexed(0..3, 0, 0..1);
             }
 
-            self.app_view.device.get_queue().submit(&[encoder.finish()]);
+            self.app_view.device.get_queue().submit(&[encoder.finish(None)]);
         }
     }
 }

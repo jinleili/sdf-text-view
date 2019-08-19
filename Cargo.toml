@@ -26,7 +26,7 @@ libc = "*"
 
 # wgpu = { git = "https://github.com/gfx-rs/wgpu", version = "0.2.3"}
 # wgpu-rs  is an idiomatic Rust wrapper over wgpu-native. 
-wgpu = { git = "https://github.com/gfx-rs/wgpu-rs", version = "0.2.2", rev = "e515a59309dbcbbdba20ed363cb88a0528fcfc15" }
+wgpu = { git = "https://github.com/gfx-rs/wgpu-rs", rev = "da6377acc785ece9d9a57c9edfac4391ec5df6cf" }
 # 本地版本设置了 metal-auto-capture，且解决了 iOS 设备上 Undefined symbols for architecture arm64:
 #  "_MTLCopyAllDevices" bug
 # wgpu = { path = "../wgpu-rs"}

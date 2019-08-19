@@ -28,11 +28,11 @@ pub fn from_file_and_usage_write(
     let (width, height) = img_load.dimensions();
     let texture_extent = wgpu::Extent3d { width: width, height: height, depth: 1 };
     let usage = if usage_write {
-        wgpu::TextureUsage::TRANSFER_DST
+        wgpu::TextureUsage::COPY_DST
             | wgpu::TextureUsage::SAMPLED
             | wgpu::TextureUsage::WRITE_ALL
     } else {
-        wgpu::TextureUsage::TRANSFER_DST | wgpu::TextureUsage::SAMPLED
+        wgpu::TextureUsage::COPY_DST | wgpu::TextureUsage::SAMPLED
     };
     let (format, channel_count) = if is_gray_pic { 
             (wgpu::TextureFormat::R8Unorm, 1)
@@ -49,11 +49,11 @@ pub fn from_file_and_usage_write(
         format: format,
         usage: usage,
     });
-    let texture_view = texture.create_default_view();
+    let texture_view = texture.create_view(None);
 
     let texels: Vec<u8> = img_raw;
     let temp_buf = device
-        .create_buffer_mapped(texels.len(), wgpu::BufferUsage::TRANSFER_SRC)
+        .create_buffer_mapped(texels.len(), wgpu::BufferUsage::COPY_SRC)
         .fill_from_slice(&texels);
     encoder.copy_buffer_to_texture(
         wgpu::BufferCopyView {
@@ -81,11 +81,11 @@ pub fn from_buffer_and_usage_write(
 ) -> (TextureView, Extent3d, Sampler) {
     let texture_extent = wgpu::Extent3d { width: width, height: height, depth: 1 };
     let usage = if usage_write {
-        wgpu::TextureUsage::TRANSFER_DST
+        wgpu::TextureUsage::COPY_DST
             | wgpu::TextureUsage::SAMPLED
             | wgpu::TextureUsage::WRITE_ALL
     } else {
-        wgpu::TextureUsage::TRANSFER_DST | wgpu::TextureUsage::SAMPLED
+        wgpu::TextureUsage::COPY_DST | wgpu::TextureUsage::SAMPLED
     };
     let texture = device.create_texture(&wgpu::TextureDescriptor {
         size: texture_extent,
@@ -96,7 +96,7 @@ pub fn from_buffer_and_usage_write(
         format: wgpu::TextureFormat::Rgba32Float,
         usage: usage,
     });
-    let texture_view = texture.create_default_view();
+    let texture_view = texture.create_view(None);
 
     // BufferCopyView 必须 >= TextureCopyView
     encoder.copy_buffer_to_texture(
@@ -131,11 +131,11 @@ pub fn empty(
         dimension: wgpu::TextureDimension::D2,
         format: format,
         usage: wgpu::TextureUsage::OUTPUT_ATTACHMENT
-            | wgpu::TextureUsage::TRANSFER_DST
+            | wgpu::TextureUsage::COPY_DST
             | wgpu::TextureUsage::SAMPLED
             | wgpu::TextureUsage::WRITE_ALL,
     });
-    let texture_view = texture.create_default_view();
+    let texture_view = texture.create_view(None);
     texture_view
 }
 

@@ -3,7 +3,7 @@
 // 获取 depth_stencil 状态描述符
 pub fn create_state_descriptor() -> wgpu::DepthStencilStateDescriptor {
     wgpu::DepthStencilStateDescriptor {
-        format: wgpu::TextureFormat::D32Float,
+        format: wgpu::TextureFormat::Depth32Float,
         depth_write_enabled: true,
         depth_compare: wgpu::CompareFunction::Less,
         stencil_front: wgpu::StencilStateFaceDescriptor::IGNORE,
@@ -23,10 +23,10 @@ pub fn create_depth_texture_view(
         mip_level_count: 1,
         sample_count: 1,
         dimension: wgpu::TextureDimension::D2,
-        format: wgpu::TextureFormat::D32Float,
+        format: wgpu::TextureFormat::Depth32Float,
         usage: wgpu::TextureUsage::OUTPUT_ATTACHMENT,
     });
-    depth_texture.create_default_view()
+    depth_texture.create_view(None)
 }
 
 #[allow(dead_code)]

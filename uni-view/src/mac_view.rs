@@ -39,15 +39,15 @@ impl AppView {
 }
 
 fn get_device(instance: &wgpu::Instance) -> wgpu::Device {
-        let adapter = instance.get_adapter(&wgpu::AdapterDescriptor {
-            power_preference: wgpu::PowerPreference::LowPower,
-        });
-       adapter.request_device(&wgpu::DeviceDescriptor {
-            extensions: wgpu::Extensions {
-                anisotropic_filtering: false,
-            },
-            limits: wgpu::Limits::default(),
-        })
+        let adapter = instance.get_adapter(Some(&wgpu::RequestAdapterOptions {
+        power_preference: wgpu::PowerPreference::LowPower,
+    }));
+       adapter.request_device(Some(&wgpu::DeviceDescriptor {
+        extensions: wgpu::Extensions {
+            anisotropic_filtering: false,
+        },
+        limits: wgpu::Limits::default(),
+    }))
     }
 
 impl crate::GPUContext for AppView {

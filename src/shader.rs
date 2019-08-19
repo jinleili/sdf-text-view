@@ -46,18 +46,18 @@ impl Shader {
         Shader { vs_module: module, fs_module: None }
     }
 
-    pub fn vertex_stage(&self) -> wgpu::PipelineStageDescriptor {
-        wgpu::PipelineStageDescriptor { module: &self.vs_module, entry_point: "main" }
+    pub fn vertex_stage(&self) -> wgpu::ProgrammableStageDescriptor {
+        wgpu::ProgrammableStageDescriptor { module: &self.vs_module, entry_point: "main" }
     }
 
-    pub fn cs_stage(&self) -> wgpu::PipelineStageDescriptor {
-        wgpu::PipelineStageDescriptor { module: &self.vs_module, entry_point: "main" }
+    pub fn cs_stage(&self) -> wgpu::ProgrammableStageDescriptor {
+        wgpu::ProgrammableStageDescriptor { module: &self.vs_module, entry_point: "main" }
     }
 
-    pub fn fragment_stage(&self) -> Option<wgpu::PipelineStageDescriptor> {
+    pub fn fragment_stage(&self) -> Option<wgpu::ProgrammableStageDescriptor> {
         match &self.fs_module {
             Some(fs_module) => {
-                Some(wgpu::PipelineStageDescriptor { module: fs_module, entry_point: "main" })
+                Some(wgpu::ProgrammableStageDescriptor { module: fs_module, entry_point: "main" })
             }
             None => None,
         }
