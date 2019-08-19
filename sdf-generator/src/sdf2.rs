@@ -54,7 +54,7 @@ impl SDF2 {
                 let luma = self.img.get_pixel(ix, iy)[0] as f32 / 255.0;
                 let index = self.img_index(ix as usize, iy as usize);
                 // shape bounds
-                if luma > 0.5 {
+                if luma > 0.8 {
                     out[index] = INF;
                 } else {
                     out[index] = 0.0; 
@@ -79,12 +79,14 @@ impl SDF2 {
         let scale = 255.0 / (max - min);
         
         for i in 0..self.pixel_count {
-            if out[i] <= 0.0 {
-                luma_channel[i] = 128 - (out[i] * (127.0 / (0.0 - min))) as u8;
-            } else {
-                luma_channel[i] = 128 - (out[i] * (128.0 / max)) as u8;
-            }
-            // luma_channel[i] = ((out[i] - min) * scale) as u8;
+            // if out[i] <= 0.0 {
+            //     luma_channel[i] = (127.5 + (out[i] * (127.5 / min)).abs()) as u8;
+            //     println!("{}, {}, {}", min, max, out[i] * (127.5 / min));
+            // } else {
+            //     luma_channel[i] = (127.5 - out[i] * (127.5 / max)) as u8;
+            // }
+            luma_channel[i] = ((out[i] - min) * scale) as u8;
+            
         }
 
         let outf = File::create(&self.output_image_path).unwrap();

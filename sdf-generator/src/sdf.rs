@@ -5,7 +5,7 @@ use std::vec::Vec;
 
 // use std::f32::{INFINITY, NEG_INFINITY};
 
-use image::GrayImage;
+use image::{ GrayImage, RgbaImage};
 
 static INF: f32 = f32::MAX;
 
@@ -13,7 +13,7 @@ pub struct SDF {
     output_image_path: String,
     cutoff: f32,
     radius: f32,
-    img: GrayImage,
+    img: RgbaImage,
     img_size: (u32, u32),
     pixel_count: usize,
     long_edge_pixel: usize,
@@ -22,8 +22,10 @@ pub struct SDF {
 
 impl SDF {
     pub fn new(input_image_path: &str, output_image_path: &str) -> Self {
-        let mut img: GrayImage =
-            image::open(input_image_path).ok().expect("failed to load image").to_luma();
+        // let mut img: GrayImage =
+        //     image::open(input_image_path).ok().expect("failed to load image").to_luma();
+        let mut img: RgbaImage =
+            image::open(input_image_path).ok().expect("failed to load image").to_rgba();
         let img_size = img.dimensions();
         let pixel_count = (img_size.0 * img_size.1) as usize;
         let long_edge_pixel =
@@ -48,37 +50,70 @@ impl SDF {
 
     pub fn generate(&mut self) {
         // temporary arrays for the distance transform
-        let mut grid_outer: Vec<f32> = vec![0.0; self.pixel_count];
-        let mut grid_inner: Vec<f32> = vec![0.0; self.pixel_count];
+        let mut g_background: Vec<f32> = vec![0.0; self.pixel_count];
+        let mut g_front: Vec<f32> = vec![0.0; self.pixel_count];
         let mut luma_channel: Vec<u8> = vec![0; self.pixel_count];
         for ix in 0..self.img_size.0 {
             for iy in 0..self.img_size.1 {
-                let luma = self.img.get_pixel(ix, iy)[0] as f32 / 255.0;
+                let luma = 1.0 - self.img.get_pixel(ix, iy)[3] as f32 / 255.0;
                 let index = self.img_index(ix as usize, iy as usize);
-                if luma > 0.98 {
-                    grid_inner[index] = INF;
-                    grid_outer[index] = 0.0;
-                } else if luma < 0.1 {
-                    grid_inner[index] = 0.0;
-                    grid_outer[index] = INF;
+                if luma > 0.5 {
+                    g_front[index] = INF;
+                    g_background[index] = 0.0;
+                } else if luma <= 0.01 {
+                    g_front[index] = 0.0;
+                    g_background[index] = INF;
                 } else {
-                    grid_inner[index] = max(0.0, luma - 0.5).powf(2.0);
-                    grid_outer[index] = max(0.0, 0.5 - luma).powf(2.0);
+                    g_front[index] = max(0.0, luma - 0.5).powf(2.0);
+                    g_background[index] = max(0.0, 0.5 - luma).powf(2.0);
                 }
             }
         }
 
-        self.edt(&mut grid_outer);
-        self.edt(&mut grid_inner);
+        self.edt(&mut g_background);
+        self.edt(&mut g_front);
 
+        // convert to grayscale
+        // the text outline equal to 0, >= 0 means pixel is text front
+        // for i in 0..self.pixel_count {
+        //     let d = g_background[i].sqrt() - g_front[i].sqrt();
+        //     luma_channel[i] = (255.0 - 255.0 * (d / self.radius + self.cutoff)).round() as u8;
+        //     // luma_channel[i] = (255.0 * (d + 1.0) / 2.0) as u8;
+        //     if d > 0.4 {
+        //         print!("{:?},", d);
+
+        //     }
+        // }
+
+        // take square roots, reuse g_front cache result
         for i in 0..self.pixel_count {
-            let d = grid_outer[i].sqrt() - grid_inner[i].sqrt();
-            luma_channel[i] = (255.0 - 255.0 * (d / self.radius + self.cutoff)).round() as u8;
-            // luma_channel[i] = (255.0 * (d + 1.0) / 2.0) as u8;
-            // if d < 0.4 {
-            //     print!("{:?}, {:?}, | ", d, luma_channel[i]);
+            g_front[i] = g_background[i].sqrt() - g_front[i].sqrt();
+        }
+        let (mut min, max) = min_max(&g_front);
+        if max == min {
+            panic!("max == min");
+        }
+        if min < -15.0 {
+            print!("min: {}", min);
+            min = -15.0;
+        }
 
-            // }
+        // convert to grayscale
+        // the text outline equal to 0, >= 0 means pixel is text front
+        for i in 0..self.pixel_count {
+            let mut luma = 0.0; // g_front[i] + 128.0;
+            if g_front[i] >= 0.0 {
+                luma = (128.0 + g_front[i] * (127.0 / max));
+                println!("luma: {}, {}, {}, ", luma, max, min);
+            } else {
+                luma = (128.0 - g_front[i] * (128.0 / min));
+            } 
+            if  luma < 0.0 {
+                luma = 0.0;
+            } else if (luma > 255.0) {
+                luma = 255.0;
+            }  
+            luma_channel[i] = luma as u8;   
         }
 
         let outf = File::create(&self.output_image_path).unwrap();
@@ -86,6 +121,7 @@ impl SDF {
         encoder
             .encode(&luma_channel, self.img_size.0, self.img_size.1, image::ColorType::Gray(8))
             .unwrap();
+        
     }
 
     fn edt(&mut self, grid: &mut Vec<f32>) {
@@ -164,4 +200,19 @@ fn max(a: f32, b: f32) -> f32 {
     } else {
         b
     }
+}
+
+fn min_max(grid: &Vec<f32>) -> (f32, f32) {
+    let mut min = grid[0];
+    let mut max = min;
+    for i in 1..grid.len() {
+        let val = grid[i];
+        if min > val {
+            min = val;
+        }
+        if max < val {
+            max = val;
+        }
+    }
+    (min, max)
 }

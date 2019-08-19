@@ -25,6 +25,6 @@ fn main() {
     let input_image_path = &parsed_opts.free[0];
     let output_image_path = &parsed_opts.free[1];
 
-    let mut sdf = SDF2::new(input_image_path, output_image_path);
+    let mut sdf = SDF::new(input_image_path, output_image_path);
     sdf.generate();
 }

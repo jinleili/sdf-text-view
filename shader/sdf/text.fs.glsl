@@ -7,7 +7,7 @@ layout(set = 0, binding = 2) uniform sampler tex_sampler;
 const vec4 outline = vec4(1.0, 0.0, 0.0, 1.0);
 // Between 0 and 0.5, 0 = thick outline, 0.5 = no outline
 const float outline_mask = 0.495;
-const float stroke_mask = 0.50;
+const float stroke_mask = 0.5;
 
 const bool show_outline = false;
 const bool show_shadow = false;
@@ -15,7 +15,7 @@ const bool show_shadow = false;
 // 反走样
 float aastep(float value, float mask)
 {
-    float afwidth = length(vec2(dFdx(value), dFdy(value))) * 0.70710678118654757;
+    float afwidth = length(vec2(dFdx(value), dFdy(value))) * 0.70710678118654757 ;
     return smoothstep(mask - afwidth, mask + afwidth, value);
 }
 
@@ -30,6 +30,8 @@ void main(void)
     // tex_gray = (1.0 - tex_gray);
     
     float alpha = aastep(tex_gray, stroke_mask);
+    // float alpha = step(stroke_mask,tex_gray);
+
     vec4 stroke_color = vec4(vec3(1.0), alpha);
 
     if (show_outline) {
