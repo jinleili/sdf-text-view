@@ -75,6 +75,7 @@ impl SDF2 {
         if max == min {
             return;
         }
+        println!("{}, {}", min, max);
 
         let scale = 255.0 / (max - min);
         
@@ -86,7 +87,7 @@ impl SDF2 {
             //     luma_channel[i] = (127.5 - out[i] * (127.5 / max)) as u8;
             // }
             luma_channel[i] = ((out[i] - min) * scale) as u8;
-            
+
         }
 
         let outf = File::create(&self.output_image_path).unwrap();

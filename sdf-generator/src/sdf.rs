@@ -7,13 +7,13 @@ use std::vec::Vec;
 
 use image::{ GrayImage, RgbaImage};
 
-static INF: f32 = f32::MAX;
+static INF: f32 = 9999.0;
 
 pub struct SDF {
     output_image_path: String,
     cutoff: f32,
     radius: f32,
-    img: RgbaImage,
+    img: GrayImage,
     img_size: (u32, u32),
     pixel_count: usize,
     long_edge_pixel: usize,
@@ -22,17 +22,16 @@ pub struct SDF {
 
 impl SDF {
     pub fn new(input_image_path: &str, output_image_path: &str) -> Self {
-        // let mut img: GrayImage =
-        //     image::open(input_image_path).ok().expect("failed to load image").to_luma();
-        let mut img: RgbaImage =
-            image::open(input_image_path).ok().expect("failed to load image").to_rgba();
+        let mut img: GrayImage =
+            image::open(input_image_path).ok().expect("failed to load image").to_luma();
+        // let mut img: RgbaImage =
+            // image::open(input_image_path).ok().expect("failed to load image").to_rgba();
         let img_size = img.dimensions();
         let pixel_count = (img_size.0 * img_size.1) as usize;
         let long_edge_pixel =
             if img_size.0 > img_size.1 { img_size.0 as usize } else { img_size.1 as usize };
 
-        let cutoff = 0.25;
-        let radius = 8.0;
+        let outline = 0.25;
 
         let f: Vec<f32> = vec![0.0; long_edge_pixel];
 
@@ -55,15 +54,16 @@ impl SDF {
         let mut luma_channel: Vec<u8> = vec![0; self.pixel_count];
         for ix in 0..self.img_size.0 {
             for iy in 0..self.img_size.1 {
-                let luma = 1.0 - self.img.get_pixel(ix, iy)[3] as f32 / 255.0;
+                let luma = 1.0 - self.img.get_pixel(ix, iy)[0] as f32 / 255.0;
                 let index = self.img_index(ix as usize, iy as usize);
-                if luma > 0.5 {
+                if luma >= 0.9 {
                     g_front[index] = INF;
                     g_background[index] = 0.0;
-                } else if luma <= 0.01 {
+                } else if luma <= 0.08 {
                     g_front[index] = 0.0;
                     g_background[index] = INF;
-                } else {
+                } 
+                else {
                     g_front[index] = max(0.0, luma - 0.5).powf(2.0);
                     g_background[index] = max(0.0, 0.5 - luma).powf(2.0);
                 }
@@ -73,18 +73,6 @@ impl SDF {
         self.edt(&mut g_background);
         self.edt(&mut g_front);
 
-        // convert to grayscale
-        // the text outline equal to 0, >= 0 means pixel is text front
-        // for i in 0..self.pixel_count {
-        //     let d = g_background[i].sqrt() - g_front[i].sqrt();
-        //     luma_channel[i] = (255.0 - 255.0 * (d / self.radius + self.cutoff)).round() as u8;
-        //     // luma_channel[i] = (255.0 * (d + 1.0) / 2.0) as u8;
-        //     if d > 0.4 {
-        //         print!("{:?},", d);
-
-        //     }
-        // }
-
         // take square roots, reuse g_front cache result
         for i in 0..self.pixel_count {
             g_front[i] = g_background[i].sqrt() - g_front[i].sqrt();
@@ -93,27 +81,17 @@ impl SDF {
         if max == min {
             panic!("max == min");
         }
-        if min < -15.0 {
-            print!("min: {}", min);
-            min = -15.0;
-        }
 
         // convert to grayscale
-        // the text outline equal to 0, >= 0 means pixel is text front
         for i in 0..self.pixel_count {
-            let mut luma = 0.0; // g_front[i] + 128.0;
-            if g_front[i] >= 0.0 {
-                luma = (128.0 + g_front[i] * (127.0 / max));
-                println!("luma: {}, {}, {}, ", luma, max, min);
-            } else {
-                luma = (128.0 - g_front[i] * (128.0 / min));
-            } 
+            // the text outline equal to 0.75, >= 0.75 means pixel is text front
+            let mut luma = (255.0 - 255.0 * (g_front[i] / max + self.outline)).round();
             if  luma < 0.0 {
                 luma = 0.0;
             } else if (luma > 255.0) {
                 luma = 255.0;
             }  
-            luma_channel[i] = luma as u8;   
+            luma_channel[i] = luma as u8;
         }
 
         let outf = File::create(&self.output_image_path).unwrap();
