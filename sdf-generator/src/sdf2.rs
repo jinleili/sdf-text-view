@@ -57,7 +57,7 @@ impl SDF2 {
                 if luma > 0.8 {
                     out[index] = INF;
                 } else {
-                    out[index] = 0.0; 
+                    out[index] = 0.0;
                 }
             }
         }
@@ -78,7 +78,7 @@ impl SDF2 {
         println!("{}, {}", min, max);
 
         let scale = 255.0 / (max - min);
-        
+
         for i in 0..self.pixel_count {
             // if out[i] <= 0.0 {
             //     luma_channel[i] = (127.5 + (out[i] * (127.5 / min)).abs()) as u8;
@@ -87,7 +87,6 @@ impl SDF2 {
             //     luma_channel[i] = (127.5 - out[i] * (127.5 / max)) as u8;
             // }
             luma_channel[i] = ((out[i] - min) * scale) as u8;
-
         }
 
         let outf = File::create(&self.output_image_path).unwrap();
@@ -163,7 +162,7 @@ impl SDF2 {
     }
 
     fn img_index(&self, x: usize, y: usize) -> usize {
-        y * self.img_size.0 as usize  + x
+        y * self.img_size.0 as usize + x
     }
 }
 

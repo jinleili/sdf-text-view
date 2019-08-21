@@ -16,22 +16,7 @@ fn main() -> Result<(), Box<Error>> {
     let shader_files: Vec<&str> = match std::env::var("TARGET") {
         Ok(target) => {
             if target.contains("ios") {
-                vec![
-                    // "filter/gaussian_blur",
-                    // "procedual/brick",
-                    // "none",
-                    // "node/point",
-                    // "page_turning",
-                    // "roll",
-                    "brush/bristle",
-                    "brush/brush",
-                    "brush/empty_canvas",
-                    "brush/line",
-                    "brush/present_filter",
-                    "fluid2/particle_rendering",
-                    "node/f32_buffer_present",
-                    "node/f32_tex_present",
-                ]
+                vec!["none", "text"]
             } else {
                 vec![]
             }
@@ -42,13 +27,7 @@ fn main() -> Result<(), Box<Error>> {
     let compute_shader: Vec<&str> = match std::env::var("TARGET") {
         Ok(target) => {
             if target.contains("ios") {
-                vec![
-                    "filter/gray",
-                    "fluid2/poiseuille_propagate",
-                    "fluid2/poiseuille_collide",
-                    "fluid2/poiseuille_particle",
-                    "fluid2/particle_init",
-                ]
+                vec![]
             } else {
                 vec![]
             }

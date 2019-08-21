@@ -5,16 +5,13 @@ authors = ["Li Jinlei <grenlight@icloud.com>"]
 
 
 [dependencies]
-wgpu = { git = "https://github.com/gfx-rs/wgpu-rs", rev = "da6377acc785ece9d9a57c9edfac4391ec5df6cf" }
+wgpu = { git = "https://github.com/gfx-rs/wgpu-rs", rev = "925e526e700528084c9f814ee062a9fb6233eee3" }
 # wgpu = { path = "../../wgpu-rs"}
 libc = "*"
 lazy_static = "*"
 
 [target.wasm32-unknown-emscripten.dependencies]
 stdweb =  "*"
-
-[target.'cfg(target_os = "macos")'.dependencies]
-winit = "*"
 
 [target.'cfg(target_os = "ios")'.dependencies]
 objc = "*"
@@ -23,3 +20,7 @@ core-graphics = "*"
 
 [target.'cfg(target_os = "android")'.dependencies]
 log = "*"
+
+# [patch.crates-io]
+# # winit =  { git = "https://github.com/rust-windowing/winit.git", rev = "31110be3960bb97caeacdd0a8cbad292722f94f1" }
+# wgpu-native = { path = "../../wgpu/wgpu-native"}

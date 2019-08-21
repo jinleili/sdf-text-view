@@ -8,11 +8,11 @@ mod texture;
 mod utils;
 pub use utils::{depth_stencil, matrix_helper};
 
-mod vertex;
 mod shader;
+mod vertex;
 
-mod sdf_text_view;
-pub use sdf_text_view::SDFTextView;
+mod sdf;
+pub use sdf::SDFTextView;
 
 use math::Position;
 
@@ -23,7 +23,6 @@ pub trait SurfaceView {
 
     fn enter_frame(&mut self);
 }
-
 
 #[cfg(not(target_os = "macos"))]
 #[no_mangle]

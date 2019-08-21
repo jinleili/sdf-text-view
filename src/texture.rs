@@ -1,5 +1,5 @@
-use wgpu::{Extent3d, Sampler, TextureView};
 use image::GenericImageView;
+use wgpu::{Extent3d, Sampler, TextureView};
 
 #[allow(dead_code)]
 pub fn from_file(
@@ -12,7 +12,7 @@ pub fn from_file(
 #[allow(dead_code)]
 pub fn from_file_and_usage_write(
     image_name: &str, device: &mut wgpu::Device, encoder: &mut wgpu::CommandEncoder,
-    usage_write: bool, is_gray_pic: bool
+    usage_write: bool, is_gray_pic: bool,
 ) -> (TextureView, Extent3d, Sampler) {
     // 动态加载本地文件
     let path = uni_view::fs::FileSystem::get_texture_file_path(image_name);
@@ -23,22 +23,21 @@ pub fn from_file_and_usage_write(
     };
 
     let img_load = image::load_from_memory(&image_bytes).expect("Failed to load image.");
-    let img_raw = if is_gray_pic { img_load.to_luma().into_raw() } else { img_load.to_rgba().into_raw() };
+    let img_raw =
+        if is_gray_pic { img_load.to_luma().into_raw() } else { img_load.to_rgba().into_raw() };
 
     let (width, height) = img_load.dimensions();
     let texture_extent = wgpu::Extent3d { width: width, height: height, depth: 1 };
     let usage = if usage_write {
-        wgpu::TextureUsage::COPY_DST
-            | wgpu::TextureUsage::SAMPLED
-            | wgpu::TextureUsage::WRITE_ALL
+        wgpu::TextureUsage::COPY_DST | wgpu::TextureUsage::SAMPLED | wgpu::TextureUsage::WRITE_ALL
     } else {
         wgpu::TextureUsage::COPY_DST | wgpu::TextureUsage::SAMPLED
     };
-    let (format, channel_count) = if is_gray_pic { 
-            (wgpu::TextureFormat::R8Unorm, 1)
-        } else { 
-            (wgpu::TextureFormat::Rgba8Unorm, 4)
-        };
+    let (format, channel_count) = if is_gray_pic {
+        (wgpu::TextureFormat::R8Unorm, 1)
+    } else {
+        (wgpu::TextureFormat::Rgba8Unorm, 4)
+    };
 
     let texture = device.create_texture(&wgpu::TextureDescriptor {
         size: texture_extent,
@@ -81,9 +80,7 @@ pub fn from_buffer_and_usage_write(
 ) -> (TextureView, Extent3d, Sampler) {
     let texture_extent = wgpu::Extent3d { width: width, height: height, depth: 1 };
     let usage = if usage_write {
-        wgpu::TextureUsage::COPY_DST
-            | wgpu::TextureUsage::SAMPLED
-            | wgpu::TextureUsage::WRITE_ALL
+        wgpu::TextureUsage::COPY_DST | wgpu::TextureUsage::SAMPLED | wgpu::TextureUsage::WRITE_ALL
     } else {
         wgpu::TextureUsage::COPY_DST | wgpu::TextureUsage::SAMPLED
     };

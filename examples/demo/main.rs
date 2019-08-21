@@ -14,7 +14,8 @@ use std::time::{Duration, Instant};
 
 fn main() {
     use wgpu::winit::{
-        ElementState, Event, EventsLoop, KeyboardInput, VirtualKeyCode, Window, WindowEvent,
+        ElementState, Event, EventsLoop, KeyboardInput, MouseScrollDelta, VirtualKeyCode, Window,
+        WindowEvent,
     };
 
     env_logger::init();
@@ -57,6 +58,15 @@ fn main() {
                 | WindowEvent::CloseRequested => {
                     running = false;
                 }
+                WindowEvent::MouseWheel { delta, .. } => match delta {
+                    MouseScrollDelta::LineDelta(_x, y) => {
+                        println!("{:?}, {}", _x, y);
+                    }
+                    _ => (),
+                },
+                WindowEvent::Touch(touch) => {
+                    println!("{:?}", touch);
+                }
                 WindowEvent::CursorMoved { position, .. } => {
                     surface_view.touch_moved(Position::new(position.x as f32, position.y as f32));
                 }
@@ -79,17 +89,4 @@ fn main() {
         running &= !cfg!(feature = "metal-auto-capture");
     }
     // let triangle = idroid::Triangle::new()
-}
-
-#[allow(dead_code)]
-fn test_projection() {
-    let vm_matrix = glm::TMat4::identity();
-    // vm_matrix = glm::translate(&vm_matrix, &glm::vec3(0.0, 0.0, -10.0));
-    let p_matrix: glm::TMat4<f32> = idroid::matrix_helper::ortho_pixel(400.0, 400.0);
-    let v = glm::TVec4::new(100.0, -200.0, 0.0, 1.0);
-
-    let arr: [[f32; 4]; 4] = (p_matrix * vm_matrix).into();
-    println!("{:?}", arr);
-
-    println!("{:?}", p_matrix * v);
 }

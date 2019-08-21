@@ -1,0 +1,191 @@
+use crate::geometry::plane::Plane;
+use crate::texture;
+use crate::utils::MVPUniform;
+use crate::vertex::{Pos, PosTex};
+use wgpu::Extent3d;
+
+use nalgebra_glm as glm;
+
+pub struct SDFRenderNode {
+    extent: Extent3d,
+    vertex_buf: wgpu::Buffer,
+    index_buf: wgpu::Buffer,
+    index_count: usize,
+    bind_group: wgpu::BindGroup,
+    mvp_buf: wgpu::Buffer,
+    pipeline: wgpu::RenderPipeline,
+}
+
+impl SDFRenderNode {
+    pub fn new(
+        sc_desc: &wgpu::SwapChainDescriptor, device: &mut wgpu::Device,
+        src_view: &wgpu::TextureView, extent: Extent3d,
+    ) -> Self {
+        let sampler = texture::bilinear_sampler(device);
+
+        let bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
+            bindings: &[
+                wgpu::BindGroupLayoutBinding {
+                    binding: 0,
+                    visibility: wgpu::ShaderStage::VERTEX,
+                    ty: wgpu::BindingType::UniformBuffer,
+                    dynamic: false,
+                    multisampled: false,
+                    texture_dimension: wgpu::TextureViewDimension::D2,
+                },
+                wgpu::BindGroupLayoutBinding {
+                    binding: 1,
+                    visibility: wgpu::ShaderStage::FRAGMENT,
+                    ty: wgpu::BindingType::SampledTexture,
+                    dynamic: false,
+                    multisampled: false,
+                    texture_dimension: wgpu::TextureViewDimension::D2,
+                },
+                wgpu::BindGroupLayoutBinding {
+                    binding: 2,
+                    visibility: wgpu::ShaderStage::FRAGMENT,
+                    ty: wgpu::BindingType::Sampler,
+                    dynamic: false,
+                    multisampled: false,
+                    texture_dimension: wgpu::TextureViewDimension::D2,
+                },
+            ],
+        });
+        let mvp_size = std::mem::size_of::<[[f32; 4]; 4]>() as wgpu::BufferAddress;
+        let mvp_buf = crate::utils::empty_uniform_buffer(device, mvp_size);
+        let bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
+            layout: &bind_group_layout,
+            bindings: &[
+                wgpu::Binding {
+                    binding: 0,
+                    resource: wgpu::BindingResource::Buffer {
+                        buffer: &mvp_buf,
+                        range: 0..(std::mem::size_of::<MVPUniform>() as wgpu::BufferAddress),
+                    },
+                },
+                wgpu::Binding {
+                    binding: 1,
+                    resource: wgpu::BindingResource::TextureView(src_view),
+                },
+                wgpu::Binding { binding: 2, resource: wgpu::BindingResource::Sampler(&sampler) },
+            ],
+        });
+
+        // Create the vertex and index buffers
+        let vertex_size = std::mem::size_of::<PosTex>();
+        let (vertex_data, index_data) = Plane::new(1, 1).generate_vertices();
+
+        let vertex_buf = device
+            .create_buffer_mapped(vertex_data.len(), wgpu::BufferUsage::VERTEX)
+            .fill_from_slice(&vertex_data);
+
+        let index_buf = device
+            .create_buffer_mapped(index_data.len(), wgpu::BufferUsage::INDEX)
+            .fill_from_slice(&index_data);
+        // Create the render pipeline
+        let shader = crate::shader::Shader::new("sdf/text", device);
+        let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
+            bind_group_layouts: &[&bind_group_layout],
+        });
+
+        let color_alpha_blend = crate::utils::color_alpha_blend();
+
+        let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
+            layout: &pipeline_layout,
+            vertex_stage: shader.vertex_stage(),
+            fragment_stage: shader.fragment_stage(),
+            rasterization_state: Some(wgpu::RasterizationStateDescriptor {
+                front_face: wgpu::FrontFace::Ccw,
+                cull_mode: wgpu::CullMode::None,
+                depth_bias: 0,
+                depth_bias_slope_scale: 0.0,
+                depth_bias_clamp: 0.0,
+            }),
+            primitive_topology: wgpu::PrimitiveTopology::TriangleList,
+            color_states: &[wgpu::ColorStateDescriptor {
+                format: sc_desc.format,
+                color_blend: color_alpha_blend.0,
+                alpha_blend: color_alpha_blend.1,
+                write_mask: wgpu::ColorWrite::ALL,
+            }],
+            // ??????
+            depth_stencil_state: None,
+            index_format: wgpu::IndexFormat::Uint32,
+            vertex_buffers: &[wgpu::VertexBufferDescriptor {
+                stride: vertex_size as wgpu::BufferAddress,
+                step_mode: wgpu::InputStepMode::Vertex,
+                attributes: &PosTex::attri_descriptor(0),
+            }],
+            sample_count: 1,
+            sample_mask: !0,
+            alpha_to_coverage_enabled: false,
+        });
+        SDFRenderNode {
+            extent,
+            vertex_buf,
+            index_buf,
+            index_count: index_data.len(),
+            bind_group,
+            pipeline,
+            mvp_buf,
+        }
+    }
+
+    pub fn update_scale(&mut self, sc_desc: &wgpu::SwapChainDescriptor, device: &mut wgpu::Device, scale: f32) {
+        let fovy: f32 = 75.0 / 180.0 * std::f32::consts::PI;
+        let radian: glm::TVec1<f32> = glm::vec1(fovy);
+        let p_matrix: glm::TMat4<f32> = glm::perspective_fov(
+            radian[0],
+            sc_desc.width as f32,
+            sc_desc.height as f32,
+            0.1,
+            100.0,
+        );
+        let mut vm_matrix = glm::TMat4::identity();
+        let sc_ratio = sc_desc.height as f32 / sc_desc.width as f32;
+        let tex_ratio = self.extent.height  as f32 / self.extent.width as f32;
+        // maintain texture's aspect ratio
+        vm_matrix = glm::scale(&vm_matrix, &glm::vec3(1.0, tex_ratio, 1.0));
+
+        
+        let ratio = if sc_desc.height > sc_desc.width {
+            sc_ratio
+        } else {
+            1.0
+        };
+
+        // 满屏效果: 利用 fovy 计算 tan (近裁剪平面 x | y 与 camera 原点的距离之比) 得出 z 轴平移距离
+        // 屏幕 h > w 时，才需要计算 ratio, w > h 时， ration = 1
+        let factor: f32 = (fovy / 2.0).tan();
+        vm_matrix = glm::translate(&vm_matrix, &glm::vec3(0.0, 0.0, -(ratio / factor)));
+
+        // maintain texture's aspect ratio to fill
+        if sc_ratio < tex_ratio {
+
+        }
+
+
+        let mvp: [[f32; 4]; 4] = (p_matrix * vm_matrix).into();
+        crate::utils::update_uniform(device, mvp, &self.mvp_buf);
+    }
+
+    pub fn begin_render_pass(
+        &self, frame: &wgpu::SwapChainOutput, encoder: &mut wgpu::CommandEncoder,
+    ) {
+        let mut rpass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+            color_attachments: &[wgpu::RenderPassColorAttachmentDescriptor {
+                attachment: &frame.view,
+                resolve_target: None,
+                load_op: wgpu::LoadOp::Clear,
+                store_op: wgpu::StoreOp::Store,
+                clear_color: crate::utils::clear_color(),
+            }],
+            depth_stencil_attachment: None,
+        });
+        rpass.set_pipeline(&self.pipeline);
+        rpass.set_bind_group(0, &self.bind_group, &[]);
+        rpass.set_index_buffer(&self.index_buf, 0);
+        rpass.set_vertex_buffers(0, &[(&self.vertex_buf, 0)]);
+        rpass.draw_indexed(0..self.index_count as u32, 0, 0..1);
+    }
+}

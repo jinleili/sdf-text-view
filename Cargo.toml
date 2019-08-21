@@ -15,7 +15,7 @@ crate-type = ["rlib"]
 # crate-type = ["cdylib"]
 
 [features]
-default = []
+default = ["metal"]
 dx11 = ["wgpu/dx11"]
 dx12 = ["wgpu/dx12"]
 metal = ["wgpu/metal"]
@@ -24,9 +24,7 @@ vulkan = ["wgpu/vulkan"]
 [dependencies]
 libc = "*"
 
-# wgpu = { git = "https://github.com/gfx-rs/wgpu", version = "0.2.3"}
-# wgpu-rs  is an idiomatic Rust wrapper over wgpu-native. 
-wgpu = { git = "https://github.com/gfx-rs/wgpu-rs", rev = "da6377acc785ece9d9a57c9edfac4391ec5df6cf" }
+wgpu = { git = "https://github.com/gfx-rs/wgpu-rs", rev = "925e526e700528084c9f814ee062a9fb6233eee3" }
 # 本地版本设置了 metal-auto-capture，且解决了 iOS 设备上 Undefined symbols for architecture arm64:
 #  "_MTLCopyAllDevices" bug
 # wgpu = { path = "../wgpu-rs"}
@@ -40,8 +38,8 @@ failure = "0.1"
 lazy_static = "*"
 
 [target.'cfg(target_os = "macos")'.dependencies]
-winit = "*"
 shaderc = "0.6.1"
+objc = "*"
 
 [build-dependencies]
 shaderc = "0.6.1"
@@ -53,6 +51,8 @@ lazy_static = "*"
 palette = "0.4"
 rand = "0.6"
 
-[target.'cfg(target_os = "macos")'.dev-dependencies]
-winit = "*"
-objc = "*"
+
+# [patch.crates-io]
+# # # winit =  { path = "../winit-master" }
+# wgpu-native = { path = "../wgpu/wgpu-native" }
+

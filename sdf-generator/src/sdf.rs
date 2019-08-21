@@ -5,14 +5,13 @@ use std::vec::Vec;
 
 // use std::f32::{INFINITY, NEG_INFINITY};
 
-use image::{ GrayImage, RgbaImage};
+use image::{GrayImage, RgbaImage};
 
 static INF: f32 = 9999.0;
 
 pub struct SDF {
     output_image_path: String,
-    cutoff: f32,
-    radius: f32,
+    outline: f32,
     img: GrayImage,
     img_size: (u32, u32),
     pixel_count: usize,
@@ -25,7 +24,7 @@ impl SDF {
         let mut img: GrayImage =
             image::open(input_image_path).ok().expect("failed to load image").to_luma();
         // let mut img: RgbaImage =
-            // image::open(input_image_path).ok().expect("failed to load image").to_rgba();
+        // image::open(input_image_path).ok().expect("failed to load image").to_rgba();
         let img_size = img.dimensions();
         let pixel_count = (img_size.0 * img_size.1) as usize;
         let long_edge_pixel =
@@ -37,8 +36,7 @@ impl SDF {
 
         SDF {
             output_image_path: output_image_path.to_string(),
-            cutoff,
-            radius,
+            outline,
             img,
             img_size,
             long_edge_pixel,
@@ -56,10 +54,10 @@ impl SDF {
             for iy in 0..self.img_size.1 {
                 let luma = 1.0 - self.img.get_pixel(ix, iy)[0] as f32 / 255.0;
                 let index = self.img_index(ix as usize, iy as usize);
-                if luma >= 0.9 {
+                if luma >= 0.95 {
                     g_front[index] = INF;
                     g_background[index] = 0.0;
-                } else if luma <= 0.08 {
+                } else if luma < 0.01 {
                     g_front[index] = 0.0;
                     g_background[index] = INF;
                 } 
@@ -86,11 +84,11 @@ impl SDF {
         for i in 0..self.pixel_count {
             // the text outline equal to 0.75, >= 0.75 means pixel is text front
             let mut luma = (255.0 - 255.0 * (g_front[i] / max + self.outline)).round();
-            if  luma < 0.0 {
+            if luma < 0.0 {
                 luma = 0.0;
             } else if (luma > 255.0) {
                 luma = 255.0;
-            }  
+            }
             luma_channel[i] = luma as u8;
         }
 
@@ -99,13 +97,12 @@ impl SDF {
         encoder
             .encode(&luma_channel, self.img_size.0, self.img_size.1, image::ColorType::Gray(8))
             .unwrap();
-        
     }
 
     fn edt(&mut self, grid: &mut Vec<f32>) {
         let width = self.img_size.0 as usize;
         let height = self.img_size.1 as usize;
-           // transform along columns
+        // transform along columns
         for x in 0..width {
             for y in 0..height {
                 self.f[y] = grid[self.img_index(x, y)];
@@ -163,12 +160,12 @@ impl SDF {
             // q and r are usize, if q - r < 0, will cause panic: thread 'main' panicked at 'attempt to subtract with overflow'
             d[q] = self.f[v[k]] + (q as i32 - v[k] as i32).pow(2) as f32;
         }
-        
+
         d
     }
 
     fn img_index(&self, x: usize, y: usize) -> usize {
-        y * self.img_size.0 as usize  + x
+        y * self.img_size.0 as usize + x
     }
 }
 

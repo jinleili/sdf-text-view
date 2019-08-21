@@ -15,7 +15,7 @@ pub fn default_mvp(sc_desc: &wgpu::SwapChainDescriptor) -> [[f32; 4]; 4] {
     // 相当于是 裁剪平面与其上的投影在整体缩放, 而裁剪平面始终是等于屏幕空间平面的, 所以映射到屏幕上就是没有缩放
     // 满屏效果: 利用 fovy 计算 tan (近裁剪平面 x | y 与 camera 原点的距离之比) 得出 z 轴平移距离
     // 屏幕 h > w 时，才需要计算 ratio, w > h 时， ration = 1
-    let ratio = if sc_desc.height > sc_desc.width { 
+    let ratio = if sc_desc.height > sc_desc.width {
         sc_desc.height as f32 / sc_desc.width as f32
     } else {
         1.0
