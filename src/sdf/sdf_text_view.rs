@@ -22,7 +22,7 @@ impl SDFTextView {
 
         // Create the texture
         let (texture_view, texture_extent, _sampler) = texture::from_file_and_usage_write(
-            "math1-out.png",
+            "512*1024.png",
             &mut app_view.device,
             &mut encoder,
             false,
@@ -50,8 +50,7 @@ impl SurfaceView for SDFTextView {
 
     fn resize(&mut self) {
         self.app_view.update_swap_chain();
-        self.render_node.update_scale(&self.app_view.sc_desc,
-            &mut self.app_view.device, 1.0);
+        self.render_node.update_scale(&self.app_view.sc_desc, &mut self.app_view.device, 1.0);
     }
 
     fn enter_frame(&mut self) {

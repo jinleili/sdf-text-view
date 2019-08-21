@@ -131,7 +131,9 @@ impl SDFRenderNode {
         }
     }
 
-    pub fn update_scale(&mut self, sc_desc: &wgpu::SwapChainDescriptor, device: &mut wgpu::Device, scale: f32) {
+    pub fn update_scale(
+        &mut self, sc_desc: &wgpu::SwapChainDescriptor, device: &mut wgpu::Device, scale: f32,
+    ) {
         let fovy: f32 = 75.0 / 180.0 * std::f32::consts::PI;
         let radian: glm::TVec1<f32> = glm::vec1(fovy);
         let p_matrix: glm::TMat4<f32> = glm::perspective_fov(
@@ -142,28 +144,30 @@ impl SDFRenderNode {
             100.0,
         );
         let mut vm_matrix = glm::TMat4::identity();
-        let sc_ratio = sc_desc.height as f32 / sc_desc.width as f32;
-        let tex_ratio = self.extent.height  as f32 / self.extent.width as f32;
+        let sc_ratio = sc_desc.width as f32 / sc_desc.height as f32;
+        let tex_ratio = self.extent.width as f32 / self.extent.height as f32;
         // maintain texture's aspect ratio
-        vm_matrix = glm::scale(&vm_matrix, &glm::vec3(1.0, tex_ratio, 1.0));
+        vm_matrix = glm::scale(&vm_matrix, &glm::vec3(1.0, 1.0 / tex_ratio, 1.0));
 
-        
-        let ratio = if sc_desc.height > sc_desc.width {
-            sc_ratio
-        } else {
-            1.0
-        };
-
-        // 满屏效果: 利用 fovy 计算 tan (近裁剪平面 x | y 与 camera 原点的距离之比) 得出 z 轴平移距离
-        // 屏幕 h > w 时，才需要计算 ratio, w > h 时， ration = 1
+        // when viewport's h > w,  ratio = h / w, when w > h ，ratio = 1
+        let ratio = if sc_ratio < 1.0 { sc_desc.height as f32 / sc_desc.width as f32 } else { 1.0 };
+        // use fovy calculate z translate distance
         let factor: f32 = (fovy / 2.0).tan();
-        vm_matrix = glm::translate(&vm_matrix, &glm::vec3(0.0, 0.0, -(ratio / factor)));
 
-        // maintain texture's aspect ratio to fill
+        // full fill viewport's width or height
+        let mut translate_z = -(ratio / factor);
         if sc_ratio < tex_ratio {
-
+            if tex_ratio > 1.0 {
+                translate_z /= sc_ratio * ratio;
+            }
+        } else {
+            translate_z /= tex_ratio;
+            // when tex h > w and viewport h > w, need fill the viewport's height, and the height ration is not 1.0
+            if tex_ratio < 1.0 {
+                translate_z /= ratio;
+            };
         }
-
+        vm_matrix = glm::translate(&vm_matrix, &glm::vec3(0.0, 0.0, translate_z));
 
         let mvp: [[f32; 4]; 4] = (p_matrix * vm_matrix).into();
         crate::utils::update_uniform(device, mvp, &self.mvp_buf);

@@ -38,6 +38,9 @@ void main(void)
     // float alpha = step(stroke_mask,tex_gray);
 
     vec4 stroke_color = vec4(vec3(1.0), alpha);
+    if (alpha <= 0.01) {
+        stroke_color = vec4(0.2, 0.2, 0.2, 1.0);
+    }
 
     if (show_outline) {
         vec4 outline_color = outline;
