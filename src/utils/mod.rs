@@ -168,5 +168,5 @@ where
         0,
         std::mem::size_of::<T>() as wgpu::BufferAddress,
     );
-    device.get_queue().submit(&[encoder.finish(None)]);
+    device.get_queue().submit(&[encoder.finish()]);
 }

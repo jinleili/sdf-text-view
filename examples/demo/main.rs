@@ -13,17 +13,18 @@ use nalgebra_glm as glm;
 use std::time::{Duration, Instant};
 
 fn main() {
-    use wgpu::winit::{
-        ElementState, Event, EventsLoop, KeyboardInput, MouseScrollDelta, VirtualKeyCode, Window,
+    use winit::event::{
+        ElementState, Event, KeyboardInput, MouseScrollDelta, VirtualKeyCode,
         WindowEvent,
     };
+    use winit::{ event_loop::EventLoop, window::Window };
 
     env_logger::init();
 
-    let mut events_loop = EventsLoop::new();
+    let mut events_loop = EventLoop::new();
     let window = Window::new(&events_loop).unwrap();
     // window.set_max_dimensions(Some((400_u32, 700_u32).into()));
-    window.set_max_dimensions(Some((1800_u32, 1850_u32).into()));
+    window.set_max_inner_size(Some((1800_u32, 1850_u32).into()));
     window.set_title("title");
 
     // let screen_scale: fn() -> f32 = screen_scale;
@@ -39,7 +40,13 @@ fn main() {
 
     // test_projection();
     while running {
-        events_loop.poll_events(|event| match event {
+        events_loop.run(move |event, _, control_flow|  {
+            *control_flow = if cfg!(feature = "metal-auto-capture") {
+                winit::event_loop::ControlFlow::Exit
+            } else {
+                winit::event_loop::ControlFlow::Poll
+            };
+            match event {
             Event::WindowEvent { event: WindowEvent::Resized(_size), .. } => {
                 // let physical = size.to_physical(window.get_hidpi_factor());
                 // println!("Resizing to {:?}", physical);
@@ -73,6 +80,7 @@ fn main() {
                 _ => {}
             },
             _ => (),
+        }
         });
 
         let now = Instant::now();

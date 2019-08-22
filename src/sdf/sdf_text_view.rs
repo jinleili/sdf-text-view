@@ -35,14 +35,14 @@ impl SDFTextView {
             &texture_view,
             texture_extent,
         );
-        app_view.device.get_queue().submit(&[encoder.finish(None)]);
+        app_view.device.get_queue().submit(&[encoder.finish()]);
 
         SDFTextView { app_view, render_node }
     }
 }
 
 impl SurfaceView for SDFTextView {
-    fn update(&mut self, _event: wgpu::winit::WindowEvent) {
+    fn update(&mut self, _event: winit::event::WindowEvent) {
         //empty
     }
 
@@ -65,7 +65,7 @@ impl SurfaceView for SDFTextView {
                 self.render_node.begin_render_pass(&frame, &mut encoder);
             }
 
-            self.app_view.device.get_queue().submit(&[encoder.finish(None)]);
+            self.app_view.device.get_queue().submit(&[encoder.finish()]);
         }
     }
 }

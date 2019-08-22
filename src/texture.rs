@@ -48,7 +48,7 @@ pub fn from_file_and_usage_write(
         format: format,
         usage: usage,
     });
-    let texture_view = texture.create_view(None);
+    let texture_view = texture.create_default_view();
 
     let texels: Vec<u8> = img_raw;
     let temp_buf = device
@@ -93,7 +93,7 @@ pub fn from_buffer_and_usage_write(
         format: wgpu::TextureFormat::Rgba32Float,
         usage: usage,
     });
-    let texture_view = texture.create_view(None);
+    let texture_view = texture.create_default_view();
 
     // BufferCopyView 必须 >= TextureCopyView
     encoder.copy_buffer_to_texture(
@@ -132,7 +132,7 @@ pub fn empty(
             | wgpu::TextureUsage::SAMPLED
             | wgpu::TextureUsage::WRITE_ALL,
     });
-    let texture_view = texture.create_view(None);
+    let texture_view = texture.create_default_view();
     texture_view
 }
 

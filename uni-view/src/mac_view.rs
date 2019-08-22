@@ -1,6 +1,8 @@
 
+extern crate raw_window_handle;
+
 pub struct AppView {
-    pub view: wgpu::winit::Window,
+    pub view: winit::window::Window,
     pub scale_factor: f32,
     pub instance: wgpu::Instance,
     pub device: wgpu::Device,
@@ -10,9 +12,9 @@ pub struct AppView {
 }
 
 impl AppView {
-    pub fn new(view: wgpu::winit::Window) -> Self {
-        let scale_factor = view.get_hidpi_factor();
-        let physical = view.get_inner_size().unwrap().to_physical(scale_factor);
+    pub fn new(view: winit::window::Window) -> Self {
+        let scale_factor = view.hidpi_factor();
+        let physical = view.inner_size().to_physical(scale_factor);
         let sc_desc = wgpu::SwapChainDescriptor {
             usage: wgpu::TextureUsage::OUTPUT_ATTACHMENT,
             format: wgpu::TextureFormat::Bgra8Unorm,
@@ -23,7 +25,8 @@ impl AppView {
         let instance = wgpu::Instance::new();
 
         let device = get_device(&instance);
-        let surface = instance.create_surface(&view);
+        use self::raw_window_handle::HasRawWindowHandle as _;
+        let surface = instance.create_surface(view.raw_window_handle());
         let swap_chain = device.create_swap_chain(&surface, &sc_desc);
 
         AppView {
@@ -39,16 +42,16 @@ impl AppView {
 }
 
 fn get_device(instance: &wgpu::Instance) -> wgpu::Device {
-        let adapter = instance.get_adapter(Some(&wgpu::RequestAdapterOptions {
+    let adapter = instance.request_adapter(&wgpu::RequestAdapterOptions {
         power_preference: wgpu::PowerPreference::LowPower,
-    }));
-       adapter.request_device(Some(&wgpu::DeviceDescriptor {
+    });
+    adapter.request_device(&wgpu::DeviceDescriptor {
         extensions: wgpu::Extensions {
             anisotropic_filtering: false,
         },
         limits: wgpu::Limits::default(),
-    }))
-    }
+    })
+}
 
 impl crate::GPUContext for AppView {
     fn update_swap_chain(&mut self) {
@@ -59,9 +62,9 @@ impl crate::GPUContext for AppView {
     }
 
     fn get_view_size(&self) -> crate::ViewSize {
-        let scale_factor = self.view.get_hidpi_factor();
+        let scale_factor = self.view.hidpi_factor();
         // let physical = size.to_physical(scale_factor);
-        let physical = self.view.get_inner_size().unwrap().to_physical(scale_factor);
+        let physical = self.view.inner_size().to_physical(scale_factor);
 
         crate::ViewSize {
             width: physical.width as u32,

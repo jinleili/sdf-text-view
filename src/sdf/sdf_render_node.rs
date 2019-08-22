@@ -28,26 +28,22 @@ impl SDFRenderNode {
                 wgpu::BindGroupLayoutBinding {
                     binding: 0,
                     visibility: wgpu::ShaderStage::VERTEX,
-                    ty: wgpu::BindingType::UniformBuffer,
-                    dynamic: false,
-                    multisampled: false,
-                    texture_dimension: wgpu::TextureViewDimension::D2,
+                    ty: wgpu::BindingType::UniformBuffer {
+                        dynamic: false,
+                    },
                 },
                 wgpu::BindGroupLayoutBinding {
                     binding: 1,
                     visibility: wgpu::ShaderStage::FRAGMENT,
-                    ty: wgpu::BindingType::SampledTexture,
-                    dynamic: false,
-                    multisampled: false,
-                    texture_dimension: wgpu::TextureViewDimension::D2,
+                    ty: wgpu::BindingType::SampledTexture {
+                        multisampled: false,
+                        dimension: wgpu::TextureViewDimension::D2,
+                    },                    
                 },
                 wgpu::BindGroupLayoutBinding {
                     binding: 2,
                     visibility: wgpu::ShaderStage::FRAGMENT,
                     ty: wgpu::BindingType::Sampler,
-                    dynamic: false,
-                    multisampled: false,
-                    texture_dimension: wgpu::TextureViewDimension::D2,
                 },
             ],
         });

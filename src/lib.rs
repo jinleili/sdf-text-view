@@ -18,7 +18,7 @@ use math::Position;
 
 pub trait SurfaceView {
     fn resize(&mut self);
-    fn update(&mut self, event: wgpu::winit::WindowEvent);
+    fn update(&mut self, event: winit::event::WindowEvent);
     fn touch_moved(&mut self, position: Position);
 
     fn enter_frame(&mut self);

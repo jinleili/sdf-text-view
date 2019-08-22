@@ -26,7 +26,7 @@ pub fn create_depth_texture_view(
         format: wgpu::TextureFormat::Depth32Float,
         usage: wgpu::TextureUsage::OUTPUT_ATTACHMENT,
     });
-    depth_texture.create_view(None)
+    depth_texture.create_default_view()
 }
 
 #[allow(dead_code)]
