@@ -7,49 +7,35 @@ use uni_view::AppView;
 extern crate lazy_static;
 extern crate objc;
 
-extern crate nalgebra_glm;
-use nalgebra_glm as glm;
-
-use std::time::{Duration, Instant};
-
 fn main() {
     use winit::event::{
-        ElementState, Event, KeyboardInput, MouseScrollDelta, VirtualKeyCode,
-        WindowEvent,
+        ElementState, Event, KeyboardInput, MouseScrollDelta, VirtualKeyCode, WindowEvent,
     };
-    use winit::{ event_loop::EventLoop, window::Window };
+    use winit::{event_loop::EventLoop, window::Window};
 
     env_logger::init();
 
-    let mut events_loop = EventLoop::new();
+    let events_loop = EventLoop::new();
     let window = Window::new(&events_loop).unwrap();
     // window.set_max_dimensions(Some((400_u32, 700_u32).into()));
     window.set_max_inner_size(Some((1800_u32, 1850_u32).into()));
-    window.set_title("title");
+    window.set_title("SDF Text View");
 
-    // let screen_scale: fn() -> f32 = screen_scale;
     let v = AppView::new(window);
 
     let mut surface_view = idroid::SDFTextView::new(v);
-    // let mut surface_view = idroid::filters::GrayFilter::new(v);
+    // winit 0.20.0-alpha3 不会主动触发 WindowEvent::Resized 事件了
+    // 需要主动调一次 resize 来更新 mvp
+    surface_view.resize();
 
-    let mut running = true;
-    let mut accumulator = Duration::new(0, 0);
-    let mut previous_clock = Instant::now();
-    let fixed_time_stamp = Duration::new(0, 16666667);
-
-    // test_projection();
-    while running {
-        events_loop.run(move |event, _, control_flow|  {
-            *control_flow = if cfg!(feature = "metal-auto-capture") {
-                winit::event_loop::ControlFlow::Exit
-            } else {
-                winit::event_loop::ControlFlow::Poll
-            };
-            match event {
+    events_loop.run(move |event, _, control_flow| {
+        *control_flow = if cfg!(feature = "metal-auto-capture") {
+            winit::event_loop::ControlFlow::Exit
+        } else {
+            winit::event_loop::ControlFlow::Poll
+        };
+        match event {
             Event::WindowEvent { event: WindowEvent::Resized(_size), .. } => {
-                // let physical = size.to_physical(window.get_hidpi_factor());
-                // println!("Resizing to {:?}", physical);
                 surface_view.resize();
             }
             Event::WindowEvent { event, .. } => match event {
@@ -63,38 +49,28 @@ fn main() {
                     ..
                 }
                 | WindowEvent::CloseRequested => {
-                    running = false;
+                    *control_flow = winit::event_loop::ControlFlow::Exit;
                 }
-                WindowEvent::MouseWheel { delta, .. } => match delta {
+                | WindowEvent::MouseWheel { delta, .. } => match delta {
                     MouseScrollDelta::LineDelta(_x, y) => {
                         println!("{:?}, {}", _x, y);
                     }
                     _ => (),
                 },
-                WindowEvent::Touch(touch) => {
+                | WindowEvent::Touch(touch) => {
                     println!("{:?}", touch);
                 }
-                WindowEvent::CursorMoved { position, .. } => {
+                | WindowEvent::CursorMoved { position, .. } => {
                     surface_view.touch_moved(Position::new(position.x as f32, position.y as f32));
                 }
                 _ => {}
             },
+            Event::EventsCleared => {
+                surface_view.enter_frame();
+            }
             _ => (),
         }
-        });
+    });
 
-        let now = Instant::now();
-        accumulator += now - previous_clock;
-
-        if accumulator >= fixed_time_stamp {
-            previous_clock = now;
-            accumulator = Duration::new(0, 0);
-            surface_view.enter_frame();
-        } else {
-            std::thread::sleep(fixed_time_stamp - accumulator);
-        }
-
-        running &= !cfg!(feature = "metal-auto-capture");
-    }
     // let triangle = idroid::Triangle::new()
 }

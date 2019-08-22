@@ -24,27 +24,12 @@ pub trait SurfaceView {
     fn enter_frame(&mut self);
 }
 
-#[cfg(not(target_os = "macos"))]
-#[no_mangle]
-pub extern "C" fn create_blur_filter(view: uni_view::AppViewObj) -> *mut libc::c_void {
-    let rust_view = uni_view::AppView::new(view);
-    let obj = filters::BlurFilter::new(rust_view);
-    box_obj(obj)
-}
 
 #[cfg(not(target_os = "macos"))]
 #[no_mangle]
-pub extern "C" fn create_gray_filter(view: uni_view::AppViewObj) -> *mut libc::c_void {
+pub extern "C" fn create_sdf_view(view: uni_view::AppViewObj) -> *mut libc::c_void {
     let rust_view = uni_view::AppView::new(view);
-    let obj = filters::GrayFilter::new(rust_view);
-    box_obj(obj)
-}
-
-#[cfg(not(target_os = "macos"))]
-#[no_mangle]
-pub extern "C" fn create_brush_view(view: uni_view::AppViewObj) -> *mut libc::c_void {
-    let rust_view = uni_view::AppView::new(view);
-    let obj = BrushView::new(rust_view);
+    let obj = SDFTextView::new(rust_view);
     box_obj(obj)
 }
 

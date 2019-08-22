@@ -28,9 +28,7 @@ impl SDFRenderNode {
                 wgpu::BindGroupLayoutBinding {
                     binding: 0,
                     visibility: wgpu::ShaderStage::VERTEX,
-                    ty: wgpu::BindingType::UniformBuffer {
-                        dynamic: false,
-                    },
+                    ty: wgpu::BindingType::UniformBuffer { dynamic: false },
                 },
                 wgpu::BindGroupLayoutBinding {
                     binding: 1,
@@ -38,7 +36,7 @@ impl SDFRenderNode {
                     ty: wgpu::BindingType::SampledTexture {
                         multisampled: false,
                         dimension: wgpu::TextureViewDimension::D2,
-                    },                    
+                    },
                 },
                 wgpu::BindGroupLayoutBinding {
                     binding: 2,
