@@ -51,16 +51,16 @@ fn main() {
                 | WindowEvent::CloseRequested => {
                     *control_flow = winit::event_loop::ControlFlow::Exit;
                 }
-                | WindowEvent::MouseWheel { delta, .. } => match delta {
+                WindowEvent::MouseWheel { delta, .. } => match delta {
                     MouseScrollDelta::LineDelta(_x, y) => {
                         println!("{:?}, {}", _x, y);
                     }
                     _ => (),
                 },
-                | WindowEvent::Touch(touch) => {
+                WindowEvent::Touch(touch) => {
                     println!("{:?}", touch);
                 }
-                | WindowEvent::CursorMoved { position, .. } => {
+                WindowEvent::CursorMoved { position, .. } => {
                     surface_view.touch_moved(Position::new(position.x as f32, position.y as f32));
                 }
                 _ => {}

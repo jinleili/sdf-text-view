@@ -1,15 +1,17 @@
 use crate::texture;
-use crate::utils::MVPUniform;
+use crate::utils::{ MVPUniform, HUD } ;
 use crate::SurfaceView;
 
 use uni_view::{AppView, GPUContext};
 
-use super::SDFRenderNode;
+use super::{SDFComputeNode, SDFRenderNode};
 
 // use nalgebra_glm as glm;
 
 pub struct SDFTextView {
     app_view: AppView,
+    hud: HUD,
+    compute_node: SDFComputeNode,
     render_node: SDFRenderNode,
 }
 
@@ -22,12 +24,16 @@ impl SDFTextView {
 
         // Create the texture
         let (texture_view, texture_extent, _sampler) = texture::from_file_and_usage_write(
-            "512*1024.png",
+            "math.png",
             &mut app_view.device,
             &mut encoder,
             false,
             true,
         );
+
+        let compute_node =
+            SDFComputeNode::new(&mut app_view.device, &mut encoder, &texture_view, texture_extent);
+        compute_node.compute(&mut app_view.device, &mut encoder);
 
         let render_node = SDFRenderNode::new(
             &app_view.sc_desc,
@@ -37,7 +43,9 @@ impl SDFTextView {
         );
         app_view.device.get_queue().submit(&[encoder.finish()]);
 
-        SDFTextView { app_view, render_node }
+        let hud = HUD::new();
+
+        SDFTextView { app_view, hud, compute_node, render_node }
     }
 }
 
@@ -59,6 +67,10 @@ impl SurfaceView for SDFTextView {
             .device
             .create_command_encoder(&wgpu::CommandEncoderDescriptor { todo: 0 });
         {
+            // self.hud.start_frame_timer();
+            // self.compute_node.compute(&mut self.app_view.device, &mut encoder);
+            // println!("time: {:?}", self.hud.stop_frame_timer() );
+
             let frame = self.app_view.swap_chain.get_next_texture();
 
             {

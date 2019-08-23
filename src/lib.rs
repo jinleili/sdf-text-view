@@ -24,7 +24,6 @@ pub trait SurfaceView {
     fn enter_frame(&mut self);
 }
 
-
 #[cfg(not(target_os = "macos"))]
 #[no_mangle]
 pub extern "C" fn create_sdf_view(view: uni_view::AppViewObj) -> *mut libc::c_void {

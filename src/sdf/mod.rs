@@ -1,5 +1,8 @@
 mod sdf_text_view;
 pub use sdf_text_view::SDFTextView;
 
-mod sdf_render_node;
-use sdf_render_node::SDFRenderNode;
+mod render_node;
+use render_node::SDFRenderNode;
+
+mod compute_node;
+use compute_node::SDFComputeNode;

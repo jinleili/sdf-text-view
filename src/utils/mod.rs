@@ -1,6 +1,9 @@
 pub mod depth_stencil;
 pub mod matrix_helper;
 
+mod hud;
+pub use hud::HUD;
+
 pub fn clear_color() -> wgpu::Color {
     wgpu::Color { r: 0.25, g: 0.25, b: 0.3, a: 1.0 }
 }
