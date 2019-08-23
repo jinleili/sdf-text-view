@@ -9,10 +9,7 @@ pub struct HUD {
 
 impl HUD {
     pub fn new() -> Self {
-        HUD {
-            accumulator: Duration::new(0, 0),
-            frame_start: Instant::now(),
-        }
+        HUD { accumulator: Duration::new(0, 0), frame_start: Instant::now() }
     }
 
     pub fn start_frame_timer(&mut self) {

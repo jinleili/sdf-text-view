@@ -1,5 +1,5 @@
 use crate::texture;
-use crate::utils::{ MVPUniform, HUD } ;
+use crate::utils::{MVPUniform, HUD};
 use crate::SurfaceView;
 
 use uni_view::{AppView, GPUContext};
@@ -72,11 +72,9 @@ impl SurfaceView for SDFTextView {
             // println!("time: {:?}", self.hud.stop_frame_timer() );
 
             let frame = self.app_view.swap_chain.get_next_texture();
-
             {
-                self.render_node.begin_render_pass(&frame, &mut encoder);
+                self.render_node.begin_render_pass(&frame, &mut encoder, &mut self.app_view.device);
             }
-
             self.app_view.device.get_queue().submit(&[encoder.finish()]);
         }
     }

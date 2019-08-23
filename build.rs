@@ -16,7 +16,7 @@ fn main() -> Result<(), Box<Error>> {
     let shader_files: Vec<&str> = match std::env::var("TARGET") {
         Ok(target) => {
             if target.contains("ios") {
-                vec!["none", "text"]
+                vec!["none", "sdf/text"]
             } else {
                 vec![]
             }
@@ -27,7 +27,7 @@ fn main() -> Result<(), Box<Error>> {
     let compute_shader: Vec<&str> = match std::env::var("TARGET") {
         Ok(target) => {
             if target.contains("ios") {
-                vec![]
+                vec!["sdf/sdf_init", "sdf/sdf;"]
             } else {
                 vec![]
             }

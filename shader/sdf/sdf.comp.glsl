@@ -8,7 +8,7 @@ layout(set = 0, binding = 0) uniform InfoUniform
     // [3] = 0 | 1 ( front or background distance fields)
     ivec4 info;
 };
-layout(binding = 1, rgba8) uniform image2D input_pic;
+layout(binding = 1, r8) uniform image2D input_pic;
 // g_front = front distance fields, g_background = background distance fields
 // Cannot reuse block name within the same shader
 layout(set = 0, binding = 2) buffer EDTFront { float g_front[]; };
@@ -116,8 +116,7 @@ void main() {
         float dis = sqrt(g_background[pixel_index(uv)]) - sqrt(g_front[pixel_index(uv)]);
         float luma = (1.0 - (dis / 8.0 + OUTLINE));
 
-        vec4 final = imageLoad(input_pic, uv);
-        final.r = clamp(luma, 0.0, 1.0);
-        imageStore(input_pic, uv, final);
+        float final = clamp(luma, 0.0, 1.0);
+        imageStore(input_pic, uv, vec4(final, 0.0, 0.0, 0.0));
     }
 }

@@ -7,9 +7,6 @@ use getopts::Options;
 mod sdf;
 use sdf::SDF;
 
-mod sdf2;
-use sdf2::SDF2;
-
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let program_name = args[0].clone();

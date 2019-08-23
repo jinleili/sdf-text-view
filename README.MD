@@ -1,1 +1,1 @@
-# sdf-text-renderer
+# sdf-text-view

@@ -24,11 +24,11 @@ void main()
 {
     // init front && background distance fields
     ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
-    float luma = imageLoad(input_pic, uv).r;
-    if (luma >= 0.95) {
+    float luma = 1.0 - imageLoad(input_pic, uv).r;
+    if (luma > 0.98) {
         g_front[pixel_index(uv)] = INF;
         g_background[pixel_index(uv)] = 0.0;
-    } else if (luma < 0.01) {
+    } else if (luma < 0.001) {
         g_front[pixel_index(uv)] = 0.0;
         g_background[pixel_index(uv)] = INF;
     } else {
