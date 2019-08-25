@@ -53,15 +53,17 @@ void sdf1d(int offset, int stride, int len)
     for (int q = 0; q < len; q++) {
         int real_index = offset + q * stride;
         reset_f(real_index);
-        d[real_index] = 0.0;
+        v[real_index] = 0;
         z[real_index] = 0.0;
     }
-    z[offset + (info.y - 1) * stride] = 0.0;
+    // z[offset + (len - 1) * stride] = 0.0;
     z[offset] = -INF;
     z[offset + stride] = INF;
 
     int k = 0;
     int r = 0;
+    // 1D r value, like the q
+    int r1d;
     float s = 0.0;
 
     // 1D squared distance transform
@@ -69,22 +71,25 @@ void sdf1d(int offset, int stride, int len)
         int real_q = offset + q * stride;
         do {
             r = v[offset + k * stride];
-            s = (f[real_q] + float(q * q) - f[r] - float(r * r)) / float(2 * (q - r));
+            // 1D r value, like the q
+            r1d = int((r - offset) / stride);
+            s = (f[real_q] + float(q * q) - f[r] - float(r1d * r1d)) / float(2 * (q - r1d));
             // 实际情况: k 不会小于 0
         } while (s <= z[offset + k * stride] && --k > (-1));
         k++;
         v[offset + k * stride] = real_q;
         z[offset + k * stride] = s;
-        z[offset + k * stride + 1] = INF;
+        z[offset + (k + 1) * stride] = INF;
     }
 
     k = 0;
     for (int q = 0; q < len; q++) {
-        while (z[offset + k * stride + 1] < float(q)) {
+        while (z[offset + (k + 1) * stride] < float(q)) {
             k++;
         }
         r = v[offset + k * stride];
-        update_sdf(offset + q * stride, f[r] + float((q - r) * (q - r)));
+        r1d = int((r - offset) / stride);
+        update_sdf(offset + q * stride, f[r] + float((q - r1d) * (q - r1d)));
     }
 }
 
@@ -117,7 +122,7 @@ void main()
         float luma = (1.0 - (dis / 8.0 + 0.25));
 
         float final = clamp(luma, 0.0, 1.0);
-        // float final = clamp(sqrt(g_front[pixel_index(uv)]), 0.0, 1.0);
+        // float final = clamp(sqrt(g_background[pixel_index(uv)]), 0.0, 1.0);
         imageStore(input_pic, uv, vec4(final, 0.0, 0.0, 0.0));
     }
 }

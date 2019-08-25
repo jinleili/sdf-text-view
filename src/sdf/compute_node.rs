@@ -56,11 +56,6 @@ impl SDFComputeNode {
                     visibility: wgpu::ShaderStage::COMPUTE,
                     ty: wgpu::BindingType::StorageBuffer { dynamic: false, readonly: false },
                 },
-                wgpu::BindGroupLayoutBinding {
-                    binding: 7,
-                    visibility: wgpu::ShaderStage::COMPUTE,
-                    ty: wgpu::BindingType::StorageBuffer { dynamic: false, readonly: false },
-                },
             ],
         });
 
@@ -81,7 +76,6 @@ impl SDFComputeNode {
             size: sdf_range,
             usage: wgpu::BufferUsage::STORAGE,
         });
-        let max_length = if extent.width > extent.height { extent.width } else { extent.height };
 
         let f_buffer = device.create_buffer(&wgpu::BufferDescriptor {
             size: sdf_range,
