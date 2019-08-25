@@ -51,11 +51,6 @@ impl SDFComputeNode {
                     visibility: wgpu::ShaderStage::COMPUTE,
                     ty: wgpu::BindingType::StorageBuffer { dynamic: false, readonly: false },
                 },
-                wgpu::BindGroupLayoutBinding {
-                    binding: 6,
-                    visibility: wgpu::ShaderStage::COMPUTE,
-                    ty: wgpu::BindingType::StorageBuffer { dynamic: false, readonly: false },
-                },
             ],
         });
 
@@ -73,11 +68,6 @@ impl SDFComputeNode {
             usage: wgpu::BufferUsage::STORAGE,
         });
         let sdf_background = device.create_buffer(&wgpu::BufferDescriptor {
-            size: sdf_range,
-            usage: wgpu::BufferUsage::STORAGE,
-        });
-
-        let f_buffer = device.create_buffer(&wgpu::BufferDescriptor {
             size: sdf_range,
             usage: wgpu::BufferUsage::STORAGE,
         });
@@ -122,19 +112,12 @@ impl SDFComputeNode {
                 wgpu::Binding {
                     binding: 4,
                     resource: wgpu::BindingResource::Buffer {
-                        buffer: &f_buffer,
-                        range: 0..sdf_range,
-                    },
-                },
-                wgpu::Binding {
-                    binding: 5,
-                    resource: wgpu::BindingResource::Buffer {
                         buffer: &v_buffer,
                         range: 0..sdf_range,
                     },
                 },
                 wgpu::Binding {
-                    binding: 6,
+                    binding: 5,
                     resource: wgpu::BindingResource::Buffer {
                         buffer: &z_buffer,
                         range: 0..z_range,

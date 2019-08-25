@@ -13,9 +13,8 @@ layout(binding = 1, r8) uniform image2D input_pic;
 // Cannot reuse block name within the same shader
 layout(set = 0, binding = 2) buffer EDTFront { float g_front[]; };
 layout(set = 0, binding = 3) buffer EDTBackground { float g_background[]; };
-layout(set = 0, binding = 4) buffer EDTFn { float f[]; };
-layout(set = 0, binding = 5) buffer EDTTempV { int v[]; };
-layout(set = 0, binding = 6) buffer EDTTempZ { float z[]; };
+layout(set = 0, binding = 4) buffer EDTTempV { int v[]; };
+layout(set = 0, binding = 5) buffer EDTTempZ { float z[]; };
 
 const float INF = 99999.0;
 
@@ -29,12 +28,11 @@ int pixel_index(ivec2 uv)
     return uv.y * info.x + uv.x;
 }
 
-void reset_f(int index)
-{
+float get_f(int index) {
     if (info[3] == 0) {
-        f[index] = g_front[index];
+        return g_front[index];
     } else {
-        f[index] = g_background[index];
+        return g_background[index];
     }
 }
 
@@ -52,7 +50,6 @@ void sdf1d(int offset, int stride, int len)
     // restore temp arr to default value
     for (int q = 0; q < len; q++) {
         int real_index = offset + q * stride;
-        reset_f(real_index);
         v[real_index] = 0;
         z[real_index] = 0.0;
     }
@@ -71,9 +68,8 @@ void sdf1d(int offset, int stride, int len)
         int real_q = offset + q * stride;
         do {
             r = v[offset + k * stride];
-            // 1D r value, like the q
-            r1d = int((r - offset) / stride);
-            s = (f[real_q] + float(q * q) - f[r] - float(r1d * r1d)) / float(2 * (q - r1d));
+            r1d = (r - offset) / stride;
+            s = (get_f(real_q) + float(q * q) - get_f(r) - float(r1d * r1d)) / float(2 * (q - r1d));
             // 实际情况: k 不会小于 0
         } while (s <= z[offset + k * stride] && --k > (-1));
         k++;
@@ -88,8 +84,8 @@ void sdf1d(int offset, int stride, int len)
             k++;
         }
         r = v[offset + k * stride];
-        r1d = int((r - offset) / stride);
-        update_sdf(offset + q * stride, f[r] + float((q - r1d) * (q - r1d)));
+        r1d = (r - offset) / stride;
+        update_sdf(offset + q * stride, get_f(r) + float((q - r1d) * (q - r1d)));
     }
 }
 
