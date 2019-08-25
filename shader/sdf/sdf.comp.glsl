@@ -2,10 +2,10 @@ layout(local_size_x = 1, local_size_y = 1) in;
 
 layout(set = 0, binding = 0) uniform InfoUniform
 {
-    // info[0] = pic.width ; [1] = pic.height;
-    // [2] = 0 | 1 (iter by y, x),
-    // [2] = 2 (save final distance to input_pic's r channel)
-    // [3] = 0 | 1 ( front or background distance fields)
+    // info[0] = pic.width ;
+    // info[1] = pic.height;
+    // info[2] = 0 | 1 (iter by y, x), = 1 (init edt), = 2 (save final distance to input_pic's r channel)
+    // info[3] = 0 | 1 ( front or background distance fields)
     ivec4 info;
 };
 layout(binding = 1, r8) uniform image2D input_pic;
@@ -14,109 +14,110 @@ layout(binding = 1, r8) uniform image2D input_pic;
 layout(set = 0, binding = 2) buffer EDTFront { float g_front[]; };
 layout(set = 0, binding = 3) buffer EDTBackground { float g_background[]; };
 layout(set = 0, binding = 4) buffer EDTFn { float f[]; };
-layout(set = 0, binding = 5) buffer EDTTempDistance { float d[]; };
-layout(set = 0, binding = 6) buffer EDTTempV { int v[]; };
-layout(set = 0, binding = 7) buffer EDTTempZ { float z[]; };
+layout(set = 0, binding = 5) buffer EDTTempV { int v[]; };
+layout(set = 0, binding = 6) buffer EDTTempZ { float z[]; };
 
 const float INF = 99999.0;
-const float OUTLINE = 0.25;
+
+int pixel_coord(int x, int y)
+{
+    return y * info.x + x;
+}
 
 int pixel_index(ivec2 uv)
 {
-    return uv.y * info[0] + uv.x;
+    return uv.y * info.x + uv.x;
 }
 
-float reset_f(int x, int y) {
-    if (info[3] == 0) {
-        return g_front[pixel_index(ivec2(x, y))].r;
-    } else {
-        return g_background[pixel_index(ivec2(x, y))].r;
-    }
-}
-
-void reset_v_n_z()
+void reset_f(int index)
 {
-    int max_length = info.x > info.y ? info.x : info.y;
-    for (int i = 0; i < max_length; i++) {
-        v[i] = 0;
-        z[i] = 0.0;
-    }
-    z[max_length] = 0.0;
-    z[0] = -INF;
-    z[1] = INF;
-}
-
-void update_sdf(int x, int y, float val) {
     if (info[3] == 0) {
-        g_front[pixel_index(ivec2(x, y))] = val;
+        f[index] = g_front[index];
     } else {
-        g_background[pixel_index(ivec2(x, y))] = val;
+        f[index] = g_background[index];
     }
 }
 
-void sdf1d(int length)
+void update_sdf(int index, float val)
 {
+    if (info[3] == 0) {
+        g_front[index] = val;
+    } else {
+        g_background[index] = val;
+    }
+}
+
+void sdf1d(int offset, int stride, int len)
+{
+    // restore temp arr to default value
+    for (int q = 0; q < len; q++) {
+        int real_index = offset + q * stride;
+        reset_f(real_index);
+        d[real_index] = 0.0;
+        z[real_index] = 0.0;
+    }
+    z[offset + (info.y - 1) * stride] = 0.0;
+    z[offset] = -INF;
+    z[offset + stride] = INF;
+
     int k = 0;
     int r = 0;
     float s = 0.0;
 
-    reset_v_n_z();
-
-    for (int q = 1; q < length; q++) {
+    // 1D squared distance transform
+    for (int q = 1; q < len; q++) {
+        int real_q = offset + q * stride;
         do {
-            r = v[k];
-            s = (f[q] + float(q * q) - f[r] - float(r * r)) / float(2 * (q - r));
+            r = v[offset + k * stride];
+            s = (f[real_q] + float(q * q) - f[r] - float(r * r)) / float(2 * (q - r));
             // 实际情况: k 不会小于 0
-            k--;
-        } while (s <= z[k]);
+        } while (s <= z[offset + k * stride] && --k > (-1));
         k++;
-        v[k] = q;
-        z[k] = s;
-        z[k + 1] = INF;
+        v[offset + k * stride] = real_q;
+        z[offset + k * stride] = s;
+        z[offset + k * stride + 1] = INF;
     }
 
     k = 0;
-    for (int q = 0; q < length; q++) {
-        while (z[k + 1] < float(q)) {
+    for (int q = 0; q < len; q++) {
+        while (z[offset + k * stride + 1] < float(q)) {
             k++;
         }
-        r = v[k];
-        d[q] = f[r] + float(pow(q - r, 2));
+        r = v[offset + k * stride];
+        update_sdf(offset + q * stride, f[r] + float((q - r) * (q - r)));
     }
 }
 
-void main() {
-    if (info[2] == 0) {
+void main()
+{
+    ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+
+    if (info[2] == 2) {
+        // init front && background distance fields
+        float luma = imageLoad(input_pic, uv).r;
+        if (luma > 0.949) {
+            g_front[pixel_index(uv)] = INF;
+            g_background[pixel_index(uv)] = 0.0;
+        } else if (luma < 0.01) {
+            g_front[pixel_index(uv)] = 0.0;
+            g_background[pixel_index(uv)] = INF;
+        } else {
+            g_front[pixel_index(uv)] = pow(max(0.0, luma - 0.5), 2.0);
+            g_background[pixel_index(uv)] = pow(max(0.0, 0.5 - luma), 2.0);
+        }
+    } else if (info[2] == 0) {
         // transform along columns
-        int x = int(gl_GlobalInvocationID.x);
-        for (int y = 0; y < info.y; y++) {
-            f[y] = reset_f(x, y);
-        }
-
-        sdf1d(info.y);
-
-        for (int y = 0; y < info.y; y++) {
-            update_sdf(x, y, d[y]);
-        }
+        sdf1d(uv.x, info.x, info.y);
     } else if (info[2] == 1) {
         // transform along rows
-        int y = int(gl_GlobalInvocationID.y);
-        for (int x = 0; y < info.x; x++) {
-            f[x] = reset_f(x, y);
-        }
-
-        sdf1d(info.x);
-
-        for (int x = 0; y < info.x; x++) {
-            update_sdf(x, y, d[x]);
-        }
+        sdf1d(uv.y * info.x, 1, info.x);
     } else {
         // output final distans fields
-        ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
         float dis = sqrt(g_background[pixel_index(uv)]) - sqrt(g_front[pixel_index(uv)]);
-        float luma = (1.0 - (dis / 8.0 + OUTLINE));
+        float luma = (1.0 - (dis / 8.0 + 0.25));
 
         float final = clamp(luma, 0.0, 1.0);
+        // float final = clamp(sqrt(g_front[pixel_index(uv)]), 0.0, 1.0);
         imageStore(input_pic, uv, vec4(final, 0.0, 0.0, 0.0));
     }
 }

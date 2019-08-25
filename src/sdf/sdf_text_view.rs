@@ -13,6 +13,7 @@ pub struct SDFTextView {
     hud: HUD,
     compute_node: SDFComputeNode,
     render_node: SDFRenderNode,
+    need_cal_sdf: bool,
 }
 
 impl SDFTextView {
@@ -27,13 +28,13 @@ impl SDFTextView {
             "math.png",
             &mut app_view.device,
             &mut encoder,
-            false,
+            true,
             true,
         );
 
         let compute_node =
             SDFComputeNode::new(&mut app_view.device, &mut encoder, &texture_view, texture_extent);
-        compute_node.compute(&mut app_view.device, &mut encoder);
+        // compute_node.compute(&mut app_view.device, &mut encoder);
 
         let render_node = SDFRenderNode::new(
             &app_view.sc_desc,
@@ -45,7 +46,7 @@ impl SDFTextView {
 
         let hud = HUD::new();
 
-        SDFTextView { app_view, hud, compute_node, render_node }
+        SDFTextView { app_view, hud, compute_node, render_node, need_cal_sdf: true }
     }
 }
 
@@ -67,9 +68,12 @@ impl SurfaceView for SDFTextView {
             .device
             .create_command_encoder(&wgpu::CommandEncoderDescriptor { todo: 0 });
         {
-            // self.hud.start_frame_timer();
-            // self.compute_node.compute(&mut self.app_view.device, &mut encoder);
-            // println!("time: {:?}", self.hud.stop_frame_timer() );
+            if self.need_cal_sdf {
+                self.hud.start_frame_timer();
+                self.compute_node.compute(&mut self.app_view.device, &mut encoder);
+                self.need_cal_sdf = false;
+                println!("sdf time: {:?}", self.hud.stop_frame_timer());
+            }
 
             let frame = self.app_view.swap_chain.get_next_texture();
             {

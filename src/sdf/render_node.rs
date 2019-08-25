@@ -92,7 +92,7 @@ impl SDFRenderNode {
             ],
         });
 
-    let draw_buf_stroke = crate::utils::create_uniform_buffer(
+        let draw_buf_stroke = crate::utils::create_uniform_buffer(
             device,
             DrawUniform { stroke_color: [1.0, 1.0, 1.0, 1.0], mask_n_gamma: [0.25, 0.036] },
         );
@@ -226,7 +226,8 @@ impl SDFRenderNode {
     }
 
     pub fn begin_render_pass(
-        &self, frame: &wgpu::SwapChainOutput, encoder: &mut wgpu::CommandEncoder, device: &mut wgpu::Device
+        &self, frame: &wgpu::SwapChainOutput, encoder: &mut wgpu::CommandEncoder,
+        device: &mut wgpu::Device,
     ) {
         let mut rpass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
             color_attachments: &[wgpu::RenderPassColorAttachmentDescriptor {
@@ -244,6 +245,7 @@ impl SDFRenderNode {
         rpass.set_vertex_buffers(0, &[(&self.vertex_buf, 0)]);
         rpass.draw_indexed(0..self.index_count as u32, 0, 0..1);
 
+        // Need use update_uniform to improve
         rpass.set_bind_group(0, &self.bind_group_stroke, &[]);
         rpass.draw_indexed(0..self.index_count as u32, 0, 0..1);
 

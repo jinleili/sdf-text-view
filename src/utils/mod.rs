@@ -173,3 +173,22 @@ where
     );
     device.get_queue().submit(&[encoder.finish()]);
 }
+
+#[allow(dead_code)]
+pub fn update_buffer_use_encoder<T>(
+    encoder: &mut wgpu::CommandEncoder, device: &mut wgpu::Device, uniforms: T,
+    destination: &wgpu::Buffer,
+) where
+    T: 'static + Copy,
+{
+    let temp_buf =
+        device.create_buffer_mapped(1, wgpu::BufferUsage::COPY_SRC).fill_from_slice(&[uniforms]);
+
+    encoder.copy_buffer_to_buffer(
+        &temp_buf,
+        0,
+        destination,
+        0,
+        std::mem::size_of::<T>() as wgpu::BufferAddress,
+    );
+}

@@ -27,12 +27,12 @@ vec4 lerp(vec4 a, vec4 b, float w) {
 void main(void)
 {
     float tex_gray = texture(sampler2D(sdf_texture, sdf_sampler), uv).r;
-    // 反转一下数值
-    tex_gray = (1.0 - tex_gray);
+    // // 反转一下数值
+    // tex_gray = (1.0 - tex_gray);
 
-    float alpha = aastep2(tex_gray, mask_n_gamma[0]);
+    // float alpha = aastep2(tex_gray, mask_n_gamma[0]);
 
-    frag_color = vec4(stroke_color.rgb, alpha);
+    // frag_color = vec4(stroke_color.rgb, alpha);
 
     // if (show_outline) {
     //     vec4 outline_color = outline;
@@ -44,5 +44,5 @@ void main(void)
     //     shadow_color.a = aastep(tex_gray, outline_mask);
     //     stroke_color = lerp(shadow_color, stroke_color, alpha);
     // }
-    // frag_color = stroke_color;
+    frag_color = vec4(vec3(tex_gray), 1.0);
 }
