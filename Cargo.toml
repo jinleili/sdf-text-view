@@ -23,7 +23,7 @@ vulkan = ["wgpu/vulkan"]
 
 [dependencies]
 libc = "*"
-wgpu = { git = "https://github.com/gfx-rs/wgpu-rs", rev = "0641ef6aa3333da2e67fc3484e7d5152b0159c74"  }
+wgpu = { git = "https://github.com/gfx-rs/wgpu-rs", rev = "b7d8d8fa995964315318e67f4296a52d4490d518"  }
 # 本地版本设置了 metal-auto-capture，且解决了 iOS 设备上 Undefined symbols for architecture arm64:
 #  "_MTLCopyAllDevices" bug
 # wgpu = { path = "../wgpu-rs"}

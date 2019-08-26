@@ -53,7 +53,7 @@ void sdf1d(int offset, int stride, int len)
         v[real_index] = 0;
         z[real_index] = 0.0;
     }
-    // z[offset + (len - 1) * stride] = 0.0;
+    z[offset + (len - 1) * stride] = 0.0;
     z[offset] = -INF;
     z[offset + stride] = INF;
 
@@ -117,8 +117,8 @@ void main()
         float dis = sqrt(g_background[pixel_index(uv)]) - sqrt(g_front[pixel_index(uv)]);
         float luma = (1.0 - (dis / 8.0 + 0.25));
 
-        float final = clamp(luma, 0.0, 1.0);
-        // float final = clamp(sqrt(g_background[pixel_index(uv)]), 0.0, 1.0);
+        // float final = clamp(luma, 0.0, 1.0);
+        float final = clamp(sqrt(g_front[pixel_index(uv)]), 0.0, 1.0);
         imageStore(input_pic, uv, vec4(final, 0.0, 0.0, 0.0));
     }
 }
