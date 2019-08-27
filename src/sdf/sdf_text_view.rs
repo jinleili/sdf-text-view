@@ -1,12 +1,9 @@
 use crate::texture;
-use crate::utils::{MVPUniform, HUD};
+use crate::utils::HUD;
 use crate::SurfaceView;
 
-use uni_view::{AppView, GPUContext};
-
 use super::{SDFComputeNode, SDFRenderNode};
-
-// use nalgebra_glm as glm;
+use uni_view::{AppView, GPUContext};
 
 pub struct SDFTextView {
     app_view: AppView,
@@ -32,8 +29,6 @@ impl SDFTextView {
             true,
         );
 
-        print!("extent: {:?}", texture_extent);
-
         let compute_node =
             SDFComputeNode::new(&mut app_view.device, &mut encoder, &texture_view, texture_extent);
         // compute_node.compute(&mut app_view.device, &mut encoder);
@@ -48,8 +43,9 @@ impl SDFTextView {
 
         let hud = HUD::new();
 
-        let mut instance = SDFTextView { app_view, hud, compute_node, render_node, need_cal_sdf: true };
-         // 需要主动调一次 resize 来更新 mvp
+        let mut instance =
+            SDFTextView { app_view, hud, compute_node, render_node, need_cal_sdf: true };
+        // 需要主动调一次 resize 来更新 mvp
         instance.resize();
 
         instance

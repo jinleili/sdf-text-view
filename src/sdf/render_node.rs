@@ -255,6 +255,5 @@ impl SDFRenderNode {
         // Need use update_uniform to improve
         rpass.set_bind_group(0, &self.bind_group_stroke, &[]);
         rpass.draw_indexed(0..self.index_count as u32, 0, 0..1);
-
     }
 }

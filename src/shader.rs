@@ -34,7 +34,8 @@ impl Shader {
     #[allow(dead_code)]
     pub fn new_by_compute(name: &str, device: &mut wgpu::Device) -> Self {
         let bytes = generate_shader_source(name, "comp");
-        let module = device.create_shader_module(&wgpu::read_spirv(std::io::Cursor::new(&bytes[..])).unwrap());
+        let module = device
+            .create_shader_module(&wgpu::read_spirv(std::io::Cursor::new(&bytes[..])).unwrap());
         Shader { vs_module: module, fs_module: None }
     }
 
@@ -75,8 +76,10 @@ pub fn load_general_glsl(
 ) -> (wgpu::ShaderModule, wgpu::ShaderModule) {
     let vs_bytes = generate_shader_source(name, "vs");
     let fs_bytes = generate_shader_source(name, "fs");
-    let vs_module = device.create_shader_module(&wgpu::read_spirv(std::io::Cursor::new(&vs_bytes[..])).unwrap());
-    let fs_module = device.create_shader_module(&wgpu::read_spirv(std::io::Cursor::new(&fs_bytes[..])).unwrap());;
+    let vs_module = device
+        .create_shader_module(&wgpu::read_spirv(std::io::Cursor::new(&vs_bytes[..])).unwrap());
+    let fs_module = device
+        .create_shader_module(&wgpu::read_spirv(std::io::Cursor::new(&fs_bytes[..])).unwrap());;
 
     (vs_module, fs_module)
 }

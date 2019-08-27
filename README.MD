@@ -4,12 +4,13 @@ SDFTextView is a view component that based wgpu to calculate SDF(signed distance
 Also implemented a cpu-based SDF version on ```sdf-generator/```, it accept a input image and output a sdf gray image.
 
 ## Real time performance of  SDF compute shader
+Test 6 times, the resolution of the input image used is 368*130.
 
 Device | SDF time cost
 --------- | -------------
 MBP 2018 (15-inch, Intel i7) |  1.414149ms
 iPhone 6 plus  | 8.211291ms
-iPhone Xs Max   | 1.182791ms
+iPhone Xs Max   | 1.330083ms
 
 ## Screenshot
  &nbsp; | &nbsp;

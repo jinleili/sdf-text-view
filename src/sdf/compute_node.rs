@@ -140,39 +140,25 @@ impl SDFComputeNode {
 
     pub fn compute(&mut self, device: &mut wgpu::Device, encoder: &mut wgpu::CommandEncoder) {
         // init distance fields
-        self.step_uniform(2, 0, self.extent.width, self.extent.height, device, encoder);
-        // crate::utils::update_buffer_use_encoder(encoder, device, self.step_uniform(2, 0), &self.uniform_buf);
+        self.step_cal(2, 0, self.extent.width, self.extent.height, device, encoder);
 
         // step front y
-        self.step_uniform(0, 0, self.extent.width, 1, device, encoder);
-
-        // crate::utils::update_buffer_use_encoder(encoder, device, self.step_uniform(0, 0), &self.uniform_buf);
-        // cpass.dispatch(self.extent.width, 1, 1);
+        self.step_cal(0, 0, self.extent.width, 1, device, encoder);
 
         // step front x
-        self.step_uniform(1, 0, 1, self.extent.height, device, encoder);
-
-        // // crate::utils::update_buffer_use_encoder(encoder, device, self.step_uniform(1, 0), &self.uniform_buf);
-        // // cpass.dispatch(1, self.extent.height, 1);
+        self.step_cal(1, 0, 1, self.extent.height, device, encoder);
 
         // step background y
-        self.step_uniform(0, 1, self.extent.width, 1, device, encoder);
+        self.step_cal(0, 1, self.extent.width, 1, device, encoder);
 
-        // // crate::utils::update_buffer_use_encoder(encoder, device, self.step_uniform(0, 1), &self.uniform_buf);
-        // // cpass.dispatch(self.extent.width, 1, 1);
         // step background x
-        self.step_uniform(1, 1, 1, self.extent.height, device, encoder);
-
-        // // crate::utils::update_buffer_use_encoder(encoder, device, self.step_uniform(1, 1), &self.uniform_buf);
-        // // cpass.dispatch(1, self.extent.height, 1);
+        self.step_cal(1, 1, 1, self.extent.height, device, encoder);
 
         // final output
-        self.step_uniform(3, 0, self.extent.width as u32, self.extent.height, device, encoder);
-        // crate::utils::update_buffer_use_encoder(encoder, device, self.step_uniform(3, 0), &self.uniform_buf);
-        // cpass.dispatch(self.extent.width, self.extent.height, 1);
+        self.step_cal(3, 0, self.extent.width as u32, self.extent.height, device, encoder);
     }
 
-    fn step_uniform(
+    fn step_cal(
         &self, iter: i32, is_bg: i32, dispatch_x: u32, dispatch_y: u32, device: &mut wgpu::Device,
         encoder: &mut wgpu::CommandEncoder,
     ) {
@@ -180,7 +166,6 @@ impl SDFComputeNode {
             info: [self.extent.width as i32, self.extent.height as i32, iter, is_bg],
         };
         crate::utils::update_buffer_use_encoder(encoder, device, u, &self.uniform_buf);
-        
 
         let mut cpass = encoder.begin_compute_pass();
         cpass.set_pipeline(&self.compute_pipeline);

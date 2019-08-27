@@ -25,7 +25,6 @@ fn main() {
 
     let mut surface_view = idroid::SDFTextView::new(v);
     // winit 0.20.0-alpha3 不会主动触发 WindowEvent::Resized 事件了
-   
 
     events_loop.run(move |event, _, control_flow| {
         *control_flow = if cfg!(feature = "metal-auto-capture") {
