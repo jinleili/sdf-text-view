@@ -18,5 +18,6 @@ struct idroid_obj *create_sdf_view(struct app_view object);
 
 void enter_frame(struct rust_obj *data);
 void touch_move(struct rust_obj *data, struct TouchPoint p);
+void resize(struct rust_obj *data);
 
 #endif /* idroid_h */

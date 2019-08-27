@@ -62,6 +62,7 @@ impl AppView {
 impl crate::GPUContext for AppView {
     fn update_swap_chain(&mut self) {
         let size = self.get_view_size();
+        println!("view_size: {:?}", size);
         self.sc_desc.width = size.width;
         self.sc_desc.height = size.height;
         self.swap_chain = self.device.create_swap_chain(&self.surface, &self.sc_desc);

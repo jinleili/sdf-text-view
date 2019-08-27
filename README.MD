@@ -1,6 +1,8 @@
 # SDFTextView
 SDFTextView is a view component that based wgpu to calculate SDF(signed distance field) at real time and rendering.
 
+Also implemented a cpu-based SDF version on ```sdf-generator/```, it accept a input image and output a sdf gray image.
+
 ## Screenshot
 ![macOS App](screenshot/macOS_gif.gif)
 
@@ -28,3 +30,9 @@ RUST_BACKTRACE=1 cargo build --target aarch64-apple-ios
 cargo build --target aarch64-apple-ios --release
 ```
 Then,use Xcode to open iOS/demo.xcworkspace and run.
+
+### cpu-based version
+```
+cd sdf-generator
+cargo run input.png output.png
+```

@@ -48,7 +48,11 @@ impl SDFTextView {
 
         let hud = HUD::new();
 
-        SDFTextView { app_view, hud, compute_node, render_node, need_cal_sdf: true }
+        let mut instance = SDFTextView { app_view, hud, compute_node, render_node, need_cal_sdf: true };
+         // 需要主动调一次 resize 来更新 mvp
+        instance.resize();
+
+        instance
     }
 }
 
@@ -56,6 +60,7 @@ impl SurfaceView for SDFTextView {
     fn touch_moved(&mut self, _position: crate::math::Position) {}
 
     fn resize(&mut self) {
+        println!("resize()--");
         self.app_view.update_swap_chain();
         self.render_node.update_scale(&self.app_view.sc_desc, &mut self.app_view.device, 1.0);
     }

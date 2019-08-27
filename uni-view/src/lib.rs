@@ -26,6 +26,7 @@ mod ffi;
 
 
 #[repr(C)]
+#[derive(Debug)]
 pub struct ViewSize {
     pub width: u32,
     pub height: u32,

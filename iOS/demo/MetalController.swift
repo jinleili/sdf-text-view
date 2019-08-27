@@ -27,14 +27,16 @@ class MetalController: UIViewController {
 
 //                enter_frame(drawObj)
                 displayLink = CADisplayLink.init(target: self, selector: #selector(enterFrame))
+                self.displayLink?.add(to: .current, forMode: .default)
             }
+        } else {
+            self.displayLink?.isPaused = false
         }
-        self.displayLink?.add(to: .current, forMode: .default)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        displayLink?.invalidate()
+        displayLink?.isPaused = true
     }
     
     @objc func enterFrame() {
@@ -45,11 +47,29 @@ class MetalController: UIViewController {
     }
 
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        let p = touches.first!.location(in: self.view)
-        let tp = TouchPoint(x: Float(p.x), y: Float(p.y), force: 0.0)
-        touch_move(self.drawObj!, tp)
-//        enter_frame(drawObj)
+        if let obj = self.drawObj {
+            let p = touches.first!.location(in: self.view)
+            let tp = TouchPoint(x: Float(p.x), y: Float(p.y), force: 0.0)
+            touch_move(obj, tp)
+        }
     }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        self.displayLink?.isPaused = true
+        
+        super.viewWillTransition(to: size, with: coordinator)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            [weak self] in
+            if let obj = self?.drawObj {
+                resize(obj)
+                self?.displayLink?.isPaused = false
+            }
+        }
+    }
+    
+    
+    
     
     deinit {
         displayLink?.invalidate()

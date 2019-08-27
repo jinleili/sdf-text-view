@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SnapKit
 
 class ViewController: UIViewController {
 
@@ -24,8 +25,10 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        metalController.view.frame = CGRect(x: 0, y: 50, width: 400, height: 400)
         self.view.addSubview(metalController.view)
+        metalController.view.snp.makeConstraints { (make) -> Void in
+            make.edges.equalTo(self.view)
+        }
         
     }
     
