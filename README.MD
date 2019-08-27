@@ -12,7 +12,7 @@ iPhone 6 plus  | 8.211291ms
 iPhone Xs Max   | 1.182791ms
 
 ## Screenshot
- | 
+ &nbsp; | &nbsp;
 --------- | -------------
 ![on macOS](screenshot/macOS_gif.gif)  | ![on iPhone](screenshot/iPhone_gif.gif)
 
