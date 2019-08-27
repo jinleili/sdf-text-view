@@ -1,7 +1,10 @@
-# sdf-text-view
-Real time SDF(signed distance field) calculate and rendering on gpu.
+# SDFTextView
+SDFTextView is a view component that based wgpu to calculate SDF(signed distance field) at real time and rendering.
 
-## SDF rendering 
+## Screenshot
+![macOS App](/screenshot/macOS_gif.gif)
+
+## What is a SDF rendering 
 SDF rendering is a technique that allows you to render bitmap fonts without jagged edges even at high magnifications. 
 
 Original SIGGRAPH 2007 paper: [Improved Alpha-Tested Magnification for Vector Textures and Special Effects](https://steamcdn-a.akamaihd.net/apps/valve/2007/SIGGRAPH2007_AlphaTestedMagnification.pdf)

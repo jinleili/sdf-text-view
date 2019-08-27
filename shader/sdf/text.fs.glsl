@@ -17,7 +17,7 @@ float aastep(float value, float mask)
 
 float aastep2(float value, float mask)
 {
-    return smoothstep(mask - 0.015, mask + 0.015, value);
+    return smoothstep(mask - 0.055, mask + 0.055, value);
 }
 
 vec4 lerp(vec4 a, vec4 b, float w) {
@@ -30,19 +30,19 @@ void main(void)
     // // 反转一下数值
     // tex_gray = (1.0 - tex_gray);
 
-    // float alpha = aastep2(tex_gray, mask_n_gamma[0]);
-
-    // frag_color = vec4(stroke_color.rgb, alpha);
+    float alpha = aastep2(tex_gray, mask_n_gamma[0]);
+    vec4 stroke_color = vec4(stroke_color.rgb, alpha);
 
     // if (show_outline) {
     //     vec4 outline_color = outline;
     //     outline_color.a = aastep2(tex_gray, outline_mask);
     //     stroke_color = lerp(outline_color, stroke_color, alpha);
     // }
-    // if (show_shadow) {
-    //     vec4 shadow_color = vec4(0.2, 0.2, 0.2, 1.0);
-    //     shadow_color.a = aastep(tex_gray, outline_mask);
-    //     stroke_color = lerp(shadow_color, stroke_color, alpha);
+    // if (alpha < 0.75) {
+    //     vec4 shadow_color = vec4(0.7, 0.1, 0.1, 1.0);
+    //     shadow_color.a = smoothstep(0.753 - 0.45, 0.753, alpha);
+    //     stroke_color = shadow_color; //lerp(shadow_color, stroke_color, alpha);
     // }
-    frag_color = vec4(vec3(tex_gray), 1.0);
+    frag_color = stroke_color;
+    // frag_color = vec4(vec3(tex_gray), 1.0);
 }

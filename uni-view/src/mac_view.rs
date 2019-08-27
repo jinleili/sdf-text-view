@@ -25,7 +25,6 @@ impl AppView {
         let instance = wgpu::Instance::new();
 
         let device = get_device(&instance);
-        use self::raw_window_handle::HasRawWindowHandle as _;
         let surface = instance.create_surface(&view);
         let swap_chain = device.create_swap_chain(&surface, &sc_desc);
 

@@ -25,12 +25,14 @@ impl SDFTextView {
 
         // Create the texture
         let (texture_view, texture_extent, _sampler) = texture::from_file_and_usage_write(
-            "math.png",
+            "math2.png",
             &mut app_view.device,
             &mut encoder,
             true,
             true,
         );
+
+        print!("extent: {:?}", texture_extent);
 
         let compute_node =
             SDFComputeNode::new(&mut app_view.device, &mut encoder, &texture_view, texture_extent);

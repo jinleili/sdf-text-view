@@ -54,7 +54,7 @@ impl SDF {
             for iy in 0..self.img_size.1 {
                 let luma = 1.0 - self.img.get_pixel(ix, iy)[0] as f32 / 255.0;
                 let index = self.img_index(ix as usize, iy as usize);
-                if luma >= 0.95 {
+                if luma > 0.949 {
                     g_front[index] = INF;
                     g_background[index] = 0.0;
                 } else if luma < 0.01 {
@@ -74,6 +74,7 @@ impl SDF {
         // take square roots, reuse g_front cache result
         for i in 0..self.pixel_count {
             g_front[i] = g_background[i].sqrt() - g_front[i].sqrt();
+            // g_front[i] = g_background[i].sqrt();
         }
         let (mut min, max) = min_max(&g_front);
         if max == min {
@@ -90,6 +91,7 @@ impl SDF {
                 luma = 255.0;
             }
             luma_channel[i] = luma as u8;
+            // luma_channel[i] = g_front[i].round() as u8;
         }
 
         let outf = File::create(&self.output_image_path).unwrap();

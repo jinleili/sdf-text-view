@@ -64,7 +64,7 @@ impl SDFRenderNode {
 
         let draw_buf = crate::utils::create_uniform_buffer(
             device,
-            DrawUniform { stroke_color: [1.0, 0.0, 0.0, 1.0], mask_n_gamma: [0.063, 0.0] },
+            DrawUniform { stroke_color: [0.14, 0.14, 0.14, 1.0], mask_n_gamma: [0.55, 0.0] },
         );
 
         let bind_group_outline = device.create_bind_group(&wgpu::BindGroupDescriptor {
@@ -94,7 +94,7 @@ impl SDFRenderNode {
 
         let draw_buf_stroke = crate::utils::create_uniform_buffer(
             device,
-            DrawUniform { stroke_color: [1.0, 1.0, 1.0, 1.0], mask_n_gamma: [0.25, 0.036] },
+            DrawUniform { stroke_color: [0.97, 0.92, 0.80, 1.0], mask_n_gamma: [0.758, 0.75] },
         );
         let bind_group_stroke = device.create_bind_group(&wgpu::BindGroupDescriptor {
             layout: &bind_group_layout,
@@ -235,15 +235,17 @@ impl SDFRenderNode {
                 resolve_target: None,
                 load_op: wgpu::LoadOp::Clear,
                 store_op: wgpu::StoreOp::Store,
+                // clear_color: wgpu::Color { r: 145.0 / 255.0, g: 115.0 / 255.0, b: 105.0 / 255.0, a: 1.0 },
                 clear_color: crate::utils::clear_color(),
             }],
             depth_stencil_attachment: None,
         });
         rpass.set_pipeline(&self.pipeline);
-        rpass.set_bind_group(0, &self.bind_group_outline, &[]);
         rpass.set_index_buffer(&self.index_buf, 0);
         rpass.set_vertex_buffers(0, &[(&self.vertex_buf, 0)]);
-        rpass.draw_indexed(0..self.index_count as u32, 0, 0..1);
+
+        // rpass.set_bind_group(0, &self.bind_group_outline, &[]);
+        // rpass.draw_indexed(0..self.index_count as u32, 0, 0..1);
 
         // Need use update_uniform to improve
         rpass.set_bind_group(0, &self.bind_group_stroke, &[]);
