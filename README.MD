@@ -3,8 +3,18 @@ SDFTextView is a view component that based wgpu to calculate SDF(signed distance
 
 Also implemented a cpu-based SDF version on ```sdf-generator/```, it accept a input image and output a sdf gray image.
 
+## Real time performance of  SDF compute shader
+
+Device | SDF time cost
+--------- | -------------
+MBP 2018 (15-inch, Intel i7) |  1.414149ms
+iPhone 6 plus  | 8.211291ms
+iPhone Xs Max   | 1.182791ms
+
 ## Screenshot
-![on macOS](screenshot/macOS_gif.gif) ![on iPhone](screenshot/iPhone_gif.gif)
+ | 
+--------- | -------------
+![on macOS](screenshot/macOS_gif.gif)  | ![on iPhone](screenshot/iPhone_gif.gif)
 
 ## What is a SDF rendering 
 SDF rendering is a technique that allows you to render bitmap fonts without jagged edges even at high magnifications. 
