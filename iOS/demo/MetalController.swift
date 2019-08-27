@@ -11,8 +11,14 @@ class MetalController: UIViewController {
     var displayLink: CADisplayLink?
     var drawObj: OpaquePointer?
     
+    lazy var pintch: UIPinchGestureRecognizer = {
+        let gestureRecognizer = UIPinchGestureRecognizer.init(target: self, action: #selector(pintchGesture))
+        return gestureRecognizer
+    }()
+    
     override func loadView() {
         self.view = MetalView()
+        self.view.addGestureRecognizer(pintch)
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -68,7 +74,21 @@ class MetalController: UIViewController {
         }
     }
     
-    
+    @IBAction func pintchGesture(_ gestureRecognizer : UIPinchGestureRecognizer) {
+        guard gestureRecognizer.view != nil else { return }
+        
+        if gestureRecognizer.state == .began || gestureRecognizer.state == .changed {
+            let s = gestureRecognizer.scale
+            if let obj = self.drawObj {
+                self.displayLink?.isPaused = false
+                scale(obj, Float(s))
+                self.displayLink?.isPaused = false
+            }
+            gestureRecognizer.scale = 1.0
+        }
+        
+    }
+
     
     
     deinit {

@@ -18,7 +18,7 @@ use math::Position;
 
 pub trait SurfaceView {
     fn resize(&mut self);
-    
+    fn scale(&mut self, scale: f32);
     fn touch_moved(&mut self, position: Position);
 
     fn enter_frame(&mut self);
@@ -68,6 +68,14 @@ pub unsafe extern "C" fn resize(obj: *mut libc::c_void, p: TouchPoint) {
     let mut obj: Box<Box<dyn SurfaceView>> = Box::from_raw(obj as *mut _);
     obj.resize();
 
-    // 重新将所有权移出
+    let _ = Box::into_raw(obj) as *mut libc::c_void;
+}
+
+#[cfg(not(target_os = "macos"))]
+#[no_mangle]
+pub unsafe extern "C" fn scale(obj: *mut libc::c_void, scale: f32) {
+    let mut obj: Box<Box<dyn SurfaceView>> = Box::from_raw(obj as *mut _);
+    obj.scale(scale);
+
     let _ = Box::into_raw(obj) as *mut libc::c_void;
 }

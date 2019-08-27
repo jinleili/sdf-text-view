@@ -8,6 +8,7 @@ use nalgebra_glm as glm;
 
 pub struct SDFRenderNode {
     extent: Extent3d,
+    scale: f32,
     vertex_buf: wgpu::Buffer,
     index_buf: wgpu::Buffer,
     index_count: usize,
@@ -64,7 +65,7 @@ impl SDFRenderNode {
 
         let draw_buf = crate::utils::create_uniform_buffer(
             device,
-            DrawUniform { stroke_color: [0.14, 0.14, 0.14, 1.0], mask_n_gamma: [0.55, 0.0] },
+            DrawUniform { stroke_color: [0.14, 0.14, 0.44, 1.0], mask_n_gamma: [0.55, 0.0] },
         );
 
         let bind_group_outline = device.create_bind_group(&wgpu::BindGroupDescriptor {
@@ -172,6 +173,7 @@ impl SDFRenderNode {
         });
         SDFRenderNode {
             extent,
+            scale: 1.0,
             vertex_buf,
             index_buf,
             index_count: index_data.len(),
@@ -221,6 +223,9 @@ impl SDFRenderNode {
         }
         vm_matrix = glm::translate(&vm_matrix, &glm::vec3(0.0, 0.0, translate_z));
 
+        self.scale *= scale;
+        vm_matrix = glm::scale(&vm_matrix, &glm::vec3(self.scale, self.scale, 1.0));
+
         let mvp: [[f32; 4]; 4] = (p_matrix * vm_matrix).into();
         crate::utils::update_uniform(device, mvp, &self.mvp_buf);
     }
@@ -244,16 +249,12 @@ impl SDFRenderNode {
         rpass.set_index_buffer(&self.index_buf, 0);
         rpass.set_vertex_buffers(0, &[(&self.vertex_buf, 0)]);
 
-        // rpass.set_bind_group(0, &self.bind_group_outline, &[]);
-        // rpass.draw_indexed(0..self.index_count as u32, 0, 0..1);
+        rpass.set_bind_group(0, &self.bind_group_outline, &[]);
+        rpass.draw_indexed(0..self.index_count as u32, 0, 0..1);
 
         // Need use update_uniform to improve
         rpass.set_bind_group(0, &self.bind_group_stroke, &[]);
         rpass.draw_indexed(0..self.index_count as u32, 0, 0..1);
 
-        // crate::utils::update_uniform(device,  DrawUniform { stroke_color: [1.0, 0.0, 0.0, 1.0], mask_n_gamma: [0.30, 0.0], } , &self.draw_buf);
-
-        // crate::utils::update_uniform(device,  DrawUniform { stroke_color: [1.0, 1.0, 1.0, 1.0], mask_n_gamma: [0.25, 0.145], } , &self.draw_buf);
-        // rpass.draw_indexed(0..self.index_count as u32, 0, 0..1);
     }
 }
