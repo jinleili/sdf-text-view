@@ -2,7 +2,7 @@
 SDFTextView is a view component that based wgpu to calculate SDF(signed distance field) at real time and rendering.
 
 ## Screenshot
-![macOS App](/screenshot/macOS_gif.gif)
+![macOS App](screenshot/macOS_gif.gif)
 
 ## What is a SDF rendering 
 SDF rendering is a technique that allows you to render bitmap fonts without jagged edges even at high magnifications. 
@@ -14,10 +14,17 @@ Improved algorithm: [Felzenszwalb/Huttenlocher distance transform](http://cs.bro
 ## Running Example
 ### On PC
 ```
-// macOS
+# macOS
 cargo run --example demo
-// Windows
+# Windows
 cargo run --example demo --features dx12
 ```
 ### On iOS device
-use Xcode to open iOS/demo.xcworkspace
+```
+# build for iOS
+# debug 
+RUST_BACKTRACE=1 cargo build --target aarch64-apple-ios
+# release
+cargo build --target aarch64-apple-ios --release
+```
+Then,use Xcode to open iOS/demo.xcworkspace and run.

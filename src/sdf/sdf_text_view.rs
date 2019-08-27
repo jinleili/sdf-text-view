@@ -53,10 +53,6 @@ impl SDFTextView {
 }
 
 impl SurfaceView for SDFTextView {
-    fn update(&mut self, _event: winit::event::WindowEvent) {
-        //empty
-    }
-
     fn touch_moved(&mut self, _position: crate::math::Position) {}
 
     fn resize(&mut self) {

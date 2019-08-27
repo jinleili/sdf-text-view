@@ -4,6 +4,9 @@ use std::path::PathBuf;
 #[cfg(not(target_os = "ios"))]
 use shaderc::ShaderKind;
 
+#[cfg(target_os = "ios")]
+use std::io::Read;
+
 // 所有 GL_ 打头的宏名称都是 glsl 保留的，不能自定义
 const SHADER_VERSION_GL: &str = "#version 450\n";
 const SHADER_IMPORT: &str = "#include ";
@@ -31,7 +34,8 @@ impl Shader {
     #[allow(dead_code)]
     pub fn new_by_compute(name: &str, device: &mut wgpu::Device) -> Self {
         let bytes = generate_shader_source(name, "comp");
-        Shader::shader_by_bytes(&bytes, device)
+        let module = device.create_shader_module(&wgpu::read_spirv(std::io::Cursor::new(&bytes[..])).unwrap());
+        Shader { vs_module: module, fs_module: None }
     }
 
     #[cfg(not(target_os = "ios"))]
@@ -71,15 +75,15 @@ pub fn load_general_glsl(
 ) -> (wgpu::ShaderModule, wgpu::ShaderModule) {
     let vs_bytes = generate_shader_source(name, "vs");
     let fs_bytes = generate_shader_source(name, "fs");
-    let vs_module = device.create_shader_module(&vs_bytes);
-    let fs_module = device.create_shader_module(&fs_bytes);
+    let vs_module = device.create_shader_module(&wgpu::read_spirv(std::io::Cursor::new(&vs_bytes[..])).unwrap());
+    let fs_module = device.create_shader_module(&wgpu::read_spirv(std::io::Cursor::new(&fs_bytes[..])).unwrap());;
 
     (vs_module, fs_module)
 }
 
 #[cfg(target_os = "ios")]
 #[allow(dead_code)]
-fn generate_shader_source(name: &str, suffix: &str) -> Vec<u32> {
+fn generate_shader_source(name: &str, suffix: &str) -> Vec<u8> {
     let p = uni_view::fs::FileSystem::get_shader_path(name, suffix);
     println!("spv path: {:?}", &p);
     let mut f = std::fs::File::open(p).unwrap();

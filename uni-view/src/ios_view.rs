@@ -38,10 +38,9 @@ impl AppView {
             height: physical.height,
             present_mode: wgpu::PresentMode::Vsync,
         };
-        println!("cfg!(target_os = {}", if cfg!(target_os = "ios") { "aaa"} else { "bbb"});
         let instance = wgpu::Instance::new();
         let device = get_device(&instance);
-        let surface = instance.create_surface_from_macos_layer(obj.metal_layer);
+        let surface = instance.create_surface_from_core_animation_layer(obj.metal_layer);
         let swap_chain = device.create_swap_chain(&surface, &sc_desc);
 
         AppView {
@@ -83,7 +82,7 @@ fn get_scale_factor(obj: *mut Object) -> f32 {
 }
 
 fn get_device(instance: &wgpu::Instance) -> wgpu::Device {
-    let adapter = instance.get_adapter(&wgpu::AdapterDescriptor {
+    let adapter = instance.request_adapter(&wgpu::RequestAdapterOptions {
         power_preference: wgpu::PowerPreference::LowPower,
     });
     adapter.request_device(&wgpu::DeviceDescriptor {

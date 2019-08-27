@@ -27,7 +27,7 @@ fn main() -> Result<(), Box<Error>> {
     let compute_shader: Vec<&str> = match std::env::var("TARGET") {
         Ok(target) => {
             if target.contains("ios") {
-                vec!["sdf/sdf_init", "sdf/sdf;"]
+                vec!["sdf/sdf"]
             } else {
                 vec![]
             }

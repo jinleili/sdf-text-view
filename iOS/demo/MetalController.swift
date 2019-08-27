@@ -20,7 +20,7 @@ class MetalController: UIViewController {
         // 在 viewDidLoad 里创建 wgpu 绘制对象会报 iOSurface 为 nil 的错误
         if drawObj == nil {
             if let metalView = self.view as? MetalView {
-                drawObj = create_blur_filter(metalView.appView())
+                drawObj = create_sdf_view(metalView.appView())
 //                drawObj = create_page_turning(metalView.appView())
 //                drawObj = create_fluid(metalView.appView())
 //                drawObj = create_brush_view(metalView.appView())
