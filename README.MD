@@ -1,5 +1,5 @@
 # SDFTextView
-SDFTextView is a view component that based wgpu to calculate SDF(signed distance field) at real time and rendering.
+View component that based wgpu to calculate SDF(signed distance field) at real time and rendering.
 
 Also implemented a cpu-based SDF version on ```sdf-generator/```, it accept a input image and output a sdf gray image.
 
@@ -52,3 +52,5 @@ cargo run input.png output.png
 ## To do list
 - [ ] Use Android ```SurfaceView``` to Run on Android device
 - [ ] Improve screen rotate on iOS
+device
+- [ ] Scrollable when scaled model projection  over the viewport boundaries
