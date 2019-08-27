@@ -45,4 +45,9 @@ Then,use Xcode to open iOS/demo.xcworkspace and run.
 ```
 cd sdf-generator
 cargo run input.png output.png
+
 ```
+
+## To do list
+- [ ] Use Android ```SurfaceView``` to Run on Android device
+- [ ] Improve screen rotate on iOS
