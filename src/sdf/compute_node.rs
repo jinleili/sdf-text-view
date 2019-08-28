@@ -2,18 +2,20 @@
 #[repr(C)]
 pub struct PicInfoUniform {
     info: [i32; 4],
+    // only for requested 256 alignment: (256 - 16) / 4 = 60
+    any: [i32; 60], 
 }
 
 pub struct SDFComputeNode {
     extent: wgpu::Extent3d,
     bind_group: wgpu::BindGroup,
-    uniform_buf: wgpu::Buffer,
     compute_pipeline: wgpu::ComputePipeline,
+    offset_stride: wgpu::BufferAddress,
 }
 
 impl SDFComputeNode {
     pub fn new(
-        device: &mut wgpu::Device, encoder: &mut wgpu::CommandEncoder,
+        device: &mut wgpu::Device, _encoder: &mut wgpu::CommandEncoder,
         src_view: &wgpu::TextureView, extent: wgpu::Extent3d,
     ) -> Self {
         let img_size = (extent.width * extent.height) as u64;
@@ -22,7 +24,7 @@ impl SDFComputeNode {
                 wgpu::BindGroupLayoutBinding {
                     binding: 0,
                     visibility: wgpu::ShaderStage::COMPUTE,
-                    ty: wgpu::BindingType::UniformBuffer { dynamic: false },
+                    ty: wgpu::BindingType::UniformBuffer { dynamic: true },
                 },
                 wgpu::BindGroupLayoutBinding {
                     binding: 1,
@@ -54,13 +56,18 @@ impl SDFComputeNode {
             ],
         });
 
-        let uniform_size = std::mem::size_of::<PicInfoUniform>() as wgpu::BufferAddress;
-        let uniform_buf = crate::utils::create_uniform_buffer2(
-            device,
-            encoder,
-            PicInfoUniform { info: [0, 0, 0, 0] },
-            uniform_size,
-        );
+        let offset_stride = std::mem::size_of::<PicInfoUniform>() as wgpu::BufferAddress;
+        let uniform_size = offset_stride * 6;
+        let uniform_buf = device
+            .create_buffer_mapped(6, wgpu::BufferUsage::UNIFORM | wgpu::BufferUsage::COPY_DST)
+            .fill_from_slice(&[
+                PicInfoUniform { info: [extent.width as i32, extent.height as i32, 2, 0], any: [0; 60] },
+                PicInfoUniform { info: [extent.width as i32, extent.height as i32, 0, 0], any: [0; 60]  },
+                PicInfoUniform { info: [extent.width as i32, extent.height as i32, 1, 0], any: [0; 60]  },
+                PicInfoUniform { info: [extent.width as i32, extent.height as i32, 0, 1], any: [0; 60]  },
+                PicInfoUniform { info: [extent.width as i32, extent.height as i32, 1, 1], any: [0; 60]  },
+                PicInfoUniform { info: [extent.width as i32, extent.height as i32, 3, 0], any: [0; 60]  },
+            ]);
 
         let sdf_range = (img_size * 4) as wgpu::BufferAddress;
         let sdf_front = device.create_buffer(&wgpu::BufferDescriptor {
@@ -135,41 +142,34 @@ impl SDFComputeNode {
             layout: &pipeline_layout,
             compute_stage: shader_compute.cs_stage(),
         });
-        SDFComputeNode { extent, uniform_buf, bind_group, compute_pipeline }
+        SDFComputeNode { extent, bind_group, compute_pipeline, offset_stride }
     }
 
-    pub fn compute(&mut self, device: &mut wgpu::Device, encoder: &mut wgpu::CommandEncoder) {
-        // init distance fields
-        self.step_cal(2, 0, self.extent.width, self.extent.height, device, encoder);
-
-        // step front y
-        self.step_cal(0, 0, self.extent.width, 1, device, encoder);
-
-        // step front x
-        self.step_cal(1, 0, 1, self.extent.height, device, encoder);
-
-        // step background y
-        self.step_cal(0, 1, self.extent.width, 1, device, encoder);
-
-        // step background x
-        self.step_cal(1, 1, 1, self.extent.height, device, encoder);
-
-        // final output
-        self.step_cal(3, 0, self.extent.width as u32, self.extent.height, device, encoder);
-    }
-
-    fn step_cal(
-        &self, iter: i32, is_bg: i32, dispatch_x: u32, dispatch_y: u32, device: &mut wgpu::Device,
-        encoder: &mut wgpu::CommandEncoder,
-    ) {
-        let u = PicInfoUniform {
-            info: [self.extent.width as i32, self.extent.height as i32, iter, is_bg],
-        };
-        crate::utils::update_buffer_use_encoder(encoder, device, u, &self.uniform_buf);
-
+    pub fn compute(&mut self, _device: &mut wgpu::Device, encoder: &mut wgpu::CommandEncoder) {
         let mut cpass = encoder.begin_compute_pass();
         cpass.set_pipeline(&self.compute_pipeline);
-        cpass.set_bind_group(0, &self.bind_group, &[]);
-        cpass.dispatch(dispatch_x, dispatch_y, 1);
+        cpass.set_bind_group(0, &self.bind_group, &[0]);
+        cpass.dispatch(self.extent.width, self.extent.height, 1);
+
+        self.offset_stride = 256;
+        // step front y
+        cpass.set_bind_group(0, &self.bind_group, &[self.offset_stride]);
+        cpass.dispatch(self.extent.width, 1, 1);
+
+        // step front x
+        cpass.set_bind_group(0, &self.bind_group, &[self.offset_stride * 2]);
+        cpass.dispatch(1, self.extent.height, 1);
+
+        // step background y
+        cpass.set_bind_group(0, &self.bind_group, &[self.offset_stride * 3]);
+        cpass.dispatch(self.extent.width, 1, 1);
+
+        // step background x
+        cpass.set_bind_group(0, &self.bind_group, &[self.offset_stride * 4]);
+        cpass.dispatch(1, self.extent.height, 1);
+
+        // final output
+        cpass.set_bind_group(0, &self.bind_group, &[self.offset_stride * 5]);
+        cpass.dispatch(self.extent.width, self.extent.height, 1);
     }
 }
