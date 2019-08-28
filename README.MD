@@ -13,10 +13,10 @@ iPhone 6 plus  | 3.211291ms
 iPhone Xs Max   | 0.688541ms
 
 ## Screenshot
-<div style="width:100%; margin:0 auto; overflow:auto; _display:inline-block;"> 
-    <div style="width:49%; float:right; "><image src="screenshot/iPhone.gif" alt="iPhone gif" /></div> 
-    <div style=" margin-right:51%; width:49%;"><image src="screenshot/macOS_gif.gif" alt="macOS gif" /></div> 
-</div> 
+
+| [macOS gif](screenshot/macOS_gif.gif) | [iPhone gif](screenshot/iPhone.gif) |
+| --------- | ------------- |
+
 
 ## What is a SDF rendering 
 SDF rendering is a technique that allows you to render bitmap fonts without jagged edges even at high magnifications. 
