@@ -66,6 +66,8 @@ impl crate::GPUContext for AppView {
         self.sc_desc.width = size.width;
         self.sc_desc.height = size.height;
         self.swap_chain = self.device.create_swap_chain(&self.surface, &self.sc_desc);
+        println!("swap_chain: {:?}", self.swap_chain);
+
     }
 
     fn get_view_size(&self) -> crate::ViewSize {

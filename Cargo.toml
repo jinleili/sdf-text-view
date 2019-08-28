@@ -7,9 +7,6 @@ edition = "2018"
 [lib]
 name = "idroid"
 
-# [target.'cfg(target_os = "ios")'.lib]
-# crate-type = ["staticlib"]
-# [target.'cfg(target_os = "macos")'.lib]
 crate-type = ["rlib", "staticlib"]
 # [target.'cfg(target_os = "android")'.lib]
 # crate-type = ["cdylib"]
@@ -24,9 +21,7 @@ vulkan = ["wgpu/vulkan"]
 [dependencies]
 libc = "*"
 wgpu = { git = "https://github.com/gfx-rs/wgpu-rs", rev = "b7d8d8fa995964315318e67f4296a52d4490d518"  }
-# 本地版本设置了 metal-auto-capture，且解决了 iOS 设备上 Undefined symbols for architecture arm64:
-#  "_MTLCopyAllDevices" bug
-# wgpu = { path = "../wgpu-rs"}
+
 uni-view = { path="uni-view" }
 
 nalgebra-glm = "*"
@@ -52,8 +47,6 @@ lazy_static = "*"
 palette = "0.4"
 rand = "0.6"
 
-
-# [patch.crates-io]
-# # # winit =  { path = "../winit-master" }
-# wgpu-native = { path = "../wgpu/wgpu-native" }
+[patch.crates-io]
+wgpu-native = { git = "https://github.com/gfx-rs/wgpu", version = "0.3.3", features = ["local", "metal-auto-capture"] }
 

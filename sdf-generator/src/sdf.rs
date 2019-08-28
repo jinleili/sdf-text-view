@@ -162,7 +162,6 @@ impl SDF {
             // q and r are usize, if q - r < 0, will cause panic: thread 'main' panicked at 'attempt to subtract with overflow'
             d[q] = self.f[v[k]] + (q as i32 - v[k] as i32).pow(2) as f32;
         }
-
         d
     }
 

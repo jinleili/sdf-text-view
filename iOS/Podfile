@@ -4,16 +4,14 @@ use_frameworks!
 target "demo" do
 project  "demo.xcodeproj"
 # 官方正在开发 5.0，目前是 beta7 (20190731)
-pod 'Alamofire'
+#pod 'Alamofire'
 
 # https://github.com/onevcat/Kingfisher/wiki/Kingfisher-5.0-Migration-Guide
 pod 'Kingfisher', '~> 5.7.0'
 pod 'SnapKit', '~> 5.0.0'
-pod 'RxDataSources', '~> 4.0.1'
-pod 'Moya', '~> 13.0.1'
-
-pod 'RxSwift', '~> 5.0.0'
-pod 'RxCocoa', '~> 5.0.0'
-
-pod 'ObjectMapper', '~> 3.5.1'
+#
+#pod 'RxSwift', '~> 5.0.0'
+#pod 'RxCocoa', '~> 5.0.0'
+#
+#pod 'ObjectMapper', '~> 3.5.1'
 end

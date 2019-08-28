@@ -18,7 +18,7 @@ iPhone Xs Max   | 0.688541ms
 | --------- | ------------- |
 
 
-## What is a SDF rendering 
+## What is SDF rendering 
 SDF rendering is a technique that allows you to render bitmap fonts without jagged edges even at high magnifications. 
 
 Original SIGGRAPH 2007 paper: [Improved Alpha-Tested Magnification for Vector Textures and Special Effects](https://steamcdn-a.akamaihd.net/apps/valve/2007/SIGGRAPH2007_AlphaTestedMagnification.pdf)
@@ -46,6 +46,11 @@ Then,use Xcode to open iOS/demo.xcworkspace and run.
 cd sdf-generator
 cargo run input.png output.png
 ```
+
+## When things go wrong
+- SDFTextView use ```shaderc-rs``` compile glsl to spirv, which need your compute installed ```Pathon``` 3: [wgpu-rs/pull/44](https://github.com/gfx-rs/wgpu-rs/pull/44);
+- When build for iOS, ```build.rs``` will compile the specified .glsl to shader-gen/*.spv, rename glsl file maybe also need modify build.rs;
+
 
 ## To do list
 - [ ] Use Android ```SurfaceView``` to Run on Android device
