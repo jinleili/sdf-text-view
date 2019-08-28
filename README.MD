@@ -30,6 +30,10 @@ Improved algorithm: [Felzenszwalb/Huttenlocher distance transform](http://cs.bro
 ```
 # macOS
 cargo run --example demo
+# windows (not tested!)
+cargo run --example demo --features dx12
+# linux  (not tested!)
+cargo run --example demo --features vulkan
 ```
 ### On iOS device
 ```

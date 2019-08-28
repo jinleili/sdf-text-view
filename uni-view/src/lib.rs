@@ -3,11 +3,11 @@ extern crate wgpu;
 
 use std::ops::Deref;
 
-#[cfg(target_os = "macos")]
+#[cfg(any(target_os = "macos", target_os = "linux", target_os = "windows"))]
 #[path = "mac_view.rs"]
 mod app_view;
 
-#[cfg(not(target_os = "macos"))]
+#[cfg(target_os = "ios")]
 #[path = "ios_view.rs"]
 mod app_view;
 
@@ -17,7 +17,7 @@ pub use app_view::*;
 #[path = "ios_fs.rs"]
 pub mod fs ;
 
-#[cfg(not(target_os = "ios"))]
+#[cfg(any(target_os = "macos", target_os = "linux", target_os = "windows"))]
 #[path = "mac_fs.rs"]
 pub mod fs ;
 
