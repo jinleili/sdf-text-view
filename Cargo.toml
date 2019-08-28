@@ -31,7 +31,7 @@ log = "0.4"
 failure = "0.1"
 lazy_static = "*"
 
-[target.'cfg(target_os = "macos")'.dependencies]
+[target.'cfg(any(target_os = "macos", target_os = "windows", target_os = "linux"))'.dependencies]
 shaderc = "0.6.1"
 objc = "*"
 winit = "0.20.0-alpha3"
