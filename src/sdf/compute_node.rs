@@ -3,7 +3,7 @@
 pub struct PicInfoUniform {
     info: [i32; 4],
     // only for requested 256 alignment: (256 - 16) / 4 = 60
-    any: [i32; 60], 
+    any: [i32; 60],
 }
 
 pub struct SDFComputeNode {
@@ -61,12 +61,30 @@ impl SDFComputeNode {
         let uniform_buf = device
             .create_buffer_mapped(6, wgpu::BufferUsage::UNIFORM | wgpu::BufferUsage::COPY_DST)
             .fill_from_slice(&[
-                PicInfoUniform { info: [extent.width as i32, extent.height as i32, 2, 0], any: [0; 60] },
-                PicInfoUniform { info: [extent.width as i32, extent.height as i32, 0, 0], any: [0; 60]  },
-                PicInfoUniform { info: [extent.width as i32, extent.height as i32, 1, 0], any: [0; 60]  },
-                PicInfoUniform { info: [extent.width as i32, extent.height as i32, 0, 1], any: [0; 60]  },
-                PicInfoUniform { info: [extent.width as i32, extent.height as i32, 1, 1], any: [0; 60]  },
-                PicInfoUniform { info: [extent.width as i32, extent.height as i32, 3, 0], any: [0; 60]  },
+                PicInfoUniform {
+                    info: [extent.width as i32, extent.height as i32, 2, 0],
+                    any: [0; 60],
+                },
+                PicInfoUniform {
+                    info: [extent.width as i32, extent.height as i32, 0, 0],
+                    any: [0; 60],
+                },
+                PicInfoUniform {
+                    info: [extent.width as i32, extent.height as i32, 1, 0],
+                    any: [0; 60],
+                },
+                PicInfoUniform {
+                    info: [extent.width as i32, extent.height as i32, 0, 1],
+                    any: [0; 60],
+                },
+                PicInfoUniform {
+                    info: [extent.width as i32, extent.height as i32, 1, 1],
+                    any: [0; 60],
+                },
+                PicInfoUniform {
+                    info: [extent.width as i32, extent.height as i32, 3, 0],
+                    any: [0; 60],
+                },
             ]);
 
         let sdf_range = (img_size * 4) as wgpu::BufferAddress;
