@@ -36,7 +36,7 @@ fn main() -> Result<(), Box<Error>> {
     };
 
     // Tell the build script to only run again if we change our source shaders
-    println!("cargo:rerun-if-changed=shader");
+    // println!("cargo:rerun-if-changed=shader");
 
     // Create destination path if necessary
     std::fs::create_dir_all("shader-gen")?;

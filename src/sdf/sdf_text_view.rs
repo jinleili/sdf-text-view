@@ -24,7 +24,7 @@ impl SDFTextView {
 
         // Create the texture
         let (texture_view, texture_extent, _sampler) = texture::from_file_and_usage_write(
-            "txt1.png",
+            "large.png",
             &mut app_view.device,
             &mut encoder,
             true,
@@ -104,6 +104,7 @@ impl SurfaceView for SDFTextView {
                 }
             }
             self.app_view.device.get_queue().submit(&[encoder.finish()]);
+
         }
     }
 }

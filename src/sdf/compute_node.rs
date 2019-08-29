@@ -11,6 +11,7 @@ pub struct SDFComputeNode {
     bind_group: wgpu::BindGroup,
     compute_pipeline: wgpu::ComputePipeline,
     offset_stride: wgpu::BufferAddress,
+    threadgroup_count: (u32, u32),
 }
 
 impl SDFComputeNode {
@@ -106,6 +107,7 @@ impl SDFComputeNode {
             size: z_range,
             usage: wgpu::BufferUsage::STORAGE,
         });
+        
         let bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
             layout: &bind_group_layout,
             bindings: &[
@@ -160,34 +162,38 @@ impl SDFComputeNode {
             layout: &pipeline_layout,
             compute_stage: shader_compute.cs_stage(),
         });
-        SDFComputeNode { extent, bind_group, compute_pipeline, offset_stride }
+        let threadgroup_count = ((extent.width + 15) / 16, (extent.height + 15) / 16);
+        println!("{:?}", threadgroup_count);
+        SDFComputeNode { extent, bind_group, compute_pipeline, offset_stride,  threadgroup_count}
     }
 
     pub fn compute(&mut self, _device: &mut wgpu::Device, encoder: &mut wgpu::CommandEncoder) {
         let mut cpass = encoder.begin_compute_pass();
         cpass.set_pipeline(&self.compute_pipeline);
         cpass.set_bind_group(0, &self.bind_group, &[0]);
-        cpass.dispatch(self.extent.width, self.extent.height, 1);
+        cpass.dispatch(self.threadgroup_count.0, self.threadgroup_count.1, 1);
 
+       
         self.offset_stride = 256;
         // step front y
         cpass.set_bind_group(0, &self.bind_group, &[self.offset_stride]);
-        cpass.dispatch(self.extent.width, 1, 1);
-
-        // step front x
-        cpass.set_bind_group(0, &self.bind_group, &[self.offset_stride * 2]);
-        cpass.dispatch(1, self.extent.height, 1);
+        cpass.dispatch(self.threadgroup_count.0, 1, 1);
 
         // step background y
         cpass.set_bind_group(0, &self.bind_group, &[self.offset_stride * 3]);
-        cpass.dispatch(self.extent.width, 1, 1);
+        cpass.dispatch(self.threadgroup_count.0, 1, 1);
+
+        // step front x
+        cpass.set_bind_group(0, &self.bind_group, &[self.offset_stride * 2]);
+        cpass.dispatch(1, self.threadgroup_count.1, 1);
 
         // step background x
         cpass.set_bind_group(0, &self.bind_group, &[self.offset_stride * 4]);
-        cpass.dispatch(1, self.extent.height, 1);
+        cpass.dispatch(1, self.threadgroup_count.1, 1);
 
         // final output
         cpass.set_bind_group(0, &self.bind_group, &[self.offset_stride * 5]);
-        cpass.dispatch(self.extent.width, self.extent.height, 1);
+        cpass.dispatch(self.threadgroup_count.0, self.threadgroup_count.1, 1);
     }
+
 }

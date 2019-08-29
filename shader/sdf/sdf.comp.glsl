@@ -1,4 +1,4 @@
-layout(local_size_x = 1, local_size_y = 1) in;
+layout(local_size_x = 16, local_size_y = 16) in;
 
 layout(set = 0, binding = 0) uniform InfoUniform
 {
@@ -96,7 +96,12 @@ void sdf1d(int offset, int stride, int len, int offset_z, int stride_z)
 void main()
 {
     ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
+    if (uv.x > (info.x -1) || uv.y > (info.y -1)) {
+        return;
+    }
+    
     int pixel_index = get_pixel_index(uv);
+    // z[pixel_index] = float(uv.x);
 
     if (info[2] == 2) {
         // init front && background distance fields
@@ -121,9 +126,9 @@ void main()
         // output final distans fields
         float dis = sqrt(g_background[pixel_index]) - sqrt(g_front[pixel_index]);
         // float dis = sqrt(g_background[pixel_index]);
-        float luma = (1.0 - (dis / 8.0 + 0.25));
+        float luma = clamp((1.0 - (dis / 8.0 + 0.25)), 0.0, 1.0);
+        // float luma = clamp(dis, 0.0, 1.0);
 
-        float final = clamp(luma, 0.0, 1.0);
-        imageStore(input_pic, uv, vec4(final, 0.0, 0.0, 0.0));
+        imageStore(input_pic, uv, vec4(luma, 0.0, 0.0, 0.0));
     }
 }
