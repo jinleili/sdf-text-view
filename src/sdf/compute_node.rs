@@ -9,9 +9,13 @@ pub struct PicInfoUniform {
 pub struct SDFComputeNode {
     extent: wgpu::Extent3d,
     bind_group: wgpu::BindGroup,
-    compute_pipeline: wgpu::ComputePipeline,
+    xy_pipeline: wgpu::ComputePipeline,
+    x_pipeline: wgpu::ComputePipeline,
+    y_pipeline: wgpu::ComputePipeline,
     offset_stride: wgpu::BufferAddress,
     threadgroup_count: (u32, u32),
+    pub sdf_buffer: wgpu::Buffer,
+    pub staging_buffer: wgpu::Buffer,
 }
 
 impl SDFComputeNode {
@@ -91,7 +95,11 @@ impl SDFComputeNode {
         let sdf_range = (img_size * 4) as wgpu::BufferAddress;
         let sdf_front = device.create_buffer(&wgpu::BufferDescriptor {
             size: sdf_range,
-            usage: wgpu::BufferUsage::STORAGE,
+            usage: wgpu::BufferUsage::STORAGE | wgpu::BufferUsage::COPY_SRC,
+        });
+        let staging_buffer = device.create_buffer(&wgpu::BufferDescriptor {
+            size: sdf_range,
+            usage: wgpu::BufferUsage::MAP_READ | wgpu::BufferUsage::COPY_DST,
         });
         let sdf_background = device.create_buffer(&wgpu::BufferDescriptor {
             size: sdf_range,
@@ -107,7 +115,6 @@ impl SDFComputeNode {
             size: z_range,
             usage: wgpu::BufferUsage::STORAGE,
         });
-        
         let bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
             layout: &bind_group_layout,
             bindings: &[
@@ -157,43 +164,62 @@ impl SDFComputeNode {
             bind_group_layouts: &[&bind_group_layout],
         });
 
-        let shader_compute = crate::shader::Shader::new_by_compute("sdf/sdf", device);
-        let compute_pipeline = device.create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
+        let shader_xy = crate::shader::Shader::new_by_compute("sdf/sdf", device);
+        let xy_pipeline = device.create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
             layout: &pipeline_layout,
-            compute_stage: shader_compute.cs_stage(),
+            compute_stage: shader_xy.cs_stage(),
         });
+        let shader_x = crate::shader::Shader::new_by_compute("sdf/sdf_x", device);
+        let x_pipeline = device.create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
+            layout: &pipeline_layout,
+            compute_stage: shader_x.cs_stage(),
+        });
+        let shader_y = crate::shader::Shader::new_by_compute("sdf/sdf_y", device);
+        let y_pipeline = device.create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
+            layout: &pipeline_layout,
+            compute_stage: shader_y.cs_stage(),
+        });
+
         let threadgroup_count = ((extent.width + 15) / 16, (extent.height + 15) / 16);
-        println!("{:?}", threadgroup_count);
-        SDFComputeNode { extent, bind_group, compute_pipeline, offset_stride,  threadgroup_count}
+        
+        SDFComputeNode {
+            extent,
+            bind_group,
+            xy_pipeline,
+            x_pipeline,
+            y_pipeline,
+            offset_stride,
+            threadgroup_count,
+            staging_buffer,
+            sdf_buffer: sdf_front,
+        }
     }
 
     pub fn compute(&mut self, _device: &mut wgpu::Device, encoder: &mut wgpu::CommandEncoder) {
         let mut cpass = encoder.begin_compute_pass();
-        cpass.set_pipeline(&self.compute_pipeline);
+        cpass.set_pipeline(&self.xy_pipeline);
         cpass.set_bind_group(0, &self.bind_group, &[0]);
         cpass.dispatch(self.threadgroup_count.0, self.threadgroup_count.1, 1);
 
-       
-        self.offset_stride = 256;
+        cpass.set_pipeline(&self.x_pipeline);
+        // step background y
+        cpass.set_bind_group(0, &self.bind_group, &[self.offset_stride * 3]);
+        cpass.dispatch(self.threadgroup_count.0, 1, 1);
         // step front y
         cpass.set_bind_group(0, &self.bind_group, &[self.offset_stride]);
         cpass.dispatch(self.threadgroup_count.0, 1, 1);
 
-        // step background y
-        cpass.set_bind_group(0, &self.bind_group, &[self.offset_stride * 3]);
-        cpass.dispatch(self.threadgroup_count.0, 1, 1);
-
+        cpass.set_pipeline(&self.y_pipeline);
+        // step background x
+        cpass.set_bind_group(0, &self.bind_group, &[self.offset_stride * 4]);
+        cpass.dispatch(1, self.threadgroup_count.1, 1);
         // step front x
         cpass.set_bind_group(0, &self.bind_group, &[self.offset_stride * 2]);
         cpass.dispatch(1, self.threadgroup_count.1, 1);
 
-        // step background x
-        cpass.set_bind_group(0, &self.bind_group, &[self.offset_stride * 4]);
-        cpass.dispatch(1, self.threadgroup_count.1, 1);
-
         // final output
+        cpass.set_pipeline(&self.xy_pipeline);
         cpass.set_bind_group(0, &self.bind_group, &[self.offset_stride * 5]);
         cpass.dispatch(self.threadgroup_count.0, self.threadgroup_count.1, 1);
     }
-
 }

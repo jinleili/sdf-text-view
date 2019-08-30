@@ -201,6 +201,7 @@ fn get_shader_funcs(key: &str) -> Option<&str> {
         "vs_micros" => Some(VS_MICROS),
         "fs_micros" => Some(FS_MICROS),
         "fluid_layout_and_fn" => Some(FLUID_DEFINE),
+        "sdf_layout_and_fn" => Some(SDF_COMMON),
         _ => None,
     }
 }
@@ -220,3 +221,7 @@ static COLOR_SPACE_CONVERT: &'static str =
 #[allow(dead_code)]
 static FLUID_DEFINE: &'static str =
     include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/shader/func/fluid.glsl"));
+
+#[allow(dead_code)]
+static SDF_COMMON: &'static str =
+    include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/shader/sdf/common.glsl"));

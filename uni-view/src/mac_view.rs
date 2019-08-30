@@ -4,7 +4,6 @@ extern crate raw_window_handle;
 pub struct AppView {
     pub view: winit::window::Window,
     pub scale_factor: f32,
-    pub instance: wgpu::Instance,
     pub device: wgpu::Device,
     pub surface: wgpu::Surface,
     pub sc_desc: wgpu::SwapChainDescriptor,
@@ -22,18 +21,15 @@ impl AppView {
             height: physical.height as u32,
             present_mode: wgpu::PresentMode::Vsync,
         };
+        
         let instance = wgpu::Instance::new();
-
         let device = get_device(&instance);
-                print!("{:?}", device);
-
         let surface = instance.create_surface(&view);
         let swap_chain = device.create_swap_chain(&surface, &sc_desc);
 
         AppView {
             view,
             scale_factor: scale_factor as f32,
-            instance,
             device,
             surface,
             sc_desc,

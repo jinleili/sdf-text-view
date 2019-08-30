@@ -13,9 +13,9 @@ crate-type = ["rlib", "staticlib"]
 
 [features]
 default = ["metal"]
+metal = ["wgpu/metal"]
 dx11 = ["wgpu/dx11"]
 dx12 = ["wgpu/dx12"]
-metal = ["wgpu/metal"]
 vulkan = ["wgpu/vulkan"]
 
 [dependencies]
@@ -48,5 +48,5 @@ palette = "0.4"
 rand = "0.6"
 
 [patch.crates-io]
-wgpu-native = { git = "https://github.com/gfx-rs/wgpu", version = "0.3.3", features = ["local", "metal-auto-capture"] }
+wgpu-native = { git = "https://github.com/gfx-rs/wgpu", version = "0.3.3", rev = "b58c96e4a66943e09e9a9aa0ee8345c7bc878d38", features = ["local", "metal-auto-capture"] }
 

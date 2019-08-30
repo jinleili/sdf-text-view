@@ -4,13 +4,24 @@ View component that based wgpu to calculate SDF(signed distance field) at real t
 Also implemented a cpu-based SDF version on ```sdf-generator/```, it accept a input image and output a sdf gray image.
 
 ## Real time performance of  SDF compute shader
-Test 10 times, the resolution of the input image used is 368*130.
+Test 10 times take the average, the  
+<p></p>
+resolution of the input image(assets/math2.png): 368 * 130.
 
 Device | SDF time cost
 --------- | -------------
-MBP 2018 (15-inch, Intel i7) |  0.420992ms
+MBP 2018 (15-inch, Intel i7) |  0.390735ms
 iPhone 6 plus  | 3.211291ms
 iPhone Xs Max   | 0.688541ms
+
+<p></p>
+resolution of the input image(assets/large.png): 1398  * 652.
+
+Device | SDF time cost
+--------- | -------------
+MBP 2018 (15-inch, Intel i7) |  0.393194ms
+iPhone 6 plus  | 2.94562ms
+iPhone Xs Max   | 0.784541ms
 
 ## Screenshot
 

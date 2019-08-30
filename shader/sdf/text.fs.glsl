@@ -30,7 +30,7 @@ void main(void)
     // // 反转一下数值
     // tex_gray = (1.0 - tex_gray);
 
-    float alpha = aastep2(tex_gray, mask_n_gamma[0]);
+    float alpha = aastep(tex_gray, mask_n_gamma[0]);
     vec4 stroke_color = vec4(stroke_color.rgb, alpha);
 
     // if (show_outline) {
@@ -43,6 +43,6 @@ void main(void)
     //     shadow_color.a = smoothstep(0.753 - 0.45, 0.753, alpha);
     //     stroke_color = shadow_color; //lerp(shadow_color, stroke_color, alpha);
     // }
-    // frag_color = stroke_color;
-    frag_color = vec4(vec3(tex_gray), 1.0);
+    frag_color = stroke_color;
+    // frag_color = vec4(vec3(tex_gray), 1.0);
 }

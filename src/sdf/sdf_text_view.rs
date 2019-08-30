@@ -54,7 +54,7 @@ impl SDFTextView {
             need_draw: true,
             draw_count: 0,
         };
-        // 需要主动调一次 resize 来更新 mvp
+        // invoke resize to update mvp matrix
         instance.resize();
 
         instance
@@ -90,13 +90,20 @@ impl SurfaceView for SDFTextView {
                 self.compute_node.compute(&mut self.app_view.device, &mut encoder);
                 self.need_cal_sdf = false;
                 println!("sdf cost: {:?}", self.hud.stop_frame_timer());
+                // encoder.copy_buffer_to_buffer(
+                //     &self.compute_node.sdf_buffer,
+                //     0,
+                //     &self.compute_node.staging_buffer,
+                //     0,
+                //     18 * 22 * 4,
+                // );
             }
 
             let frame = self.app_view.swap_chain.get_next_texture();
             {
                 self.render_node.begin_render_pass(&frame, &mut encoder, &mut self.app_view.device);
 
-                // draw for all swap_chain frame textures
+                // draw for all swap_chain frame textures, then, stop to draw frame until resize() or rotate() fn called.
                 self.draw_count += 1;
                 if self.draw_count == 3 {
                     self.need_draw = false;
@@ -105,6 +112,15 @@ impl SurfaceView for SDFTextView {
             }
             self.app_view.device.get_queue().submit(&[encoder.finish()]);
 
+            // self.compute_node.staging_buffer.map_read_async(
+            //     0,
+            //     18 * 22 * 4,
+            //     |result: wgpu::BufferMapAsyncResult<&[f32]>| {
+            //         if let Ok(mapping) = result {
+            //             println!("Times: {:?}", mapping.data);
+            //         }
+            //     },
+            // );
         }
     }
 }

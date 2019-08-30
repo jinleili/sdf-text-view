@@ -65,7 +65,7 @@ impl SDFRenderNode {
 
         let draw_buf = crate::utils::create_uniform_buffer(
             device,
-            DrawUniform { stroke_color: [0.14, 0.14, 0.44, 1.0], mask_n_gamma: [0.55, 0.0] },
+            DrawUniform { stroke_color: [0.14, 0.14, 0.14, 1.0], mask_n_gamma: [0.70, 0.0] },
         );
 
         let bind_group_outline = device.create_bind_group(&wgpu::BindGroupDescriptor {
@@ -95,7 +95,7 @@ impl SDFRenderNode {
 
         let draw_buf_stroke = crate::utils::create_uniform_buffer(
             device,
-            DrawUniform { stroke_color: [0.97, 0.92, 0.80, 1.0], mask_n_gamma: [0.758, 0.75] },
+            DrawUniform { stroke_color: [0.97, 0.92, 0.80, 1.0], mask_n_gamma: [0.75, 0.75] },
         );
         let bind_group_stroke = device.create_bind_group(&wgpu::BindGroupDescriptor {
             layout: &bind_group_layout,
