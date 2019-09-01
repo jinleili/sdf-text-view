@@ -24,6 +24,7 @@ fn main() {
     let v = AppView::new(window);
 
     let mut surface_view = idroid::SDFTextView::new(v);
+    surface_view.bundle_image("math0.png");
     // winit 0.20.0-alpha3 不会主动触发 WindowEvent::Resized 事件了
 
     events_loop.run(move |event, _, control_flow| {

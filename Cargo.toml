@@ -48,5 +48,5 @@ palette = "0.4"
 rand = "0.6"
 
 [patch.crates-io]
-wgpu-native = { git = "https://github.com/gfx-rs/wgpu", version = "0.3.3", rev = "b58c96e4a66943e09e9a9aa0ee8345c7bc878d38", features = ["local", "metal-auto-capture"] }
+wgpu-native = { git = "https://github.com/gfx-rs/wgpu", version = "0.3.3", rev = "27af484f6c730e7277039b3c9664f1fe29912138", features = ["local", "metal-auto-capture"] }
 
