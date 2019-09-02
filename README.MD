@@ -55,7 +55,7 @@ RUST_BACKTRACE=1 cargo build --target aarch64-apple-ios
 cargo build --target aarch64-apple-ios --release
 ```
 
-```
+```swift
 # usage
 let metalView = MetalView()
 let drawObj = create_sdf_view(metalView.appView())
