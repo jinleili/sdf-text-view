@@ -27,11 +27,8 @@ class MetalController: UIViewController {
         if drawObj == nil {
             if let metalView = self.view as? MetalView {
                 drawObj = create_sdf_view(metalView.appView())
-//                drawObj = create_page_turning(metalView.appView())
-//                drawObj = create_fluid(metalView.appView())
-//                drawObj = create_brush_view(metalView.appView())
+                sdf_view_bundle_image(drawObj, UnsafeMutablePointer(mutating: "math0.png"))
 
-//                enter_frame(drawObj)
                 displayLink = CADisplayLink.init(target: self, selector: #selector(enterFrame))
                 self.displayLink?.add(to: .current, forMode: .default)
             }

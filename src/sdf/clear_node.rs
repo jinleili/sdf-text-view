@@ -2,7 +2,9 @@
 // so, when use not set image, need render only background color
 
 use crate::geometry::plane::Plane;
+use crate::utils::MVPUniform;
 use crate::vertex::{Pos, PosTex};
+use nalgebra_glm as glm;
 
 pub struct ClearColorNode {
     vertex_buf: wgpu::Buffer,
@@ -14,12 +16,23 @@ pub struct ClearColorNode {
 
 impl ClearColorNode {
     pub fn new(sc_desc: &wgpu::SwapChainDescriptor, device: &mut wgpu::Device) -> Self {
-        let bind_group_layout =
-            device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor { bindings: &[] });
+        let bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
+            bindings: &[wgpu::BindGroupLayoutBinding {
+                binding: 0,
+                visibility: wgpu::ShaderStage::VERTEX,
+                ty: wgpu::BindingType::UniformBuffer { dynamic: false },
+            }],
+        });
+
+        let mvp_size = std::mem::size_of::<[[f32; 4]; 4]>() as wgpu::BufferAddress;
+        let mvp_buf = crate::utils::empty_uniform_buffer(device, mvp_size);
 
         let bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
             layout: &bind_group_layout,
-            bindings: &[],
+            bindings: &[wgpu::Binding {
+                binding: 0,
+                resource: wgpu::BindingResource::Buffer { buffer: &mvp_buf, range: 0..mvp_size },
+            }],
         });
 
         // Create the vertex and index buffers

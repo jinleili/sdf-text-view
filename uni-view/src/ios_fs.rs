@@ -12,6 +12,7 @@ use std::path::PathBuf;
 lazy_static! {
     static ref BUNDLE_PATH: &'static str = get_bundle_url();
 }
+
 fn get_bundle_url() -> &'static str {
     let cls = class!(NSBundle);
         // Allocate an instance
@@ -22,7 +23,6 @@ fn get_bundle_url() -> &'static str {
         let path: &NSString  = msg_send![*bundle, resourcePath];
         path.as_str()
     };
-
     path
 }
 
@@ -45,14 +45,14 @@ impl FileSystem {
 
     fn get_spirv_file_path(name: &str, suffix: &str) -> String {
         let mut p = name.to_string().replace("/", "_");
-        p = BUNDLE_PATH.to_string() + "/shader-gen/" + &p;
+        p = get_bundle_url().to_string() + "/shader-gen/" + &p;
         p += &format!("_{}.spv", suffix);
 
         p
     }
 
     pub fn get_texture_file_path(name: &str) -> PathBuf {
-        let p = BUNDLE_PATH.to_string() + "/assets/" + name;
+        let p = get_bundle_url().to_string() + "/assets/" + name;
         PathBuf::from(&p)      
     }
 }

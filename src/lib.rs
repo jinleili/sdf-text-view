@@ -1,3 +1,6 @@
+use std::ffi::{CStr, CString};
+use std::os::raw::c_char;
+
 extern crate libc;
 pub use uni_view::*;
 
@@ -33,6 +36,20 @@ pub extern "C" fn create_sdf_view(view: uni_view::AppViewObj) -> *mut libc::c_vo
 }
 
 #[cfg(not(target_os = "macos"))]
+#[no_mangle]
+pub unsafe extern "C" fn sdf_view_bundle_image(obj: *mut libc::c_void, image_name: *mut c_char) {
+    let c_str = CStr::from_ptr(image_name);
+    let name = match c_str.to_str() {
+        Err(_) => "",
+        Ok(string) => string,
+    };
+
+    let mut obj: Box<Box<SDFTextView>> = Box::from_raw(obj as *mut _);
+    obj.bundle_image(name.to_string());
+    let _ = Box::into_raw(obj) as *mut libc::c_void;
+}
+
+#[cfg(not(target_os = "macos"))]
 fn box_obj(obj: impl SurfaceView) -> *mut libc::c_void {
     let boxed_trait: Box<dyn SurfaceView> = Box::new(obj);
     let boxed_boxed_trait = Box::new(boxed_trait);
@@ -64,7 +81,7 @@ pub unsafe extern "C" fn touch_move(obj: *mut libc::c_void, p: TouchPoint) {
 
 #[cfg(not(target_os = "macos"))]
 #[no_mangle]
-pub unsafe extern "C" fn resize(obj: *mut libc::c_void, p: TouchPoint) {
+pub unsafe extern "C" fn resize(obj: *mut libc::c_void, _p: TouchPoint) {
     let mut obj: Box<Box<dyn SurfaceView>> = Box::from_raw(obj as *mut _);
     obj.resize();
 

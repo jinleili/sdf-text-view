@@ -46,7 +46,7 @@ cargo run --example demo --features dx12
 # linux  (not tested!)
 cargo run --example demo --features vulkan
 ```
-### On iOS device
+### On iOS 
 ```
 # build for iOS
 # debug 
@@ -54,6 +54,14 @@ RUST_BACKTRACE=1 cargo build --target aarch64-apple-ios
 # release
 cargo build --target aarch64-apple-ios --release
 ```
+
+```
+# usage
+let metalView = MetalView()
+let drawObj = create_sdf_view(metalView.appView())
+sdf_view_bundle_image(drawObj, UnsafeMutablePointer(mutating: "math0.png"))
+```
+
 Then,use Xcode to open iOS/demo.xcworkspace and run.
 
 ### cpu-based version
