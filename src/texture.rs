@@ -1,22 +1,30 @@
 use image::GenericImageView;
+use std::path::PathBuf;
 use wgpu::{Extent3d, Sampler, TextureView};
 
 #[allow(dead_code)]
-pub fn from_file(
+pub fn from_img_name(
     image_name: &str, device: &mut wgpu::Device, encoder: &mut wgpu::CommandEncoder,
 ) -> (TextureView, Extent3d, Sampler) {
-    self::from_file_and_usage_write(image_name, device, encoder, false, false)
+    self::from_img_name_and_usage_write(image_name, device, encoder, false, false)
 }
 
 // is_gray_pic: 是否为单通道灰度纹理
 #[allow(dead_code)]
-pub fn from_file_and_usage_write(
+pub fn from_img_name_and_usage_write(
     image_name: &str, device: &mut wgpu::Device, encoder: &mut wgpu::CommandEncoder,
     usage_write: bool, is_gray_pic: bool,
 ) -> (TextureView, Extent3d, Sampler) {
     // 动态加载本地文件
     let path = uni_view::fs::FileSystem::get_texture_file_path(image_name);
+    crate::texture::from_path(path, device, encoder, usage_write, is_gray_pic)
+}
 
+#[allow(dead_code)]
+pub fn from_path(
+    path: PathBuf, device: &mut wgpu::Device, encoder: &mut wgpu::CommandEncoder,
+    usage_write: bool, is_gray_pic: bool,
+) -> (TextureView, Extent3d, Sampler) {
     let image_bytes = match std::fs::read(&path) {
         Ok(code) => code,
         Err(e) => panic!("Unable to read {:?}: {:?}", path, e),

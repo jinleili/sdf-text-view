@@ -66,12 +66,30 @@ impl SDFComputeNode {
         let uniform_buffer = device
             .create_buffer_mapped(6, wgpu::BufferUsage::UNIFORM | wgpu::BufferUsage::COPY_DST)
             .fill_from_slice(&[
-                PicInfoUniform { info: [0, 0, 2, 0], any: [0; 60] },
-                PicInfoUniform { info: [0, 0, 2, 0], any: [0; 60] },
-                PicInfoUniform { info: [0, 0, 2, 0], any: [0; 60] },
-                PicInfoUniform { info: [0, 0, 2, 0], any: [0; 60] },
-                PicInfoUniform { info: [0, 0, 2, 0], any: [0; 60] },
-                PicInfoUniform { info: [0, 0, 2, 0], any: [0; 60] },
+                PicInfoUniform {
+                    info: [extent.width as i32, extent.height as i32, 2, 0],
+                    any: [0; 60],
+                },
+                PicInfoUniform {
+                    info: [extent.width as i32, extent.height as i32, 0, 0],
+                    any: [0; 60],
+                },
+                PicInfoUniform {
+                    info: [extent.width as i32, extent.height as i32, 1, 0],
+                    any: [0; 60],
+                },
+                PicInfoUniform {
+                    info: [extent.width as i32, extent.height as i32, 0, 1],
+                    any: [0; 60],
+                },
+                PicInfoUniform {
+                    info: [extent.width as i32, extent.height as i32, 1, 1],
+                    any: [0; 60],
+                },
+                PicInfoUniform {
+                    info: [extent.width as i32, extent.height as i32, 3, 0],
+                    any: [0; 60],
+                },
             ]);
 
         let sdf_range = (img_size * 4) as wgpu::BufferAddress;
@@ -97,7 +115,7 @@ impl SDFComputeNode {
             size: z_range,
             usage: wgpu::BufferUsage::STORAGE,
         });
-        let bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
+        let bind_group: wgpu::BindGroup = device.create_bind_group(&wgpu::BindGroupDescriptor {
             layout: &bind_group_layout,
             bindings: &[
                 wgpu::Binding {
@@ -175,41 +193,6 @@ impl SDFComputeNode {
             staging_buffer,
             sdf_buffer: sdf_front,
         }
-    }
-
-    pub fn set_texture_extent(
-        &mut self, extent: wgpu::Extent3d, device: &mut wgpu::Device,
-        encoder: &mut wgpu::CommandEncoder,
-    ) {
-        let uniforms: [PicInfoUniform; 6] = [
-            PicInfoUniform {
-                info: [extent.width as i32, extent.height as i32, 2, 0],
-                any: [0; 60],
-            },
-            PicInfoUniform {
-                info: [extent.width as i32, extent.height as i32, 0, 0],
-                any: [0; 60],
-            },
-            PicInfoUniform {
-                info: [extent.width as i32, extent.height as i32, 1, 0],
-                any: [0; 60],
-            },
-            PicInfoUniform {
-                info: [extent.width as i32, extent.height as i32, 0, 1],
-                any: [0; 60],
-            },
-            PicInfoUniform {
-                info: [extent.width as i32, extent.height as i32, 1, 1],
-                any: [0; 60],
-            },
-            PicInfoUniform {
-                info: [extent.width as i32, extent.height as i32, 3, 0],
-                any: [0; 60],
-            },
-        ];
-        let temp_buf =
-            device.create_buffer_mapped(6, wgpu::BufferUsage::COPY_SRC).fill_from_slice(&uniforms);
-        encoder.copy_buffer_to_buffer(&temp_buf, 0, &self.uniform_buffer, 0, 256 * 6);
     }
 
     pub fn compute(&mut self, _device: &mut wgpu::Device, encoder: &mut wgpu::CommandEncoder) {

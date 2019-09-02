@@ -6,3 +6,6 @@ use render_node::SDFRenderNode;
 
 mod compute_node;
 use compute_node::SDFComputeNode;
+
+mod clear_node;
+use clear_node::ClearColorNode;

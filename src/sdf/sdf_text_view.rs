@@ -4,15 +4,18 @@ use crate::SurfaceView;
 
 use std::path::PathBuf;
 
-use super::{SDFComputeNode, SDFRenderNode};
+use super::{ClearColorNode, SDFComputeNode, SDFRenderNode};
 use uni_view::{AppView, GPUContext};
 
 pub struct SDFTextView {
     app_view: AppView,
     hud: HUD,
-    image_path: Option<PathBuf>,
+    image: Option<String>,
     compute_node: Option<SDFComputeNode>,
     render_node: Option<SDFRenderNode>,
+    clear_color_node: ClearColorNode,
+    need_clear_color: bool,
+    clear_count: u8,
     need_cal_sdf: bool,
     need_draw: bool,
     draw_count: u8,
@@ -21,66 +24,53 @@ pub struct SDFTextView {
 impl SDFTextView {
     pub fn new(app_view: AppView) -> Self {
         let mut app_view = app_view;
-
         let hud = HUD::new();
-
-        let mut instance = SDFTextView {
+        let clear_color_node = ClearColorNode::new(&app_view.sc_desc, &mut app_view.device);
+        let instance = SDFTextView {
             app_view,
             hud,
-            image_path: None,
+            image: None,
             compute_node: None,
             render_node: None,
+            clear_color_node,
+            need_clear_color: true,
             need_cal_sdf: false,
             need_draw: false,
             draw_count: 0,
+            clear_count: 0,
         };
-        // invoke resize to update mvp matrix
-        instance.resize();
-
         instance
     }
-    pub fn bundle_image(&mut self, name: &str) {
-        let path = uni_view::fs::FileSystem::get_texture_file_path(name);
-        self.image_path = Some(path);
 
-        let mut encoder = self
-            .app_view
-            .device
-            .create_command_encoder(&wgpu::CommandEncoderDescriptor { todo: 0 });
+    pub fn bundle_image(&mut self, name: String) {
+        self.need_clear_color = false;
+        self.image = Some(name);
+        self.need_draw = true;
+    }
 
-        // Create the texture
-        let (texture_view, texture_extent, _sampler) = texture::from_file_and_usage_write(
-            name,
-            &mut self.app_view.device,
-            &mut encoder,
-            true,
-            true,
-        );
+    fn create_nodes(&mut self, encoder: &mut wgpu::CommandEncoder) {
+        let path = uni_view::fs::FileSystem::get_texture_file_path(&self.image.as_ref().unwrap());
+        let (texture_view, texture_extent, _sampler) =
+            texture::from_path(path, &mut self.app_view.device, encoder, true, true);
 
-        let compute_node = SDFComputeNode::new(
-            &mut self.app_view.device,
-            &mut encoder,
-            &texture_view,
-            texture_extent,
-        );
-        // compute_node.compute(&mut app_view.device, &mut encoder);
+        let compute_node =
+            SDFComputeNode::new(&mut self.app_view.device, encoder, &texture_view, texture_extent);
 
-        let render_node = SDFRenderNode::new(
+        let mut render_node = SDFRenderNode::new(
             &self.app_view.sc_desc,
             &mut self.app_view.device,
             &texture_view,
             texture_extent,
         );
-        self.app_view.device.get_queue().submit(&[encoder.finish()]);
+        // update mvp matrix
+        render_node.update_scale(&self.app_view.sc_desc, &mut self.app_view.device, 1.0);
 
         self.compute_node = Some(compute_node);
         self.render_node = Some(render_node);
         self.need_cal_sdf = true;
-        self.need_draw = true;
         self.draw_count = 0;
+        self.need_draw = true;
     }
-
-    fn create_nodes(&mut self) {}
 }
 
 impl SurfaceView for SDFTextView {
@@ -89,9 +79,10 @@ impl SurfaceView for SDFTextView {
     fn resize(&mut self) {
         println!("resize()--");
         if let Some(render_node) = &mut self.render_node {
-            self.app_view.update_swap_chain();
             render_node.update_scale(&self.app_view.sc_desc, &mut self.app_view.device, 1.0);
+            self.app_view.update_swap_chain();
             self.need_draw = true;
+            self.enter_frame();
         }
     }
 
@@ -104,51 +95,48 @@ impl SurfaceView for SDFTextView {
 
     fn enter_frame(&mut self) {
         if self.need_draw == false {
-            return;
-        }
-        match (&mut self.compute_node, &mut self.render_node) {
-            (Some(compute_node), Some(render_node)) => {
-                let mut encoder = self
-                    .app_view
-                    .device
-                    .create_command_encoder(&wgpu::CommandEncoderDescriptor { todo: 0 });
+            if self.need_clear_color && self.clear_count < 3 {
+                let frame = self.app_view.swap_chain.get_next_texture();
                 {
-                    if self.need_cal_sdf {
-                        self.hud.start_frame_timer();
-                        compute_node.compute(&mut self.app_view.device, &mut encoder);
-                        self.need_cal_sdf = false;
-                        println!("sdf cost: {:?}", self.hud.stop_frame_timer());
-                    }
-
-                    let frame = self.app_view.swap_chain.get_next_texture();
-                    {
-                        render_node.begin_render_pass(
-                            &frame,
-                            &mut encoder,
-                            &mut self.app_view.device,
-                        );
-
-                        // draw for all swap_chain frame textures, then, stop to draw frame until resize() or rotate() fn called.
-                        self.draw_count += 1;
-                        if self.draw_count == 3 {
-                            self.need_draw = false;
-                            self.draw_count = 0;
-                        }
-                    }
-                    self.app_view.device.get_queue().submit(&[encoder.finish()]);
+                    self.clear_color_node.clear_color(&frame, &mut self.app_view.device);
+                    self.clear_count += 1;
                 }
             }
-            (_, _) => {}
+            return;
         }
 
-        // self.compute_node.staging_buffer.map_read_async(
-        //     0,
-        //     18 * 22 * 4,
-        //     |result: wgpu::BufferMapAsyncResult<&[f32]>| {
-        //         if let Ok(mapping) = result {
-        //             println!("Times: {:?}", mapping.data);
-        //         }
-        //     },
-        // );
+        let mut encoder = self
+            .app_view
+            .device
+            .create_command_encoder(&wgpu::CommandEncoderDescriptor { todo: 0 });
+
+        let _ = match (&mut self.compute_node, &mut self.render_node) {
+            (Some(compute_node), Some(render_node)) => {
+                if self.need_cal_sdf {
+                    self.hud.start_frame_timer();
+                    compute_node.compute(&mut self.app_view.device, &mut encoder);
+                    self.need_cal_sdf = false;
+                    println!("sdf cost: {:?}", self.hud.stop_frame_timer());
+                }
+
+                let frame = self.app_view.swap_chain.get_next_texture();
+                {
+                    render_node.begin_render_pass(&frame, &mut encoder);
+                    // draw for all swap_chain frame textures, then, stop to draw frame until resize() or rotate() fn called.
+                    self.draw_count += 1;
+                    if self.draw_count == 3 {
+                        self.need_draw = false;
+                        self.draw_count = 0;
+                    }
+                }
+                self.app_view.device.get_queue().submit(&[encoder.finish()]);
+            }
+            (_, _) => {
+                self.create_nodes(&mut encoder);
+                self.app_view.device.get_queue().submit(&[encoder.finish()]);
+            }
+        };
+
+        // self.app_view.device.get_queue().submit(&[encoder.finish()]);
     }
 }

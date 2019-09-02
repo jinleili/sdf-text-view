@@ -140,7 +140,6 @@ impl SDFRenderNode {
         });
 
         let color_alpha_blend = crate::utils::color_alpha_blend();
-
         let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             layout: &pipeline_layout,
             vertex_stage: shader.vertex_stage(),
@@ -171,6 +170,7 @@ impl SDFRenderNode {
             sample_mask: !0,
             alpha_to_coverage_enabled: false,
         });
+
         SDFRenderNode {
             extent,
             scale: 1.0,
@@ -232,7 +232,6 @@ impl SDFRenderNode {
 
     pub fn begin_render_pass(
         &self, frame: &wgpu::SwapChainOutput, encoder: &mut wgpu::CommandEncoder,
-        device: &mut wgpu::Device,
     ) {
         let mut rpass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
             color_attachments: &[wgpu::RenderPassColorAttachmentDescriptor {
@@ -245,9 +244,10 @@ impl SDFRenderNode {
             }],
             depth_stencil_attachment: None,
         });
-        rpass.set_pipeline(&self.pipeline);
         rpass.set_index_buffer(&self.index_buf, 0);
         rpass.set_vertex_buffers(0, &[(&self.vertex_buf, 0)]);
+
+        rpass.set_pipeline(&self.pipeline);
 
         rpass.set_bind_group(0, &self.bind_group_outline, &[]);
         rpass.draw_indexed(0..self.index_count as u32, 0, 0..1);
