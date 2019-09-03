@@ -15,7 +15,7 @@
 
 
 struct idroid_obj *create_sdf_view(struct app_view object);
-void sdf_view_bundle_image(struct rust_obj *data, char* image_name);
+void sdf_view_set_bundle_image(struct rust_obj *data, char* image_name);
 
 void enter_frame(struct rust_obj *data);
 void touch_move(struct rust_obj *data, struct TouchPoint p);

@@ -2,7 +2,6 @@ use shaderc::ShaderKind;
 
 use std::error::Error;
 use std::fs::read_to_string;
-use std::io::Read;
 use std::path::PathBuf;
 
 // 参考： https://falseidolfactory.com/2018/06/23/compiling-glsl-to-spirv-at-build-time.html
@@ -11,7 +10,7 @@ const SHADER_VERSION_GL: &str = "#version 450\n";
 const SHADER_IMPORT: &str = "#include ";
 
 // build.rs 配置：https://blog.csdn.net/weixin_33910434/article/details/87943334
-fn main() -> Result<(), Box<Error>> {
+fn main() -> Result<(), Box<dyn Error>> {
     // 只在编译为移动端的库文件时，才编译 spv
     let shader_files: Vec<&str> = match std::env::var("TARGET") {
         Ok(target) => {
@@ -41,18 +40,18 @@ fn main() -> Result<(), Box<Error>> {
     // Create destination path if necessary
     std::fs::create_dir_all("shader-gen")?;
     for name in shader_files {
-        generate_shader_spirv(name, ShaderKind::Vertex);
-        generate_shader_spirv(name, ShaderKind::Fragment);
+        let _ = generate_shader_spirv(name, ShaderKind::Vertex);
+        let _ = generate_shader_spirv(name, ShaderKind::Fragment);
     }
 
     for comp in compute_shader {
-        generate_shader_spirv(comp, ShaderKind::Compute);
+        let _ = generate_shader_spirv(comp, ShaderKind::Compute);
     }
 
     Ok(())
 }
 
-fn generate_shader_spirv(name: &str, ty: ShaderKind) -> Result<(), Box<Error>> {
+fn generate_shader_spirv(name: &str, ty: ShaderKind) -> Result<(), Box<dyn Error>> {
     let suffix = match ty {
         ShaderKind::Vertex => "vs",
         ShaderKind::Fragment => "fs",
@@ -82,7 +81,7 @@ fn generate_shader_spirv(name: &str, ty: ShaderKind) -> Result<(), Box<Error>> {
     // panic!("--panic--");
 
     let mut compiler = shaderc::Compiler::new().unwrap();
-    let mut options = shaderc::CompileOptions::new().unwrap();
+    let options = shaderc::CompileOptions::new().unwrap();
     let binary_result = compiler
         .compile_into_spirv(&shader_source, ty, "shader.glsl", "main", Some(&options))
         .unwrap();

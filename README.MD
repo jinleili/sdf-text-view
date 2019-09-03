@@ -59,7 +59,7 @@ cargo build --target aarch64-apple-ios --release
 # usage
 let metalView = MetalView()
 let drawObj = create_sdf_view(metalView.appView())
-sdf_view_bundle_image(drawObj, UnsafeMutablePointer(mutating: "math0.png"))
+sdf_view_set_bundle_image(drawObj, UnsafeMutablePointer(mutating: "math0.png"))
 ```
 
 Then,use Xcode to open iOS/demo.xcworkspace and run.

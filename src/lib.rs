@@ -37,7 +37,7 @@ pub extern "C" fn create_sdf_view(view: uni_view::AppViewObj) -> *mut libc::c_vo
 
 #[cfg(not(target_os = "macos"))]
 #[no_mangle]
-pub unsafe extern "C" fn sdf_view_bundle_image(obj: *mut libc::c_void, image_name: *mut c_char) {
+pub unsafe extern "C" fn sdf_view_set_bundle_image(obj: *mut libc::c_void, image_name: *mut c_char) {
     let c_str = CStr::from_ptr(image_name);
     let name = match c_str.to_str() {
         Err(_) => "",
