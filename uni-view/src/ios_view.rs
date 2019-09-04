@@ -16,7 +16,6 @@ pub struct AppViewObj {
 pub struct AppView {
     pub view: *mut Object,
     pub scale_factor: f32,
-    pub instance: wgpu::Instance,
     pub device: wgpu::Device,
     pub surface: wgpu::Surface,
     pub sc_desc: wgpu::SwapChainDescriptor,
@@ -38,15 +37,13 @@ impl AppView {
             height: physical.height,
             present_mode: wgpu::PresentMode::Vsync,
         };
-        let instance = wgpu::Instance::new();
-        let device = get_device(&instance);
-        let surface = instance.create_surface_from_core_animation_layer(obj.metal_layer);
+        let device = get_device();
+        let surface = wgpu::Surface::create_surface_from_core_animation_layer(obj.metal_layer);
         let swap_chain = device.create_swap_chain(&surface, &sc_desc);
 
         AppView {
             view: obj.view,
             scale_factor,
-            instance,
             device,
             surface,
             sc_desc,
@@ -84,10 +81,11 @@ fn get_scale_factor(obj: *mut Object) -> f32 {
     s as f32
 }
 
-fn get_device(instance: &wgpu::Instance) -> wgpu::Device {
-    let adapter = instance.request_adapter(&wgpu::RequestAdapterOptions {
+fn get_device() -> wgpu::Device {
+    let adapter = wgpu::Adapter::request(&wgpu::RequestAdapterOptions {
         power_preference: wgpu::PowerPreference::LowPower,
-    });
+        backends: wgpu::BackendBit::PRIMARY,
+    }).unwrap();
     adapter.request_device(&wgpu::DeviceDescriptor {
         extensions: wgpu::Extensions {
             anisotropic_filtering: false,

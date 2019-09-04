@@ -12,15 +12,16 @@ crate-type = ["rlib", "staticlib"]
 # crate-type = ["cdylib"]
 
 [features]
-default = ["metal"]
-metal = ["wgpu/metal"]
-dx11 = ["wgpu/dx11"]
-dx12 = ["wgpu/dx12"]
-vulkan = ["wgpu/vulkan"]
+default = []
+# default = ["metal"]
+# metal = ["wgpu/metal"]
+# dx11 = ["wgpu/dx11"]
+# dx12 = ["wgpu/dx12"]
+# vulkan = ["wgpu/vulkan"]
 
 [dependencies]
 libc = "*"
-wgpu = { git = "https://github.com/gfx-rs/wgpu-rs", rev = "b7d8d8fa995964315318e67f4296a52d4490d518"  }
+wgpu = { git = "https://github.com/gfx-rs/wgpu-rs", rev = "433ab156eaa6964e0037cb5202be4dd82790422a"  }
 
 uni-view = { path="uni-view" }
 
@@ -48,5 +49,8 @@ palette = "0.4"
 rand = "0.6"
 
 [patch.crates-io]
-wgpu-native = { git = "https://github.com/gfx-rs/wgpu", version = "0.3.3", rev = "27af484f6c730e7277039b3c9664f1fe29912138", features = ["local", "metal-auto-capture"] }
-
+# wgpu-native = { git = "https://github.com/gfx-rs/wgpu", rev = "a2956c0d425413796dcaa14b67c756a46f021bd2", features = ["local", "metal-auto-capture"] }
+# gfx-backend-vulkan = { path = "../my_forks/hal-0.3-fork/src/backend/vulkan"}
+# gfx-hal = { path = "../my_forks/hal-0.3-fork/src/hal"}
+gfx-backend-vulkan = { git = "https://github.com/gfx-rs/gfx", branch = "hal-0.3", rev = "143848c1c3a8ed2af9f6ed333bfab9e8ed0017ae" }
+gfx-hal = { git = "https://github.com/gfx-rs/gfx", branch = "hal-0.3", rev = "143848c1c3a8ed2af9f6ed333bfab9e8ed0017ae"}

@@ -6,7 +6,7 @@ authors = ["Li Jinlei <grenlight@icloud.com>"]
 
 [dependencies]
 libc = "*"
-wgpu = { git = "https://github.com/gfx-rs/wgpu-rs", rev = "b7d8d8fa995964315318e67f4296a52d4490d518"  }
+wgpu = { git = "https://github.com/gfx-rs/wgpu-rs", rev = "433ab156eaa6964e0037cb5202be4dd82790422a"  }
 # 本地版本设置了 metal-auto-capture，且解决了 iOS 设备上 Undefined symbols for architecture arm64:
 #  "_MTLCopyAllDevices" bug
 # wgpu = { path = "../wgpu-rs"}
