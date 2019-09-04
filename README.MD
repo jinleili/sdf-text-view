@@ -42,9 +42,9 @@ Improved algorithm: [Felzenszwalb/Huttenlocher distance transform](http://cs.bro
 # macOS
 cargo run --example demo
 # windows (not tested!)
-cargo run --example demo --features dx12
+cargo run --example demo
 # linux  (not tested!)
-cargo run --example demo --features vulkan
+cargo run --example demo
 ```
 ### On iOS 
 ```

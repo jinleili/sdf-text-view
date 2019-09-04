@@ -22,9 +22,8 @@ impl AppView {
             present_mode: wgpu::PresentMode::Vsync,
         };
         
-        let instance = wgpu::Instance::new();
-        let device = get_device(&instance);
-        let surface = instance.create_surface(&view);
+        let device = get_device();
+        let surface = wgpu::Surface::create(&view);
         let swap_chain = device.create_swap_chain(&surface, &sc_desc);
 
         AppView {
@@ -38,10 +37,11 @@ impl AppView {
     }
 }
 
-fn get_device(instance: &wgpu::Instance) -> wgpu::Device {
-    let adapter = instance.request_adapter(&wgpu::RequestAdapterOptions {
+fn get_device() -> wgpu::Device {
+    let adapter = wgpu::Adapter::request(&wgpu::RequestAdapterOptions {
         power_preference: wgpu::PowerPreference::LowPower,
-    });
+        backends: wgpu::BackendBit::PRIMARY,
+    }).unwrap();
     adapter.request_device(&wgpu::DeviceDescriptor {
         extensions: wgpu::Extensions {
             anisotropic_filtering: false,
