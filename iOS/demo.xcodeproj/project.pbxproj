@@ -16,9 +16,9 @@
 		B839DE9F229D249000809873 /* libresolv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = B839DE9E229D248F00809873 /* libresolv.tbd */; };
 		B839DEA8229D480C00809873 /* MetalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B839DEA7229D480C00809873 /* MetalView.swift */; };
 		B839DEAB229D488300809873 /* MetalController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B839DEAA229D488300809873 /* MetalController.swift */; };
-		B839DEB722A550E700809873 /* shader-gen in Resources */ = {isa = PBXBuildFile; fileRef = B839DEB622A550E700809873 /* shader-gen */; };
 		B844909B22B0EC6800398E55 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = B844909A22B0EC6800398E55 /* assets */; };
-		B868742B22BB9B5700EBEC93 /* libidroid.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B868742A22BB9B5700EBEC93 /* libidroid.a */; };
+		B8B8DCD823210B8A00F93474 /* shader-spirv in Resources */ = {isa = PBXBuildFile; fileRef = B8B8DCD723210B8A00F93474 /* shader-spirv */; };
+		B8B8DCDA23210F8500F93474 /* libsdf_text_view.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B8B8DCD923210F8500F93474 /* libsdf_text_view.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -37,10 +37,9 @@
 		B839DEA7229D480C00809873 /* MetalView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MetalView.swift; sourceTree = "<group>"; };
 		B839DEA9229D482200809873 /* rs_glue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rs_glue.h; sourceTree = "<group>"; };
 		B839DEAA229D488300809873 /* MetalController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MetalController.swift; sourceTree = "<group>"; };
-		B839DEB122A113A900809873 /* libidroid.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libidroid.a; path = "../target/aarch64-apple-ios/debug/libidroid.a"; sourceTree = "<group>"; };
-		B839DEB622A550E700809873 /* shader-gen */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "shader-gen"; path = "../../shader-gen"; sourceTree = "<group>"; };
 		B844909A22B0EC6800398E55 /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = assets; path = ../../assets; sourceTree = "<group>"; };
-		B868742A22BB9B5700EBEC93 /* libidroid.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libidroid.a; path = "../target/aarch64-apple-ios/release/libidroid.a"; sourceTree = "<group>"; };
+		B8B8DCD723210B8A00F93474 /* shader-spirv */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "shader-spirv"; path = "../../shader-spirv"; sourceTree = "<group>"; };
+		B8B8DCD923210F8500F93474 /* libsdf_text_view.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsdf_text_view.a; path = "../target/aarch64-apple-ios/debug/libsdf_text_view.a"; sourceTree = "<group>"; };
 		C71E08256A07426AE65D4EB0 /* Pods-demo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-demo.release.xcconfig"; path = "Target Support Files/Pods-demo/Pods-demo.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -49,9 +48,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B868742B22BB9B5700EBEC93 /* libidroid.a in Frameworks */,
 				B839DE9F229D249000809873 /* libresolv.tbd in Frameworks */,
 				2156B9B2B179DE73667FB5C2 /* Pods_demo.framework in Frameworks */,
+				B8B8DCDA23210F8500F93474 /* libsdf_text_view.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -88,10 +87,10 @@
 				B839DEA0229D3A4100809873 /* idroid.h */,
 				B82B5E372270567E007BD9FA /* Assets.xcassets */,
 				B82B5E392270567E007BD9FA /* LaunchScreen.storyboard */,
+				B8B8DCD723210B8A00F93474 /* shader-spirv */,
 				B82B5E3C2270567E007BD9FA /* Info.plist */,
 				B839DEA1229D3A6A00809873 /* demo-Bridging-Header.h */,
 				B844909A22B0EC6800398E55 /* assets */,
-				B839DEB622A550E700809873 /* shader-gen */,
 			);
 			path = demo;
 			sourceTree = "<group>";
@@ -99,8 +98,7 @@
 		B839DE9D229D248F00809873 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				B839DEB122A113A900809873 /* libidroid.a */,
-				B868742A22BB9B5700EBEC93 /* libidroid.a */,
+				B8B8DCD923210F8500F93474 /* libsdf_text_view.a */,
 				B839DE9E229D248F00809873 /* libresolv.tbd */,
 				63AB5C81079BA9C8BE1730CB /* Pods_demo.framework */,
 			);
@@ -177,8 +175,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B8B8DCD823210B8A00F93474 /* shader-spirv in Resources */,
 				B844909B22B0EC6800398E55 /* assets in Resources */,
-				B839DEB722A550E700809873 /* shader-gen in Resources */,
 				B82B5E3B2270567E007BD9FA /* LaunchScreen.storyboard in Resources */,
 				B82B5E382270567E007BD9FA /* Assets.xcassets in Resources */,
 				B82B5E362270567D007BD9FA /* Main.storyboard in Resources */,

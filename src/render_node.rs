@@ -16,7 +16,6 @@ pub struct SDFRenderNode {
     bind_group_outline: wgpu::BindGroup,
     bind_group_stroke: wgpu::BindGroup,
     mvp_buf: wgpu::Buffer,
-    draw_buf: wgpu::Buffer,
     pipeline: wgpu::RenderPipeline,
 }
 
@@ -182,7 +181,6 @@ impl SDFRenderNode {
             bind_group_stroke,
             pipeline,
             mvp_buf,
-            draw_buf,
         }
     }
 

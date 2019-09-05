@@ -15,7 +15,8 @@ default = []
 [dependencies]
 libc = "*"
 wgpu = { git = "https://github.com/gfx-rs/wgpu-rs", rev = "433ab156eaa6964e0037cb5202be4dd82790422a"  }
-
+# uni-view = { path="../idroid/uni-view" }
+# idroid = { path="../idroid/idroid" }
 uni-view = { git = "https://github.com/grenlight/idroid", rev = "81bda67e35551898ddca1c5a9c3b6dfe209f3ffd" }
 idroid = { git = "https://github.com/grenlight/idroid", rev = "81bda67e35551898ddca1c5a9c3b6dfe209f3ffd" }
 
@@ -41,9 +42,7 @@ lazy_static = "*"
 palette = "0.4"
 rand = "0.6"
 
-[patch.crates-io]
-uni-view = { path="../idroid/uni-view" }
-idroid = { path="../idroid/idroid" }
+# [patch.crates-io]
 # # wgpu-native = { git = "https://github.com/gfx-rs/wgpu", rev = "a2956c0d425413796dcaa14b67c756a46f021bd2", features = ["local", "metal-auto-capture"] }
 # # gfx-backend-vulkan = { path = "../my_forks/hal-0.3-fork/src/backend/vulkan"}
 # # gfx-hal = { path = "../my_forks/hal-0.3-fork/src/hal"}

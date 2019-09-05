@@ -2,10 +2,7 @@
 // so, when use not set image, need render only background color
 
 use idroid::geometry::plane::Plane;
-use idroid::utils::MVPUniform;
 use idroid::vertex::{Pos, PosTex};
-
-use nalgebra_glm as glm;
 
 pub struct ClearColorNode {
     vertex_buf: wgpu::Buffer,

@@ -1,7 +1,5 @@
 use idroid::{ texture, utils::HUD, SurfaceView };
 
-use std::path::PathBuf;
-
 use super::{clear_node::ClearColorNode, compute_node::SDFComputeNode, render_node::SDFRenderNode};
 use uni_view::{AppView, GPUContext, fs::FileSystem};
 
