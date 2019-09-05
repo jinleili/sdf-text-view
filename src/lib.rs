@@ -3,29 +3,15 @@ use std::os::raw::c_char;
 
 extern crate libc;
 pub use uni_view::*;
+pub use idroid::utils::{depth_stencil, matrix_helper};
 
-mod geometry;
-pub mod math;
-mod texture;
+mod clear_node;
+mod compute_node;
+mod render_node;
 
-mod utils;
-pub use utils::{depth_stencil, matrix_helper};
+mod sdf_text_view;
+pub use sdf_text_view::SDFTextView;
 
-mod shader;
-mod vertex;
-
-mod sdf;
-pub use sdf::SDFTextView;
-
-use math::Position;
-
-pub trait SurfaceView {
-    fn resize(&mut self);
-    fn scale(&mut self, scale: f32);
-    fn touch_moved(&mut self, position: Position);
-
-    fn enter_frame(&mut self);
-}
 
 #[cfg(not(target_os = "macos"))]
 #[no_mangle]

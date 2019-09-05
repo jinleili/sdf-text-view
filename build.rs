@@ -38,7 +38,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     // println!("cargo:rerun-if-changed=shader");
 
     // Create destination path if necessary
-    std::fs::create_dir_all("shader-gen")?;
+    std::fs::create_dir_all("shader-spirv")?;
     for name in shader_files {
         let _ = generate_shader_spirv(name, ShaderKind::Vertex);
         let _ = generate_shader_spirv(name, ShaderKind::Fragment);
@@ -61,7 +61,7 @@ fn generate_shader_spirv(name: &str, ty: ShaderKind) -> Result<(), Box<dyn Error
     let path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .join("shader")
         .join(format!("{}.{}.glsl", name, suffix));
-    let mut out_path = "shader-gen/".to_string();
+    let mut out_path = "shader-spirv/".to_string();
     out_path += &format!("{}_{}.spv", (name.to_string().replace("/", "_")), suffix);
 
     let code = match read_to_string(&path) {
@@ -117,7 +117,7 @@ fn parse_shader_source(source: &str, output: &mut String) {
                     // For each import, get the source, and recurse.
                     for import in imports {
                         if let Some(include) = get_shader_funcs(import) {
-                            parse_shader_source(include, output);
+                            parse_shader_source(&include, output);
                         } else {
                             println!("shader parse error -------");
                             println!("can't find shader functions: {}", import);
@@ -134,35 +134,14 @@ fn parse_shader_source(source: &str, output: &mut String) {
     println!("line: {:?}", output);
 }
 
-// 获取通用 shader function
-// 将着色器代码预先静态加载进程序，避免打包成 .a 静态库时找不到文件
-fn get_shader_funcs(key: &str) -> Option<&str> {
-    match key {
-        "color_space_convert" => Some(COLOR_SPACE_CONVERT),
-        "vs_micros" => Some(VS_MICROS),
-        "fs_micros" => Some(FS_MICROS),
-        "fluid_layout_and_fn" => Some(FLUID_DEFINE),
-        "sdf_layout_and_fn" => Some(SDF_COMMON),
-        _ => None,
-    }
+fn get_shader_funcs(key: &str) -> Option<String> {
+    let path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("shader").join(key);
+
+    let shader = match read_to_string(&path) {
+        Ok(code) => code,
+        Err(e) => panic!("Unable to read {:?}: {:?}", path, e),
+    };
+    Some(shader)
 }
 
-#[allow(dead_code)]
-static VS_MICROS: &'static str =
-    include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/shader/func/vs_micros.glsl"));
 
-#[allow(dead_code)]
-static FS_MICROS: &'static str =
-    include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/shader/func/fs_micros.glsl"));
-
-#[allow(dead_code)]
-static COLOR_SPACE_CONVERT: &'static str =
-    include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/shader/func/color_space_convert.glsl"));
-
-#[allow(dead_code)]
-static FLUID_DEFINE: &'static str =
-    include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/shader/func/fluid.glsl"));
-
-#[allow(dead_code)]
-static SDF_COMMON: &'static str =
-    include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/shader/sdf/common.glsl"));

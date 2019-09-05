@@ -1,7 +1,8 @@
-use crate::geometry::plane::Plane;
-use crate::texture;
-use crate::utils::MVPUniform;
-use crate::vertex::{Pos, PosTex};
+use idroid::geometry::plane::Plane;
+use idroid::texture;
+use idroid::utils::MVPUniform;
+use idroid::vertex::{Pos, PosTex};
+
 use wgpu::Extent3d;
 
 use nalgebra_glm as glm;
@@ -61,9 +62,9 @@ impl SDFRenderNode {
             ],
         });
         let mvp_size = std::mem::size_of::<[[f32; 4]; 4]>() as wgpu::BufferAddress;
-        let mvp_buf = crate::utils::empty_uniform_buffer(device, mvp_size);
+        let mvp_buf = idroid::utils::empty_uniform_buffer(device, mvp_size);
 
-        let draw_buf = crate::utils::create_uniform_buffer(
+        let draw_buf = idroid::utils::create_uniform_buffer(
             device,
             DrawUniform { stroke_color: [0.14, 0.14, 0.14, 1.0], mask_n_gamma: [0.70, 0.0] },
         );
@@ -93,7 +94,7 @@ impl SDFRenderNode {
             ],
         });
 
-        let draw_buf_stroke = crate::utils::create_uniform_buffer(
+        let draw_buf_stroke = idroid::utils::create_uniform_buffer(
             device,
             DrawUniform { stroke_color: [0.97, 0.92, 0.80, 1.0], mask_n_gamma: [0.75, 0.75] },
         );
@@ -134,12 +135,12 @@ impl SDFRenderNode {
             .create_buffer_mapped(index_data.len(), wgpu::BufferUsage::INDEX)
             .fill_from_slice(&index_data);
         // Create the render pipeline
-        let shader = crate::shader::Shader::new("sdf/text", device);
+        let shader = idroid::shader::Shader::new("sdf/text", device, env!("CARGO_MANIFEST_DIR"));
         let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
             bind_group_layouts: &[&bind_group_layout],
         });
 
-        let color_alpha_blend = crate::utils::color_alpha_blend();
+        let color_alpha_blend = idroid::utils::color_alpha_blend();
         let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             layout: &pipeline_layout,
             vertex_stage: shader.vertex_stage(),
@@ -227,7 +228,7 @@ impl SDFRenderNode {
         vm_matrix = glm::scale(&vm_matrix, &glm::vec3(self.scale, self.scale, 1.0));
 
         let mvp: [[f32; 4]; 4] = (p_matrix * vm_matrix).into();
-        crate::utils::update_uniform(device, mvp, &self.mvp_buf);
+        idroid::utils::update_uniform(device, mvp, &self.mvp_buf);
     }
 
     pub fn begin_render_pass(
@@ -240,7 +241,7 @@ impl SDFRenderNode {
                 load_op: wgpu::LoadOp::Clear,
                 store_op: wgpu::StoreOp::Store,
                 // clear_color: wgpu::Color { r: 145.0 / 255.0, g: 115.0 / 255.0, b: 105.0 / 255.0, a: 1.0 },
-                clear_color: crate::utils::clear_color(),
+                clear_color: idroid::utils::clear_color(),
             }],
             depth_stencil_attachment: None,
         });

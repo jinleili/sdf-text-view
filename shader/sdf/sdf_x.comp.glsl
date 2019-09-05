@@ -1,6 +1,6 @@
 layout(local_size_x = 16, local_size_y = 1) in;
 
-#include sdf_layout_and_fn
+#include sdf/sdf_layout_and_fn.glsl
 
 void main()
 {

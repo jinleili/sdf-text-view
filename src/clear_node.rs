@@ -1,9 +1,10 @@
 // on metal backend, the window/view default background color is red,
 // so, when use not set image, need render only background color
 
-use crate::geometry::plane::Plane;
-use crate::utils::MVPUniform;
-use crate::vertex::{Pos, PosTex};
+use idroid::geometry::plane::Plane;
+use idroid::utils::MVPUniform;
+use idroid::vertex::{Pos, PosTex};
+
 use nalgebra_glm as glm;
 
 pub struct ClearColorNode {
@@ -25,7 +26,7 @@ impl ClearColorNode {
         });
 
         let mvp_size = std::mem::size_of::<[[f32; 4]; 4]>() as wgpu::BufferAddress;
-        let mvp_buf = crate::utils::empty_uniform_buffer(device, mvp_size);
+        let mvp_buf = idroid::utils::empty_uniform_buffer(device, mvp_size);
 
         let bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
             layout: &bind_group_layout,
@@ -51,8 +52,8 @@ impl ClearColorNode {
             bind_group_layouts: &[&bind_group_layout],
         });
 
-        let clear_shader = crate::shader::Shader::new("clear_color", device);
-        let color_alpha_blend = crate::utils::color_alpha_blend();
+        let clear_shader = idroid::shader::Shader::new("clear_color", device, env!("CARGO_MANIFEST_DIR"));
+        let color_alpha_blend = idroid::utils::color_alpha_blend();
         let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             layout: &pipeline_layout,
             vertex_stage: clear_shader.vertex_stage(),
@@ -102,7 +103,7 @@ impl ClearColorNode {
                     resolve_target: None,
                     load_op: wgpu::LoadOp::Clear,
                     store_op: wgpu::StoreOp::Store,
-                    clear_color: crate::utils::clear_color(),
+                    clear_color: idroid::utils::clear_color(),
                 }],
                 depth_stencil_attachment: None,
             });

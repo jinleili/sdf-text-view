@@ -1,11 +1,11 @@
 [package]
-name = "sdf-generator"
+name = "sdf-cpu"
 version = "0.1.0"
 authors = ["li jinlei <grenlight@icloud.com>"]
 edition = "2018"
 
 [[bin]]
-name = "sdf-generator"
+name = "sdf-cpu"
 
 
 [dependencies]

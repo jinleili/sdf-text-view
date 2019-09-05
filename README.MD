@@ -1,7 +1,7 @@
 # SDFTextView
 View component that based [Rust WebGPU](https://github.com/gfx-rs/wgpu-rs) to calculate SDF(signed distance field) at real time and rendering.
 
-Also implemented a cpu-based SDF version on ```sdf-generator/```, it accept a input image and output a sdf gray image.
+Also implemented a cpu-based SDF version on ```sdf-cpu/```, it accept a input image and output a sdf gray image.
 
 ## Real time performance of SDF on compute shader
 Test 10 times take the average, the  

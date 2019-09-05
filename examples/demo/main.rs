@@ -4,6 +4,9 @@ use idroid::{math::Position, SurfaceView};
 extern crate uni_view;
 use uni_view::AppView;
 
+extern crate sdf_text_view;
+use sdf_text_view::SDFTextView;
+
 extern crate lazy_static;
 extern crate objc;
 
@@ -23,7 +26,7 @@ fn main() {
 
     let v = AppView::new(window);
 
-    let mut surface_view = idroid::SDFTextView::new(v);
+    let mut surface_view = SDFTextView::new(v);
     surface_view.bundle_image("math3.png".to_string());
     // winit 0.20.0-alpha3 不会主动触发 WindowEvent::Resized 事件了
 

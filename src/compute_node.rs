@@ -164,17 +164,17 @@ impl SDFComputeNode {
             bind_group_layouts: &[&bind_group_layout],
         });
 
-        let shader_xy = crate::shader::Shader::new_by_compute("sdf/sdf", device);
+        let shader_xy = idroid::shader::Shader::new_by_compute("sdf/sdf", device, env!("CARGO_MANIFEST_DIR"));
         let xy_pipeline = device.create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
             layout: &pipeline_layout,
             compute_stage: shader_xy.cs_stage(),
         });
-        let shader_x = crate::shader::Shader::new_by_compute("sdf/sdf_x", device);
+        let shader_x = idroid::shader::Shader::new_by_compute("sdf/sdf_x", device, env!("CARGO_MANIFEST_DIR"));
         let x_pipeline = device.create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
             layout: &pipeline_layout,
             compute_stage: shader_x.cs_stage(),
         });
-        let shader_y = crate::shader::Shader::new_by_compute("sdf/sdf_y", device);
+        let shader_y = idroid::shader::Shader::new_by_compute("sdf/sdf_y", device, env!("CARGO_MANIFEST_DIR"));
         let y_pipeline = device.create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
             layout: &pipeline_layout,
             compute_stage: shader_y.cs_stage(),

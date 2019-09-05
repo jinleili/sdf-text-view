@@ -1,12 +1,10 @@
 [package]
-name = "idroid"
+name = "sdf-text-view"
 version = "0.1.0"
 authors = ["li jinlei <grenlight@icloud.com>"]
 edition = "2018"
 
 [lib]
-name = "idroid"
-
 crate-type = ["rlib", "staticlib"]
 # [target.'cfg(target_os = "android")'.lib]
 # crate-type = ["cdylib"]
@@ -18,7 +16,8 @@ default = []
 libc = "*"
 wgpu = { git = "https://github.com/gfx-rs/wgpu-rs", rev = "433ab156eaa6964e0037cb5202be4dd82790422a"  }
 
-uni-view = { path="uni-view" }
+uni-view = { git = "https://github.com/grenlight/idroid", rev = "81bda67e35551898ddca1c5a9c3b6dfe209f3ffd" }
+idroid = { git = "https://github.com/grenlight/idroid", rev = "81bda67e35551898ddca1c5a9c3b6dfe209f3ffd" }
 
 nalgebra-glm = "*"
 image = "0.22.1"
@@ -35,7 +34,6 @@ raw-window-handle = "0.1"
 
 [build-dependencies]
 shaderc = "0.6.1"
-sdf-generator = { path = "sdf-generator"}
 
 [dev-dependencies]
 env_logger = "0.5"
@@ -44,8 +42,10 @@ palette = "0.4"
 rand = "0.6"
 
 [patch.crates-io]
-# wgpu-native = { git = "https://github.com/gfx-rs/wgpu", rev = "a2956c0d425413796dcaa14b67c756a46f021bd2", features = ["local", "metal-auto-capture"] }
-# gfx-backend-vulkan = { path = "../my_forks/hal-0.3-fork/src/backend/vulkan"}
-# gfx-hal = { path = "../my_forks/hal-0.3-fork/src/hal"}
-gfx-backend-vulkan = { git = "https://github.com/gfx-rs/gfx", branch = "hal-0.3", rev = "143848c1c3a8ed2af9f6ed333bfab9e8ed0017ae" }
-gfx-hal = { git = "https://github.com/gfx-rs/gfx", branch = "hal-0.3", rev = "143848c1c3a8ed2af9f6ed333bfab9e8ed0017ae"}
+uni-view = { path="../idroid/uni-view" }
+idroid = { path="../idroid/idroid" }
+# # wgpu-native = { git = "https://github.com/gfx-rs/wgpu", rev = "a2956c0d425413796dcaa14b67c756a46f021bd2", features = ["local", "metal-auto-capture"] }
+# # gfx-backend-vulkan = { path = "../my_forks/hal-0.3-fork/src/backend/vulkan"}
+# # gfx-hal = { path = "../my_forks/hal-0.3-fork/src/hal"}
+# gfx-backend-vulkan = { git = "https://github.com/gfx-rs/gfx", branch = "hal-0.3", rev = "143848c1c3a8ed2af9f6ed333bfab9e8ed0017ae" }
+# gfx-hal = { git = "https://github.com/gfx-rs/gfx", branch = "hal-0.3", rev = "143848c1c3a8ed2af9f6ed333bfab9e8ed0017ae"}

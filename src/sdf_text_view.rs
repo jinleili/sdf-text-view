@@ -1,11 +1,9 @@
-use crate::texture;
-use crate::utils::HUD;
-use crate::SurfaceView;
+use idroid::{ texture, utils::HUD, SurfaceView };
 
 use std::path::PathBuf;
 
-use super::{ClearColorNode, SDFComputeNode, SDFRenderNode};
-use uni_view::{AppView, GPUContext};
+use super::{clear_node::ClearColorNode, compute_node::SDFComputeNode, render_node::SDFRenderNode};
+use uni_view::{AppView, GPUContext, fs::FileSystem};
 
 pub struct SDFTextView {
     app_view: AppView,
@@ -42,14 +40,15 @@ impl SDFTextView {
         instance
     }
 
-    pub fn bundle_image(&mut self, name: String) {
+    pub fn bundle_image(&mut self, path: String) {
         self.need_clear_color = false;
-        self.image = Some(name);
+        self.image = Some(path);
         self.need_draw = true;
     }
 
     fn create_nodes(&mut self, encoder: &mut wgpu::CommandEncoder) {
-        let path = uni_view::fs::FileSystem::get_texture_file_path(&self.image.as_ref().unwrap());
+        let fs = FileSystem::new(env!("CARGO_MANIFEST_DIR"));
+        let path = fs.get_texture_file_path(&self.image.as_ref().unwrap());
         let (texture_view, texture_extent, _sampler) =
             texture::from_path(path, &mut self.app_view.device, encoder, true, true);
 
@@ -74,7 +73,7 @@ impl SDFTextView {
 }
 
 impl SurfaceView for SDFTextView {
-    fn touch_moved(&mut self, _position: crate::math::Position) {}
+    fn touch_moved(&mut self, _position: idroid::math::Position) {}
 
     fn resize(&mut self) {
         println!("resize()--");
