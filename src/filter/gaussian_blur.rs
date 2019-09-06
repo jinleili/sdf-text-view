@@ -1,5 +1,4 @@
 use crate::PicInfoUniform;
-use idroid::texture;
 
 #[allow(dead_code)]
 pub struct GaussianBlurFilter {
@@ -8,16 +7,15 @@ pub struct GaussianBlurFilter {
     pipeline: wgpu::ComputePipeline,
     offset_stride: wgpu::BufferAddress,
     threadgroup_count: (u32, u32),
-    pub output_view: wgpu::TextureView,
 }
 
 #[allow(dead_code)]
 impl GaussianBlurFilter {
     pub fn new(
         device: &mut wgpu::Device, _encoder: &mut wgpu::CommandEncoder,
-        src_view: &wgpu::TextureView, extent: wgpu::Extent3d, only_r_channel: bool
+        src_view: &wgpu::TextureView, out_view: &wgpu::TextureView, extent: wgpu::Extent3d,
+        only_r_channel: bool,
     ) -> Self {
-        let img_size = (extent.width * extent.height) as u64;
         let bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
             bindings: &[
                 wgpu::BindGroupLayoutBinding {
@@ -57,7 +55,6 @@ impl GaussianBlurFilter {
                 },
             ]);
 
-        let output_view = texture::empty(device, wgpu::TextureFormat::R8Unorm, extent);
         let bind_group: wgpu::BindGroup = device.create_bind_group(&wgpu::BindGroupDescriptor {
             layout: &bind_group_layout,
             bindings: &[
@@ -74,7 +71,7 @@ impl GaussianBlurFilter {
                 },
                 wgpu::Binding {
                     binding: 2,
-                    resource: wgpu::BindingResource::TextureView(&output_view),
+                    resource: wgpu::BindingResource::TextureView(out_view),
                 },
             ],
         });
@@ -101,7 +98,6 @@ impl GaussianBlurFilter {
             pipeline,
             offset_stride,
             threadgroup_count,
-            output_view,
         }
     }
 

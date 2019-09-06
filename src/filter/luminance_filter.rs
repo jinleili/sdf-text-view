@@ -45,12 +45,10 @@ impl LuminanceFilter {
         let uniform_size = offset_stride * 1;
         let uniform_buffer = device
             .create_buffer_mapped(1, wgpu::BufferUsage::UNIFORM | wgpu::BufferUsage::COPY_DST)
-            .fill_from_slice(&[
-                PicInfoUniform {
-                    info: [extent.width as i32, extent.height as i32, 0, 0],
-                    any: [0; 60],
-                }
-            ]);
+            .fill_from_slice(&[PicInfoUniform {
+                info: [extent.width as i32, extent.height as i32, 0, 0],
+                any: [0; 60],
+            }]);
 
         let output_view = texture::empty(device, wgpu::TextureFormat::R8Unorm, extent);
         let bind_group: wgpu::BindGroup = device.create_bind_group(&wgpu::BindGroupDescriptor {

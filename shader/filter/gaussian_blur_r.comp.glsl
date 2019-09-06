@@ -17,6 +17,7 @@ layout(set = 0, binding = 0) uniform InfoUniform
     ivec4 info;
 };
 layout(binding = 1, r8) uniform image2D input_pic;
+layout(binding = 2, r8) uniform image2D output_pic;
 
 const float weight[3] = { 0.39894346935609776, 0.2959625730773051, 0.004565692244646007 };
 
@@ -34,5 +35,5 @@ void main()
         temp += imageLoad(input_pic, uv - offset_uv).r * weight[i];
     }
 
-    imageStore(input_pic, uv, vec4(vec3(temp), 1.0));
+    imageStore(output_pic, uv, vec4(vec3(temp), 1.0));
 }
