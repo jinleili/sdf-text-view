@@ -21,6 +21,14 @@ pub struct PicInfoUniform {
     any: [i32; 60],
 }
 
+#[derive(Copy, Clone)]
+#[repr(C)]
+pub struct PicInfoUniform2 {
+    info: [i32; 4],
+    threshold: [f32; 4],
+    any: [i32; 56],
+}
+
 #[cfg(not(target_os = "macos"))]
 #[no_mangle]
 pub extern "C" fn create_sdf_view(view: uni_view::AppViewObj) -> *mut libc::c_void {

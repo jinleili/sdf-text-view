@@ -15,10 +15,10 @@ default = []
 [dependencies]
 libc = "*"
 wgpu = { git = "https://github.com/gfx-rs/wgpu-rs", rev = "433ab156eaa6964e0037cb5202be4dd82790422a"  }
-uni-view = { path="../idroid/uni-view" }
-idroid = { path="../idroid/idroid" }
-# uni-view = { git = "https://github.com/grenlight/idroid", rev = "81bda67e35551898ddca1c5a9c3b6dfe209f3ffd" }
-# idroid = { git = "https://github.com/grenlight/idroid", rev = "81bda67e35551898ddca1c5a9c3b6dfe209f3ffd" }
+# uni-view = { path="../idroid/uni-view" }
+# idroid = { path="../idroid/idroid" }
+uni-view = { git = "https://github.com/grenlight/idroid", rev = "81bda67e35551898ddca1c5a9c3b6dfe209f3ffd" }
+idroid = { git = "https://github.com/grenlight/idroid", rev = "81bda67e35551898ddca1c5a9c3b6dfe209f3ffd" }
 
 nalgebra-glm = "*"
 image = "0.22.1"

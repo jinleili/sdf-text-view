@@ -1,4 +1,6 @@
-use crate::filter::{GaussianBlurFilter, LuminanceFilter, SobelEdgeDetection};
+use crate::filter::{
+    GaussianBlurFilter, LuminanceFilter, NonMaximumSuppression, SobelEdgeDetection,
+};
 
 #[allow(dead_code)]
 pub struct CannyEdgeDetection {
@@ -6,6 +8,7 @@ pub struct CannyEdgeDetection {
     luminance_filter: LuminanceFilter,
     blur_filter: GaussianBlurFilter,
     sobel_edge_detection: SobelEdgeDetection,
+    non_maximum_suppression: NonMaximumSuppression,
 }
 
 #[allow(dead_code)]
@@ -25,13 +28,27 @@ impl CannyEdgeDetection {
             extent,
             true,
         );
-        let sobel_edge_detection = SobelEdgeDetection::new(device, encoder, src_view, extent);
-        CannyEdgeDetection { output_view, luminance_filter, blur_filter, sobel_edge_detection, }
+        let sobel_edge_detection = SobelEdgeDetection::new(device, encoder, &output_view, extent);
+        let non_maximum_suppression = NonMaximumSuppression::new(
+            device,
+            encoder,
+            &sobel_edge_detection.output_view,
+            &output_view,
+            extent,
+        );
+        CannyEdgeDetection {
+            output_view,
+            luminance_filter,
+            blur_filter,
+            sobel_edge_detection,
+            non_maximum_suppression,
+        }
     }
 
     pub fn compute(&mut self, device: &mut wgpu::Device, encoder: &mut wgpu::CommandEncoder) {
         self.luminance_filter.compute(device, encoder);
         self.blur_filter.compute(device, encoder);
         self.sobel_edge_detection.compute(device, encoder);
+        self.non_maximum_suppression.compute(device, encoder);
     }
 }
