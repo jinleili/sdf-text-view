@@ -1,6 +1,7 @@
 use idroid::{texture, utils::HUD, SurfaceView};
 
-use super::{clear_node::ClearColorNode, compute_node::SDFComputeNode, render_node::SDFRenderNode, filter::LuminanceFilter};
+use super::{clear_node::ClearColorNode, compute_node::SDFComputeNode, render_node::SDFRenderNode, 
+filter::LuminanceFilter, filter::GaussianBlurFilter};
 use uni_view::{fs::FileSystem, AppView, GPUContext};
 
 pub struct SDFTextView {
@@ -10,6 +11,7 @@ pub struct SDFTextView {
     compute_node: Option<SDFComputeNode>,
     render_node: Option<SDFRenderNode>,
     luminance_filter: Option<LuminanceFilter>,
+    blur_filter: Option<GaussianBlurFilter>,
     clear_color_node: ClearColorNode,
     need_clear_color: bool,
     clear_count: u8,
@@ -31,6 +33,7 @@ impl SDFTextView {
             compute_node: None,
             render_node: None,
             luminance_filter: None,
+            blur_filter: None,
             clear_color_node,
             need_clear_color: true,
             need_cal_sdf: false,
@@ -58,6 +61,8 @@ impl SDFTextView {
         let output_view = if self.need_auto_detect {
             let luminance = LuminanceFilter::new(&mut self.app_view.device, encoder, &texture_view, texture_extent);
             self.luminance_filter = Some(luminance);
+            let blur = GaussianBlurFilter::new(&mut self.app_view.device, encoder, &self.luminance_filter.as_ref().unwrap().output_view, texture_extent, true);
+            self.blur_filter = Some(blur);
             &self.luminance_filter.as_ref().unwrap().output_view
         } else {
             &texture_view
@@ -126,8 +131,9 @@ impl SurfaceView for SDFTextView {
                     self.hud.start_frame_timer();
                     if self.need_auto_detect {
                         self.luminance_filter.as_mut().unwrap().compute(&mut self.app_view.device, &mut encoder);
+                        self.blur_filter.as_mut().unwrap().compute(&mut self.app_view.device, &mut encoder);
                     }
-                    compute_node.compute(&mut self.app_view.device, &mut encoder);
+                    // compute_node.compute(&mut self.app_view.device, &mut encoder);
                     self.need_cal_sdf = false;
                     println!("sdf cost: {:?}", self.hud.stop_frame_timer());
                 }

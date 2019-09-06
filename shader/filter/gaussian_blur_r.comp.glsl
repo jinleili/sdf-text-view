@@ -34,6 +34,5 @@ void main()
         temp += imageLoad(input_pic, uv - offset_uv).r * weight[i];
     }
 
-    // save to single channel gray image
-    imageStore(out_pic, uv, vec4(vec3(temp), 1.0));
+    imageStore(input_pic, uv, vec4(vec3(temp), 1.0));
 }

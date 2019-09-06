@@ -2,7 +2,7 @@ use crate::PicInfoUniform;
 use idroid::texture;
 
 #[allow(dead_code)]
-pub struct LuminanceFilter {
+pub struct GaussianBlurFilter {
     uniform_buffer: wgpu::Buffer,
     bind_group: wgpu::BindGroup,
     pipeline: wgpu::ComputePipeline,
@@ -12,11 +12,12 @@ pub struct LuminanceFilter {
 }
 
 #[allow(dead_code)]
-impl LuminanceFilter {
+impl GaussianBlurFilter {
     pub fn new(
         device: &mut wgpu::Device, _encoder: &mut wgpu::CommandEncoder,
-        src_view: &wgpu::TextureView, extent: wgpu::Extent3d,
+        src_view: &wgpu::TextureView, extent: wgpu::Extent3d, only_r_channel: bool
     ) -> Self {
+        let img_size = (extent.width * extent.height) as u64;
         let bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
             bindings: &[
                 wgpu::BindGroupLayoutBinding {
@@ -42,14 +43,18 @@ impl LuminanceFilter {
         });
 
         let offset_stride = std::mem::size_of::<PicInfoUniform>() as wgpu::BufferAddress;
-        let uniform_size = offset_stride * 1;
+        let uniform_size = offset_stride * 2;
         let uniform_buffer = device
-            .create_buffer_mapped(1, wgpu::BufferUsage::UNIFORM | wgpu::BufferUsage::COPY_DST)
+            .create_buffer_mapped(2, wgpu::BufferUsage::UNIFORM | wgpu::BufferUsage::COPY_DST)
             .fill_from_slice(&[
                 PicInfoUniform {
                     info: [extent.width as i32, extent.height as i32, 0, 0],
                     any: [0; 60],
-                }
+                },
+                PicInfoUniform {
+                    info: [extent.width as i32, extent.height as i32, 1, 0],
+                    any: [0; 60],
+                },
             ]);
 
         let output_view = texture::empty(device, wgpu::TextureFormat::R8Unorm, extent);
@@ -79,7 +84,7 @@ impl LuminanceFilter {
         });
 
         let shader = idroid::shader::Shader::new_by_compute(
-            "filter/luminance",
+            if only_r_channel { "filter/gaussian_blur_r" } else { "filter/gaussian_blur_rgba" },
             device,
             env!("CARGO_MANIFEST_DIR"),
         );
@@ -90,7 +95,7 @@ impl LuminanceFilter {
 
         let threadgroup_count = ((extent.width + 15) / 16, (extent.height + 15) / 16);
 
-        LuminanceFilter {
+        GaussianBlurFilter {
             uniform_buffer,
             bind_group,
             pipeline,
@@ -103,7 +108,11 @@ impl LuminanceFilter {
     pub fn compute(&mut self, _device: &mut wgpu::Device, encoder: &mut wgpu::CommandEncoder) {
         let mut cpass = encoder.begin_compute_pass();
         cpass.set_pipeline(&self.pipeline);
+        // blur x
         cpass.set_bind_group(0, &self.bind_group, &[0]);
+        cpass.dispatch(self.threadgroup_count.0, self.threadgroup_count.1, 1);
+        // blur y
+        cpass.set_bind_group(0, &self.bind_group, &[self.offset_stride]);
         cpass.dispatch(self.threadgroup_count.0, self.threadgroup_count.1, 1);
     }
 }
