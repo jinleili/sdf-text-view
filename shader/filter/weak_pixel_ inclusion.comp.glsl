@@ -7,7 +7,7 @@ layout(set = 0, binding = 0) uniform InfoUniform
     ivec4 info;
 };
 layout(binding = 1, r8) uniform image2D input_pic;
-layout(binding = 2, rgba8) uniform image2D output_pic;
+layout(binding = 2, r8) uniform image2D output_pic;
 
 void main()
 {
@@ -23,15 +23,11 @@ void main()
     float rightIntensity = imageLoad(input_pic, ivec2(uv.x + 1, uv.y)).r;
     float bottomIntensity = imageLoad(input_pic, ivec2(uv.x, uv.y + 1)).r;
     float topIntensity = imageLoad(input_pic, ivec2(uv.x, uv.y - 1)).r;
-    vec2 gradientDirection;
-    gradientDirection.x = -bottomLeftIntensity - 2.0 * leftIntensity - topLeftIntensity + bottomRightIntensity + 2.0 * rightIntensity + topRightIntensity;
-    gradientDirection.y = -topLeftIntensity - 2.0 * topIntensity - topRightIntensity + bottomLeftIntensity + 2.0 * bottomIntensity + bottomRightIntensity;
-    float gradientMagnitude = length(gradientDirection);
-    vec2 normalizedDirection = normalize(gradientDirection);
-    // Offset by 1-sin(pi/8) to set to 0 if near axis, 1 if away
-    normalizedDirection = sign(normalizedDirection) * floor(abs(normalizedDirection) + 0.617316);
-    // Place -1.0 - 1.0 within 0 - 1.0
-    normalizedDirection = (normalizedDirection + 1.0) * 0.5;
+    float centerIntensity = imageLoad(input_pic, uv).r;
 
-    imageStore(output_pic, uv, vec4(gradientMagnitude, normalizedDirection.x, normalizedDirection.y, 1.0));
+    float pixelIntensitySum = bottomLeftIntensity + topRightIntensity + topLeftIntensity + bottomRightIntensity + leftIntensity + rightIntensity + bottomIntensity + topIntensity + centerIntensity;
+    float sumTest = step(1.5, pixelIntensitySum);
+    float pixelTest = step(0.01, centerIntensity);
+
+    imageStore(output_pic, uv, vec4(vec3(sumTest * pixelTest), 1.0));
 }

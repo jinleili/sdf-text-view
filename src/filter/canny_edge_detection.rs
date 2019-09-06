@@ -1,10 +1,11 @@
-use crate::filter::{GaussianBlurFilter, LuminanceFilter};
+use crate::filter::{GaussianBlurFilter, LuminanceFilter, SobelEdgeDetection};
 
 #[allow(dead_code)]
 pub struct CannyEdgeDetection {
     pub output_view: wgpu::TextureView,
     luminance_filter: LuminanceFilter,
     blur_filter: GaussianBlurFilter,
+    sobel_edge_detection: SobelEdgeDetection,
 }
 
 #[allow(dead_code)]
@@ -24,11 +25,13 @@ impl CannyEdgeDetection {
             extent,
             true,
         );
-        CannyEdgeDetection { output_view, luminance_filter, blur_filter }
+        let sobel_edge_detection = SobelEdgeDetection::new(device, encoder, src_view, extent);
+        CannyEdgeDetection { output_view, luminance_filter, blur_filter, sobel_edge_detection, }
     }
 
     pub fn compute(&mut self, device: &mut wgpu::Device, encoder: &mut wgpu::CommandEncoder) {
         self.luminance_filter.compute(device, encoder);
         self.blur_filter.compute(device, encoder);
+        self.sobel_edge_detection.compute(device, encoder);
     }
 }

@@ -1,12 +1,4 @@
-// 快速高斯模糊
-// 1，分解二维计算为两次一维计算来大幅减小计算规模；
-// 2，基于 GPU 纹理采样的特点来优化；
-// 3，缩小纹理分辨率-> blur -> 放大到原始尺寸；
 // https://software.intel.com/en-us/blogs/2014/07/15/an-investigation-of-fast-real-time-gpu-based-image-blur-algorithms
-// we can take advantage of fixed function GPU hardware, namely samplers,
-// which can load two (in our case) neighboring pixel values and return an interpolated result based on the
-// provided texture coordinate values, all for approximately the cost of one texture read.
-
 layout(local_size_x = 16, local_size_y = 16) in;
 
 layout(set = 0, binding = 0) uniform InfoUniform
@@ -27,6 +19,7 @@ void main()
     if (uv.x > (info.x - 1) || uv.y > (info.y - 1)) {
         return;
     }
+    
     bool is_direction_x = info[2] == 0 ? true : false;
     float temp = imageLoad(input_pic, uv).r * weight[0];
     for (int i = 1; i < 3; i++) {
