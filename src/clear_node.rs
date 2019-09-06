@@ -49,7 +49,8 @@ impl ClearColorNode {
             bind_group_layouts: &[&bind_group_layout],
         });
 
-        let clear_shader = idroid::shader::Shader::new("clear_color", device, env!("CARGO_MANIFEST_DIR"));
+        let clear_shader =
+            idroid::shader::Shader::new("clear_color", device, env!("CARGO_MANIFEST_DIR"));
         let color_alpha_blend = idroid::utils::color_alpha_blend();
         let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             layout: &pipeline_layout,
