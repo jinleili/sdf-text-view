@@ -4,7 +4,7 @@ pub struct OneInOneOut {
     pub bind_group: wgpu::BindGroup,
     pub uniform_buffer: wgpu::Buffer,
     pub pipeline: wgpu::ComputePipeline,
-    threadgroup_count: (u32, u32),
+    pub threadgroup_count: (u32, u32),
 }
 
 #[allow(dead_code)]

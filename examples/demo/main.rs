@@ -21,7 +21,8 @@ fn main() {
     let events_loop = EventLoop::new();
     let window = Window::new(&events_loop).unwrap();
     // window.set_max_dimensions(Some((400_u32, 700_u32).into()));
-    window.set_max_inner_size(Some((2800_u32, 1850_u32).into()));
+    window.set_inner_size((900_u32, 600_u32).into());
+    // window.set_max_inner_size(Some((2800_u32, 1850_u32).into()));
     window.set_title("SDF Text View");
 
     let v = AppView::new(window);
