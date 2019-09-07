@@ -143,5 +143,3 @@ fn get_shader_funcs(key: &str) -> Option<String> {
     };
     Some(shader)
 }
-
-

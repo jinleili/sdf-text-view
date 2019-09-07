@@ -21,13 +21,14 @@ fn main() {
     let events_loop = EventLoop::new();
     let window = Window::new(&events_loop).unwrap();
     // window.set_max_dimensions(Some((400_u32, 700_u32).into()));
-    window.set_max_inner_size(Some((2800_u32, 1850_u32).into()));
+    // window.set_inner_size((900_u32, 600_u32).into());
+    // window.set_max_inner_size(Some((2800_u32, 1850_u32).into()));
     window.set_title("SDF Text View");
 
     let v = AppView::new(window);
 
     let mut surface_view = SDFTextView::new(v);
-    surface_view.bundle_image("math3.png".to_string());
+    surface_view.bundle_image("math3.png".to_string(), false);
     // winit 0.20.0-alpha3 不会主动触发 WindowEvent::Resized 事件了
 
     events_loop.run(move |event, _, control_flow| {

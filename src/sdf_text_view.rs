@@ -1,7 +1,10 @@
-use idroid::{ texture, utils::HUD, SurfaceView };
+use idroid::{texture, utils::HUD, SurfaceView};
 
-use super::{clear_node::ClearColorNode, compute_node::SDFComputeNode, render_node::SDFRenderNode};
-use uni_view::{AppView, GPUContext, fs::FileSystem};
+use super::{
+    clear_node::ClearColorNode, compute_node::SDFComputeNode, filter::CannyEdgeDetection,
+    filter::GaussianBlurFilter, filter::LuminanceFilter, render_node::SDFRenderNode,
+};
+use uni_view::{fs::FileSystem, AppView, GPUContext};
 
 pub struct SDFTextView {
     app_view: AppView,
@@ -9,12 +12,14 @@ pub struct SDFTextView {
     image: Option<String>,
     compute_node: Option<SDFComputeNode>,
     render_node: Option<SDFRenderNode>,
+    edge_detection: Option<CannyEdgeDetection>,
     clear_color_node: ClearColorNode,
     need_clear_color: bool,
     clear_count: u8,
     need_cal_sdf: bool,
     need_draw: bool,
     draw_count: u8,
+    need_auto_detect: bool,
 }
 
 impl SDFTextView {
@@ -28,35 +33,57 @@ impl SDFTextView {
             image: None,
             compute_node: None,
             render_node: None,
+            edge_detection: None,
             clear_color_node,
             need_clear_color: true,
             need_cal_sdf: false,
             need_draw: false,
             draw_count: 0,
             clear_count: 0,
+            need_auto_detect: false,
         };
         instance
     }
 
-    pub fn bundle_image(&mut self, path: String) {
+    pub fn bundle_image(&mut self, path: String, need_auto_detect: bool) {
         self.need_clear_color = false;
         self.image = Some(path);
         self.need_draw = true;
+        self.need_auto_detect = need_auto_detect;
     }
 
     fn create_nodes(&mut self, encoder: &mut wgpu::CommandEncoder) {
         let fs = FileSystem::new(env!("CARGO_MANIFEST_DIR"));
         let path = fs.get_texture_file_path(&self.image.as_ref().unwrap());
-        let (texture_view, texture_extent, _sampler) =
-            texture::from_path(path, &mut self.app_view.device, encoder, true, true);
+        let (texture_view, texture_extent, _sampler) = texture::from_path(
+            path,
+            &mut self.app_view.device,
+            encoder,
+            true,
+            if self.need_auto_detect { false } else { true },
+        );
+
+        let output_view = if self.need_auto_detect {
+            let edge_detection = CannyEdgeDetection::new(
+                &mut self.app_view.device,
+                encoder,
+                &texture_view,
+                texture_extent,
+            );
+            self.edge_detection = Some(edge_detection);
+
+            &self.edge_detection.as_ref().unwrap().output_view
+        } else {
+            &texture_view
+        };
 
         let compute_node =
-            SDFComputeNode::new(&mut self.app_view.device, encoder, &texture_view, texture_extent);
+            SDFComputeNode::new(&mut self.app_view.device, encoder, output_view, texture_extent);
 
         let mut render_node = SDFRenderNode::new(
             &self.app_view.sc_desc,
             &mut self.app_view.device,
-            &texture_view,
+            output_view,
             texture_extent,
         );
         // update mvp matrix
@@ -111,6 +138,12 @@ impl SurfaceView for SDFTextView {
             (Some(compute_node), Some(render_node)) => {
                 if self.need_cal_sdf {
                     self.hud.start_frame_timer();
+                    if self.need_auto_detect {
+                        self.edge_detection
+                            .as_mut()
+                            .unwrap()
+                            .compute(&mut self.app_view.device, &mut encoder);
+                    }
                     compute_node.compute(&mut self.app_view.device, &mut encoder);
                     self.need_cal_sdf = false;
                     println!("sdf cost: {:?}", self.hud.stop_frame_timer());

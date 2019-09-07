@@ -1,10 +1,4 @@
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct PicInfoUniform {
-    info: [i32; 4],
-    // only for requested 256 alignment: (256 - 16) / 4 = 60
-    any: [i32; 60],
-}
+use crate::PicInfoUniform;
 
 pub struct SDFComputeNode {
     uniform_buffer: wgpu::Buffer,
@@ -164,17 +158,20 @@ impl SDFComputeNode {
             bind_group_layouts: &[&bind_group_layout],
         });
 
-        let shader_xy = idroid::shader::Shader::new_by_compute("sdf/sdf", device, env!("CARGO_MANIFEST_DIR"));
+        let shader_xy =
+            idroid::shader::Shader::new_by_compute("sdf/sdf", device, env!("CARGO_MANIFEST_DIR"));
         let xy_pipeline = device.create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
             layout: &pipeline_layout,
             compute_stage: shader_xy.cs_stage(),
         });
-        let shader_x = idroid::shader::Shader::new_by_compute("sdf/sdf_x", device, env!("CARGO_MANIFEST_DIR"));
+        let shader_x =
+            idroid::shader::Shader::new_by_compute("sdf/sdf_x", device, env!("CARGO_MANIFEST_DIR"));
         let x_pipeline = device.create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
             layout: &pipeline_layout,
             compute_stage: shader_x.cs_stage(),
         });
-        let shader_y = idroid::shader::Shader::new_by_compute("sdf/sdf_y", device, env!("CARGO_MANIFEST_DIR"));
+        let shader_y =
+            idroid::shader::Shader::new_by_compute("sdf/sdf_y", device, env!("CARGO_MANIFEST_DIR"));
         let y_pipeline = device.create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
             layout: &pipeline_layout,
             compute_stage: shader_y.cs_stage(),
