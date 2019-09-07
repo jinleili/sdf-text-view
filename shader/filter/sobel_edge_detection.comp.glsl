@@ -12,7 +12,7 @@ layout(binding = 2, rgba8) uniform image2D output_pic;
 void main()
 {
     ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
-    if (uv.x < 1 || uv.x > (info.x - 2) || uv.y < 1 || uv.y > (info.y - 2)) {
+    if (uv.x > (info.x - 1) || uv.y > (info.y - 1)) {
         return;
     }
     float bottomLeftIntensity = imageLoad(input_pic, ivec2(uv.x - 1, uv.y + 1)).r;
@@ -23,6 +23,15 @@ void main()
     float rightIntensity = imageLoad(input_pic, ivec2(uv.x + 1, uv.y)).r;
     float bottomIntensity = imageLoad(input_pic, ivec2(uv.x, uv.y + 1)).r;
     float topIntensity = imageLoad(input_pic, ivec2(uv.x, uv.y - 1)).r;
+    // float bottomLeftIntensity = imageLoad(input_pic, ivec2(uv.x - 1, uv.y - 1)).r;
+    // float topRightIntensity = imageLoad(input_pic, ivec2(uv.x + 1, uv.y + 1)).r;
+    // float topLeftIntensity = imageLoad(input_pic, ivec2(uv.x - 1, uv.y + 1)).r;
+    // float bottomRightIntensity = imageLoad(input_pic, ivec2(uv.x + 1, uv.y - 1)).r;
+    // float leftIntensity = imageLoad(input_pic, ivec2(uv.x - 1, uv.y)).r;
+    // float rightIntensity = imageLoad(input_pic, ivec2(uv.x + 1, uv.y)).r;
+    // float bottomIntensity = imageLoad(input_pic, ivec2(uv.x, uv.y - 1)).r;
+    // float topIntensity = imageLoad(input_pic, ivec2(uv.x, uv.y + 1)).r;
+
     vec2 gradientDirection;
     gradientDirection.x = -bottomLeftIntensity - 2.0 * leftIntensity - topLeftIntensity + bottomRightIntensity + 2.0 * rightIntensity + topRightIntensity;
     gradientDirection.y = -topLeftIntensity - 2.0 * topIntensity - topRightIntensity + bottomLeftIntensity + 2.0 * bottomIntensity + bottomRightIntensity;

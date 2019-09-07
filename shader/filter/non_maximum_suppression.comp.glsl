@@ -16,7 +16,7 @@ layout(binding = 2, r8) uniform image2D output_pic;
 void main()
 {
     ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
-    if (uv.x < 1 || uv.x > (info.x - 2) || uv.y < 1 || uv.y > (info.y - 2)) {
+    if (uv.x > (info.x - 1) || uv.y > (info.y - 1)) {
         return;
     }
     vec3 currentGradientAndDirection = imageLoad(input_pic, uv).rgb;

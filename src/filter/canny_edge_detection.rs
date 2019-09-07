@@ -36,7 +36,7 @@ impl CannyEdgeDetection {
             idroid::texture::empty(device, wgpu::TextureFormat::Rgba8Unorm, extent);
         let sobel_edge_detection = OneInOneOut::new(
             device,
-            &luminance_filter.output_view,
+            &output_view,
             &sobel_output_view,
             extent,
             device
@@ -52,13 +52,13 @@ impl CannyEdgeDetection {
         let non_maximum_suppression = OneInOneOut::new(
             device,
             &sobel_output_view,
-            &luminance_filter.output_view,
+            &output_view,
             extent,
             device
                 .create_buffer_mapped(1, wgpu::BufferUsage::UNIFORM | wgpu::BufferUsage::COPY_DST)
                 .fill_from_slice(&[PicInfoUniform2 {
                     info: [extent.width as i32, extent.height as i32, 0, 0],
-                    threshold: [0.2, 0.4, 0.0, 0.0],
+                    threshold: [0.1, 0.4, 0.0, 0.0],
                     any: [0; 56],
                 }]),
             uniform_size,
@@ -94,6 +94,6 @@ impl CannyEdgeDetection {
         self.blur_filter.compute(device, encoder);
         self.sobel_edge_detection.compute(device, encoder);
         self.non_maximum_suppression.compute(device, encoder);
-        self.weak_pixel_inclusion.compute(device, encoder);
+        // self.weak_pixel_inclusion.compute(device, encoder);
     }
 }

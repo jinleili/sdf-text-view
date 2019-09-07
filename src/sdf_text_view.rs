@@ -144,7 +144,7 @@ impl SurfaceView for SDFTextView {
                             .unwrap()
                             .compute(&mut self.app_view.device, &mut encoder);
                     }
-                    // compute_node.compute(&mut self.app_view.device, &mut encoder);
+                    compute_node.compute(&mut self.app_view.device, &mut encoder);
                     self.need_cal_sdf = false;
                     println!("sdf cost: {:?}", self.hud.stop_frame_timer());
                 }
