@@ -49,6 +49,6 @@ pub unsafe extern "C" fn sdf_view_set_bundle_image(
     };
 
     let mut obj: Box<Box<SDFTextView>> = Box::from_raw(obj as *mut _);
-    obj.bundle_image(name.to_string());
+    obj.bundle_image(name.to_string(), false);
     let _ = Box::into_raw(obj) as *mut libc::c_void;
 }
