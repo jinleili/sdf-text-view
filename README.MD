@@ -25,7 +25,7 @@ iPhone Xs Max   | 0.784541ms
 
 ## Screenshot
 
-| ![macOS gif](screenshot/macOS_gif.gif) | ![iPhone gif](screenshot/iPhone.gif) |
+| ![macOS gif](screenshot/macOS.gif) | ![iPhone gif](screenshot/iPhone.gif) |
 | --------- | ------------- |
 
 
