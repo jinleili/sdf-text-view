@@ -3,6 +3,9 @@ View component that based [Rust WebGPU](https://github.com/gfx-rs/wgpu-rs) to ca
 
 Also implemented a cpu-based SDF version on ```sdf-cpu/```, it accept a input image and output a sdf gray image.
 
+## Motivation
+In our iOS and Android app has lot of math LaTex content, for easy rendering reason, has been generated to png picture, the resolution of phone and tablets is very different, and if want to have a good look and feel after user zooms the picture, would need high resolution of the generated png, it is difficult to take a suitable resolution and have faster network loading speed, SDF is very suitable for solving this scenario.
+
 ## Real time performance of SDF on compute shader
 Test 10 times take the average, the  
 <p></p>
