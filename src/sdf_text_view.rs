@@ -2,7 +2,7 @@ use idroid::{texture, utils::HUD, SurfaceView};
 
 use super::{
     clear_node::ClearColorNode, compute_node::SDFComputeNode, filter::CannyEdgeDetection,
-    filter::GaussianBlurFilter, filter::LuminanceFilter, render_node::SDFRenderNode,
+    render_node::SDFRenderNode,
 };
 use uni_view::{fs::FileSystem, AppView, GPUContext};
 
@@ -87,7 +87,12 @@ impl SDFTextView {
             texture_extent,
         );
         // update mvp matrix
-        render_node.update_scale(&self.app_view.sc_desc, &mut self.app_view.device, 1.0);
+        render_node.update_scale(
+            &self.app_view.sc_desc,
+            &mut self.app_view.device,
+            &mut self.app_view.queue,
+            1.0,
+        );
 
         self.compute_node = Some(compute_node);
         self.render_node = Some(render_node);
@@ -103,7 +108,12 @@ impl SurfaceView for SDFTextView {
     fn resize(&mut self) {
         println!("resize()--");
         if let Some(render_node) = &mut self.render_node {
-            render_node.update_scale(&self.app_view.sc_desc, &mut self.app_view.device, 1.0);
+            render_node.update_scale(
+                &self.app_view.sc_desc,
+                &mut self.app_view.device,
+                &mut self.app_view.queue,
+                1.0,
+            );
             self.app_view.update_swap_chain();
             self.need_draw = true;
             self.enter_frame();
@@ -112,7 +122,12 @@ impl SurfaceView for SDFTextView {
 
     fn scale(&mut self, scale: f32) {
         if let Some(render_node) = &mut self.render_node {
-            render_node.update_scale(&self.app_view.sc_desc, &mut self.app_view.device, scale);
+            render_node.update_scale(
+                &self.app_view.sc_desc,
+                &mut self.app_view.device,
+                &mut self.app_view.queue,
+                scale,
+            );
             self.need_draw = true;
         }
     }
@@ -122,7 +137,11 @@ impl SurfaceView for SDFTextView {
             if self.need_clear_color && self.clear_count < 3 {
                 let frame = self.app_view.swap_chain.get_next_texture();
                 {
-                    self.clear_color_node.clear_color(&frame, &mut self.app_view.device);
+                    self.clear_color_node.clear_color(
+                        &frame,
+                        &mut self.app_view.device,
+                        &mut self.app_view.queue,
+                    );
                     self.clear_count += 1;
                 }
             }
@@ -159,14 +178,27 @@ impl SurfaceView for SDFTextView {
                         self.draw_count = 0;
                     }
                 }
-                self.app_view.device.get_queue().submit(&[encoder.finish()]);
+                self.app_view.queue.submit(&[encoder.finish()]);
             }
             (_, _) => {
                 self.create_nodes(&mut encoder);
-                self.app_view.device.get_queue().submit(&[encoder.finish()]);
+                self.app_view.queue.submit(&[encoder.finish()]);
             }
         };
 
         // self.app_view.device.get_queue().submit(&[encoder.finish()]);
+    }
+}
+
+impl std::ops::Deref for SDFTextView {
+    type Target = AppView;
+    fn deref<'a>(&'a self) -> &'a AppView {
+        &self.app_view
+    }
+}
+
+impl std::ops::DerefMut for SDFTextView {
+    fn deref_mut<'a>(&'a mut self) -> &'a mut AppView {
+        &mut self.app_view
     }
 }

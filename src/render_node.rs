@@ -185,7 +185,8 @@ impl SDFRenderNode {
     }
 
     pub fn update_scale(
-        &mut self, sc_desc: &wgpu::SwapChainDescriptor, device: &mut wgpu::Device, scale: f32,
+        &mut self, sc_desc: &wgpu::SwapChainDescriptor, device: &mut wgpu::Device,
+        queue: &mut wgpu::Queue, scale: f32,
     ) {
         let fovy: f32 = 75.0 / 180.0 * std::f32::consts::PI;
         let radian: glm::TVec1<f32> = glm::vec1(fovy);
@@ -226,7 +227,7 @@ impl SDFRenderNode {
         vm_matrix = glm::scale(&vm_matrix, &glm::vec3(self.scale, self.scale, 1.0));
 
         let mvp: [[f32; 4]; 4] = (p_matrix * vm_matrix).into();
-        idroid::utils::update_uniform(device, mvp, &self.mvp_buf);
+        idroid::utils::update_uniform(device, queue, mvp, &self.mvp_buf);
     }
 
     pub fn begin_render_pass(

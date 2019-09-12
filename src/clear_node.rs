@@ -91,7 +91,9 @@ impl ClearColorNode {
         }
     }
 
-    pub fn clear_color(&self, frame: &wgpu::SwapChainOutput, device: &mut wgpu::Device) {
+    pub fn clear_color(
+        &self, frame: &wgpu::SwapChainOutput, device: &mut wgpu::Device, queue: &mut wgpu::Queue,
+    ) {
         let mut encoder =
             device.create_command_encoder(&wgpu::CommandEncoderDescriptor { todo: 0 });
         {
@@ -113,6 +115,6 @@ impl ClearColorNode {
             rpass.draw_indexed(0..self.index_count as u32, 0, 0..1);
         }
 
-        device.get_queue().submit(&[encoder.finish()]);
+        queue.submit(&[encoder.finish()]);
     }
 }

@@ -1,7 +1,6 @@
 use crate::PicInfoUniform;
 
 pub struct SDFComputeNode {
-    uniform_buffer: wgpu::Buffer,
     bind_group: wgpu::BindGroup,
     xy_pipeline: wgpu::ComputePipeline,
     x_pipeline: wgpu::ComputePipeline,
@@ -180,7 +179,6 @@ impl SDFComputeNode {
         let threadgroup_count = ((extent.width + 15) / 16, (extent.height + 15) / 16);
 
         SDFComputeNode {
-            uniform_buffer,
             bind_group,
             xy_pipeline,
             x_pipeline,
