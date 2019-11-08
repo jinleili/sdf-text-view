@@ -135,7 +135,7 @@ impl SurfaceView for SDFTextView {
     fn enter_frame(&mut self) {
         if self.need_draw == false {
             if self.need_clear_color && self.clear_count < 3 {
-                let frame = self.app_view.swap_chain.get_next_texture();
+                let frame = self.app_view.swap_chain.get_next_texture().expect("swap_chain.get_next_texture() timeout");
                 {
                     self.clear_color_node.clear_color(
                         &frame,
@@ -168,7 +168,7 @@ impl SurfaceView for SDFTextView {
                     println!("sdf cost: {:?}", self.hud.stop_frame_timer());
                 }
 
-                let frame = self.app_view.swap_chain.get_next_texture();
+                let frame = self.app_view.swap_chain.get_next_texture().expect("swap_chain.get_next_texture() timeout");
                 {
                     render_node.begin_render_pass(&frame, &mut encoder);
                     // draw for all swap_chain frame textures, then, stop to draw frame until resize() or rotate() fn called.
