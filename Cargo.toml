@@ -43,9 +43,7 @@ lazy_static = "*"
 palette = "0.4"
 rand = "0.6"
 
-# [patch.crates-io]
-# wgpu-native = { git = "https://github.com/gfx-rs/wgpu", rev = "499bf1d2686ad25b5a5133d6433e4f4c9179ff0b", features = ["local", "metal-auto-capture"] }
-# # gfx-backend-vulkan = { path = "../my_forks/hal-0.3-fork/src/backend/vulkan"}
-# # gfx-hal = { path = "../my_forks/hal-0.3-fork/src/hal"}
-# gfx-backend-vulkan = { git = "https://github.com/gfx-rs/gfx", branch = "hal-0.3", rev = "143848c1c3a8ed2af9f6ed333bfab9e8ed0017ae" }
-# gfx-hal = { git = "https://github.com/gfx-rs/gfx", branch = "hal-0.3", rev = "143848c1c3a8ed2af9f6ed333bfab9e8ed0017ae"}
+[patch.crates-io]
+# fixed bug: https://github.com/gfx-rs/gfx/issues/3086
+gfx-backend-metal = { git = "https://github.com/gfx-rs/gfx", rev = "8bd4f0d1f8ccc3875183ccb4b621023edb0ed94a" }
+gfx-hal = { git = "https://github.com/gfx-rs/gfx",  rev = "8bd4f0d1f8ccc3875183ccb4b621023edb0ed94a"}
