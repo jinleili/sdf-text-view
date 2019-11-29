@@ -3,9 +3,9 @@ use idroid::texture;
 use idroid::utils::MVPUniform;
 use idroid::vertex::{Pos, PosTex};
 
-use wgpu::Extent3d;
-
 use nalgebra_glm as glm;
+use wgpu::Extent3d;
+use zerocopy::{AsBytes, FromBytes};
 
 pub struct SDFRenderNode {
     extent: Extent3d,
@@ -20,7 +20,7 @@ pub struct SDFRenderNode {
 }
 
 #[repr(C)]
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, AsBytes, FromBytes)]
 pub struct DrawUniform {
     stroke_color: [f32; 4],
     mask_n_gamma: [f32; 2],
@@ -127,12 +127,10 @@ impl SDFRenderNode {
         let (vertex_data, index_data) = Plane::new(1, 1).generate_vertices();
 
         let vertex_buf = device
-            .create_buffer_mapped(vertex_data.len(), wgpu::BufferUsage::VERTEX)
-            .fill_from_slice(&vertex_data);
-
+            .create_buffer_with_data(&vertex_data.as_bytes(), wgpu::BufferUsage::VERTEX);
         let index_buf = device
-            .create_buffer_mapped(index_data.len(), wgpu::BufferUsage::INDEX)
-            .fill_from_slice(&index_data);
+            .create_buffer_with_data(&index_data.as_bytes(), wgpu::BufferUsage::INDEX);
+            
         // Create the render pipeline
         let shader = idroid::shader::Shader::new("sdf/text", device, env!("CARGO_MANIFEST_DIR"));
         let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {

@@ -1,4 +1,5 @@
 use crate::PicInfoUniform;
+use zerocopy::AsBytes;
 
 pub struct SDFComputeNode {
     bind_group: wgpu::BindGroup,
@@ -56,9 +57,8 @@ impl SDFComputeNode {
 
         let offset_stride = std::mem::size_of::<PicInfoUniform>() as wgpu::BufferAddress;
         let uniform_size = offset_stride * 6;
-        let uniform_buffer = device
-            .create_buffer_mapped(6, wgpu::BufferUsage::UNIFORM | wgpu::BufferUsage::COPY_DST)
-            .fill_from_slice(&[
+        let uniform_buffer = device.create_buffer_with_data(
+            &[
                 PicInfoUniform {
                     info: [extent.width as i32, extent.height as i32, 2, 0],
                     any: [0; 60],
@@ -83,7 +83,10 @@ impl SDFComputeNode {
                     info: [extent.width as i32, extent.height as i32, 3, 0],
                     any: [0; 60],
                 },
-            ]);
+            ]
+            .as_bytes(),
+            wgpu::BufferUsage::UNIFORM | wgpu::BufferUsage::COPY_DST,
+        );
 
         let sdf_range = (img_size * 4) as wgpu::BufferAddress;
         let sdf_front = device.create_buffer(&wgpu::BufferDescriptor {

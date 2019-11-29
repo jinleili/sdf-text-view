@@ -1,6 +1,7 @@
 use crate::filter::OneInOneOut;
 use crate::PicInfoUniform;
 use std::ops::{Deref, DerefMut};
+use zerocopy::AsBytes;
 
 #[allow(dead_code)]
 pub struct GaussianBlurFilter {
@@ -22,9 +23,8 @@ impl GaussianBlurFilter {
             src_view,
             out_view,
             extent,
-            device
-                .create_buffer_mapped(2, wgpu::BufferUsage::UNIFORM | wgpu::BufferUsage::COPY_DST)
-                .fill_from_slice(&[
+            device.create_buffer_with_data(
+                &[
                     PicInfoUniform {
                         info: [extent.width as i32, extent.height as i32, 0, 0],
                         any: [0; 60],
@@ -33,7 +33,10 @@ impl GaussianBlurFilter {
                         info: [extent.width as i32, extent.height as i32, 1, 0],
                         any: [0; 60],
                     },
-                ]),
+                ]
+                .as_bytes(),
+                wgpu::BufferUsage::UNIFORM | wgpu::BufferUsage::COPY_DST,
+            ),
             uniform_size,
             if only_r_channel { "filter/gaussian_blur_r" } else { "filter/gaussian_blur_rgba" },
         );

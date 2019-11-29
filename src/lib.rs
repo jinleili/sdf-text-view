@@ -1,7 +1,8 @@
-use std::ffi::CStr;
-use std::os::raw::c_char;
+use zerocopy::{AsBytes, FromBytes};
 
-extern crate libc;
+#[cfg(any(target_os = "ios", target_os = "android"))]
+use std::{os::raw::c_char, ffi::CStr};
+
 pub use idroid::utils::{depth_stencil, matrix_helper};
 pub use uni_view::*;
 
@@ -13,7 +14,7 @@ mod render_node;
 mod sdf_text_view;
 pub use sdf_text_view::SDFTextView;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, AsBytes, FromBytes)]
 #[repr(C)]
 pub struct PicInfoUniform {
     info: [i32; 4],
@@ -21,7 +22,7 @@ pub struct PicInfoUniform {
     any: [i32; 60],
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, AsBytes, FromBytes)]
 #[repr(C)]
 pub struct PicInfoUniform2 {
     info: [i32; 4],

@@ -1,5 +1,6 @@
 use crate::filter::{GaussianBlurFilter, LuminanceFilter, OneInOneOut};
 use crate::{PicInfoUniform, PicInfoUniform2};
+use zerocopy::AsBytes;
 
 #[allow(dead_code)]
 pub struct CannyEdgeDetection {
@@ -39,12 +40,14 @@ impl CannyEdgeDetection {
             &output_view,
             &sobel_output_view,
             extent,
-            device
-                .create_buffer_mapped(1, wgpu::BufferUsage::UNIFORM | wgpu::BufferUsage::COPY_DST)
-                .fill_from_slice(&[PicInfoUniform {
+            device.create_buffer_with_data(
+                &[PicInfoUniform {
                     info: [extent.width as i32, extent.height as i32, 0, 0],
                     any: [0; 60],
-                }]),
+                }]
+                .as_bytes(),
+                wgpu::BufferUsage::UNIFORM | wgpu::BufferUsage::COPY_DST,
+            ),
             uniform_size,
             "filter/sobel_edge_detection",
         );
@@ -54,13 +57,15 @@ impl CannyEdgeDetection {
             &sobel_output_view,
             &output_view,
             extent,
-            device
-                .create_buffer_mapped(1, wgpu::BufferUsage::UNIFORM | wgpu::BufferUsage::COPY_DST)
-                .fill_from_slice(&[PicInfoUniform2 {
+            device.create_buffer_with_data(
+                &[PicInfoUniform2 {
                     info: [extent.width as i32, extent.height as i32, 0, 0],
                     threshold: [0.1, 0.4, 0.0, 0.0],
                     any: [0; 56],
-                }]),
+                }]
+                .as_bytes(),
+                wgpu::BufferUsage::UNIFORM | wgpu::BufferUsage::COPY_DST,
+            ),
             uniform_size,
             "filter/non_maximum_suppression",
         );
@@ -70,12 +75,14 @@ impl CannyEdgeDetection {
             &luminance_filter.output_view,
             &output_view,
             extent,
-            device
-                .create_buffer_mapped(1, wgpu::BufferUsage::UNIFORM | wgpu::BufferUsage::COPY_DST)
-                .fill_from_slice(&[PicInfoUniform {
+            device.create_buffer_with_data(
+                &[PicInfoUniform {
                     info: [extent.width as i32, extent.height as i32, 0, 0],
                     any: [0; 60],
-                }]),
+                }]
+                .as_bytes(),
+                wgpu::BufferUsage::UNIFORM | wgpu::BufferUsage::COPY_DST,
+            ),
             uniform_size,
             "filter/weak_pixel_inclusion",
         );

@@ -3,6 +3,7 @@
 
 use idroid::geometry::plane::Plane;
 use idroid::vertex::{Pos, PosTex};
+use zerocopy::AsBytes;
 
 pub struct ClearColorNode {
     vertex_buf: wgpu::Buffer,
@@ -37,13 +38,11 @@ impl ClearColorNode {
         let vertex_size = std::mem::size_of::<PosTex>();
         let (vertex_data, index_data) = Plane::new(1, 1).generate_vertices();
 
-        let vertex_buf = device
-            .create_buffer_mapped(vertex_data.len(), wgpu::BufferUsage::VERTEX)
-            .fill_from_slice(&vertex_data);
+        let vertex_buf =
+            device.create_buffer_with_data(&vertex_data.as_bytes(), wgpu::BufferUsage::VERTEX);
+        let index_buf =
+            device.create_buffer_with_data(&index_data.as_bytes(), wgpu::BufferUsage::INDEX);
 
-        let index_buf = device
-            .create_buffer_mapped(index_data.len(), wgpu::BufferUsage::INDEX)
-            .fill_from_slice(&index_data);
         // Create the render pipeline
         let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
             bind_group_layouts: &[&bind_group_layout],
