@@ -1,4 +1,6 @@
 use crate::PicInfoUniform;
+use libc::NOFLSH;
+use wgpu::util::DeviceExt;
 use zerocopy::AsBytes;
 
 pub struct SDFComputeNode {
@@ -19,46 +21,76 @@ impl SDFComputeNode {
     ) -> Self {
         let img_size = (extent.width * extent.height) as u64;
         let bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
-            bindings: &[
-                wgpu::BindGroupLayoutBinding {
+            label: None,
+            entries: &[
+                wgpu::BindGroupLayoutEntry {
+                    count: None,
                     binding: 0,
                     visibility: wgpu::ShaderStage::COMPUTE,
-                    ty: wgpu::BindingType::UniformBuffer { dynamic: true },
+                    ty: wgpu::BindingType::Buffer {
+                        ty: wgpu::BufferBindingType::Uniform,
+                        has_dynamic_offset: true,
+                        min_binding_size: wgpu::BufferSize::new(0),
+                    },
                 },
-                wgpu::BindGroupLayoutBinding {
+                wgpu::BindGroupLayoutEntry {
+                    count: None,
                     binding: 1,
                     visibility: wgpu::ShaderStage::COMPUTE,
                     ty: wgpu::BindingType::StorageTexture {
-                        dimension: wgpu::TextureViewDimension::D2,
+                        view_dimension: wgpu::TextureViewDimension::D2,
+                        access: wgpu::StorageTextureAccess::ReadWrite,
+                        format: wgpu::TextureFormat::Rgba8Unorm,
                     },
                 },
-                wgpu::BindGroupLayoutBinding {
+                wgpu::BindGroupLayoutEntry {
+                    count: None,
                     binding: 2,
                     visibility: wgpu::ShaderStage::COMPUTE,
-                    ty: wgpu::BindingType::StorageBuffer { dynamic: false, readonly: false },
+                    ty: wgpu::BindingType::Buffer {
+                        ty: wgpu::BufferBindingType::Storage { read_only: false },
+                        has_dynamic_offset: false,
+                        min_binding_size: wgpu::BufferSize::new(0),
+                    },
                 },
-                wgpu::BindGroupLayoutBinding {
+                wgpu::BindGroupLayoutEntry {
+                    count: None,
                     binding: 3,
                     visibility: wgpu::ShaderStage::COMPUTE,
-                    ty: wgpu::BindingType::StorageBuffer { dynamic: false, readonly: false },
+                    ty: wgpu::BindingType::Buffer {
+                        ty: wgpu::BufferBindingType::Storage { read_only: false },
+                        has_dynamic_offset: false,
+                        min_binding_size: wgpu::BufferSize::new(0),
+                    },
                 },
-                wgpu::BindGroupLayoutBinding {
+                wgpu::BindGroupLayoutEntry {
+                    count: None,
                     binding: 4,
                     visibility: wgpu::ShaderStage::COMPUTE,
-                    ty: wgpu::BindingType::StorageBuffer { dynamic: false, readonly: false },
+                    ty: wgpu::BindingType::Buffer {
+                        ty: wgpu::BufferBindingType::Storage { read_only: false },
+                        has_dynamic_offset: false,
+                        min_binding_size: wgpu::BufferSize::new(0),
+                    },
                 },
-                wgpu::BindGroupLayoutBinding {
+                wgpu::BindGroupLayoutEntry {
+                    count: None,
                     binding: 5,
                     visibility: wgpu::ShaderStage::COMPUTE,
-                    ty: wgpu::BindingType::StorageBuffer { dynamic: false, readonly: false },
+                    ty: wgpu::BindingType::Buffer {
+                        ty: wgpu::BufferBindingType::Storage { read_only: false },
+                        has_dynamic_offset: false,
+                        min_binding_size: wgpu::BufferSize::new(0),
+                    },
                 },
             ],
         });
 
         let offset_stride = std::mem::size_of::<PicInfoUniform>() as wgpu::BufferAddress;
         let uniform_size = offset_stride * 6;
-        let uniform_buffer = device.create_buffer_with_data(
-            &[
+        let uniform_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: None,
+            contents: &[
                 PicInfoUniform {
                     info: [extent.width as i32, extent.height as i32, 2, 0],
                     any: [0; 60],
@@ -85,98 +117,84 @@ impl SDFComputeNode {
                 },
             ]
             .as_bytes(),
-            wgpu::BufferUsage::UNIFORM | wgpu::BufferUsage::COPY_DST,
-        );
+            usage: wgpu::BufferUsage::UNIFORM | wgpu::BufferUsage::COPY_DST,
+        });
 
         let sdf_range = (img_size * 4) as wgpu::BufferAddress;
         let sdf_front = device.create_buffer(&wgpu::BufferDescriptor {
             size: sdf_range,
             usage: wgpu::BufferUsage::STORAGE | wgpu::BufferUsage::COPY_SRC,
+            label: None,
+            mapped_at_creation: false,
         });
         let staging_buffer = device.create_buffer(&wgpu::BufferDescriptor {
             size: sdf_range,
             usage: wgpu::BufferUsage::MAP_READ | wgpu::BufferUsage::COPY_DST,
+            label: None,
+            mapped_at_creation: false,
         });
         let sdf_background = device.create_buffer(&wgpu::BufferDescriptor {
             size: sdf_range,
             usage: wgpu::BufferUsage::STORAGE,
+            label: None,
+            mapped_at_creation: false,
         });
 
         let v_buffer = device.create_buffer(&wgpu::BufferDescriptor {
             size: sdf_range,
             usage: wgpu::BufferUsage::STORAGE,
+            label: None,
+            mapped_at_creation: false,
         });
         let z_range = ((extent.width + 1) * (extent.height + 1) * 4) as wgpu::BufferAddress;
         let z_buffer = device.create_buffer(&wgpu::BufferDescriptor {
             size: z_range,
             usage: wgpu::BufferUsage::STORAGE,
+            label: None,
+            mapped_at_creation: false,
         });
         let bind_group: wgpu::BindGroup = device.create_bind_group(&wgpu::BindGroupDescriptor {
             layout: &bind_group_layout,
-            bindings: &[
-                wgpu::Binding {
-                    binding: 0,
-                    resource: wgpu::BindingResource::Buffer {
-                        buffer: &uniform_buffer,
-                        range: 0..uniform_size,
-                    },
-                },
-                wgpu::Binding {
+            label: None,
+            entries: &[
+                wgpu::BindGroupEntry { binding: 0, resource: uniform_buffer.as_entire_binding() },
+                wgpu::BindGroupEntry {
                     binding: 1,
                     resource: wgpu::BindingResource::TextureView(src_view),
                 },
-                wgpu::Binding {
-                    binding: 2,
-                    resource: wgpu::BindingResource::Buffer {
-                        buffer: &sdf_front,
-                        range: 0..sdf_range,
-                    },
-                },
-                wgpu::Binding {
-                    binding: 3,
-                    resource: wgpu::BindingResource::Buffer {
-                        buffer: &sdf_background,
-                        range: 0..sdf_range,
-                    },
-                },
-                wgpu::Binding {
-                    binding: 4,
-                    resource: wgpu::BindingResource::Buffer {
-                        buffer: &v_buffer,
-                        range: 0..sdf_range,
-                    },
-                },
-                wgpu::Binding {
-                    binding: 5,
-                    resource: wgpu::BindingResource::Buffer {
-                        buffer: &z_buffer,
-                        range: 0..z_range,
-                    },
-                },
+                wgpu::BindGroupEntry { binding: 2, resource: sdf_front.as_entire_binding() },
+                wgpu::BindGroupEntry { binding: 3, resource: sdf_background.as_entire_binding() },
+                wgpu::BindGroupEntry { binding: 4, resource: v_buffer.as_entire_binding() },
+                wgpu::BindGroupEntry { binding: 5, resource: z_buffer.as_entire_binding() },
             ],
         });
 
         let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
+            label: None,
+            push_constant_ranges: &[],
             bind_group_layouts: &[&bind_group_layout],
         });
 
-        let shader_xy =
-            idroid::shader::Shader::new_by_compute("sdf/sdf", device, env!("CARGO_MANIFEST_DIR"));
+        let shader_xy = idroid::shader::Shader::new_by_compute("sdf/sdf", device);
         let xy_pipeline = device.create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
-            layout: &pipeline_layout,
-            compute_stage: shader_xy.cs_stage(),
+            layout: Some(&pipeline_layout),
+            module: &shader_xy.vs_module,
+            entry_point: "main",
+            label: None,
         });
-        let shader_x =
-            idroid::shader::Shader::new_by_compute("sdf/sdf_x", device, env!("CARGO_MANIFEST_DIR"));
+        let shader_x = idroid::shader::Shader::new_by_compute("sdf/sdf_x", device);
         let x_pipeline = device.create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
-            layout: &pipeline_layout,
-            compute_stage: shader_x.cs_stage(),
+            layout: Some(&pipeline_layout),
+            module: &shader_x.vs_module,
+            entry_point: "main",
+            label: None,
         });
-        let shader_y =
-            idroid::shader::Shader::new_by_compute("sdf/sdf_y", device, env!("CARGO_MANIFEST_DIR"));
+        let shader_y = idroid::shader::Shader::new_by_compute("sdf/sdf_y", device);
         let y_pipeline = device.create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
-            layout: &pipeline_layout,
-            compute_stage: shader_y.cs_stage(),
+            layout: Some(&pipeline_layout),
+            module: &shader_y.vs_module,
+            entry_point: "main",
+            label: None,
         });
 
         let threadgroup_count = ((extent.width + 15) / 16, (extent.height + 15) / 16);
@@ -194,30 +212,30 @@ impl SDFComputeNode {
     }
 
     pub fn compute(&mut self, _device: &mut wgpu::Device, encoder: &mut wgpu::CommandEncoder) {
-        let mut cpass = encoder.begin_compute_pass();
+        let mut cpass = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor { label: None });
         cpass.set_pipeline(&self.xy_pipeline);
         cpass.set_bind_group(0, &self.bind_group, &[0]);
         cpass.dispatch(self.threadgroup_count.0, self.threadgroup_count.1, 1);
 
         cpass.set_pipeline(&self.x_pipeline);
         // step background y
-        cpass.set_bind_group(0, &self.bind_group, &[self.offset_stride * 3]);
+        cpass.set_bind_group(0, &self.bind_group, &[self.offset_stride as wgpu::DynamicOffset * 3]);
         cpass.dispatch(self.threadgroup_count.0, 1, 1);
         // step front y
-        cpass.set_bind_group(0, &self.bind_group, &[self.offset_stride]);
+        cpass.set_bind_group(0, &self.bind_group, &[self.offset_stride as wgpu::DynamicOffset]);
         cpass.dispatch(self.threadgroup_count.0, 1, 1);
 
         cpass.set_pipeline(&self.y_pipeline);
         // step background x
-        cpass.set_bind_group(0, &self.bind_group, &[self.offset_stride * 4]);
+        cpass.set_bind_group(0, &self.bind_group, &[self.offset_stride as wgpu::DynamicOffset * 4]);
         cpass.dispatch(1, self.threadgroup_count.1, 1);
         // step front x
-        cpass.set_bind_group(0, &self.bind_group, &[self.offset_stride * 2]);
+        cpass.set_bind_group(0, &self.bind_group, &[self.offset_stride as wgpu::DynamicOffset * 2]);
         cpass.dispatch(1, self.threadgroup_count.1, 1);
 
         // final output
         cpass.set_pipeline(&self.xy_pipeline);
-        cpass.set_bind_group(0, &self.bind_group, &[self.offset_stride * 5]);
+        cpass.set_bind_group(0, &self.bind_group, &[self.offset_stride as wgpu::DynamicOffset * 5]);
         cpass.dispatch(self.threadgroup_count.0, self.threadgroup_count.1, 1);
     }
 }

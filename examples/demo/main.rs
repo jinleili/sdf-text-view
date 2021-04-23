@@ -1,5 +1,5 @@
 extern crate idroid;
-use idroid::{math::Position, SurfaceView};
+use idroid::{math::Position, math::TouchPoint, SurfaceView};
 
 extern crate uni_view;
 use uni_view::AppView;
@@ -64,11 +64,18 @@ fn main() {
                     println!("{:?}", touch);
                 }
                 WindowEvent::CursorMoved { position, .. } => {
-                    surface_view.touch_moved(Position::new(position.x as f32, position.y as f32));
+                    let mut point = TouchPoint::new(
+                        Position::new(position.x as f32, position.y as f32),
+                        0.0,
+                        0.0,
+                        0.0,
+                    );
+
+                    surface_view.touch_moved(point);
                 }
                 _ => {}
             },
-            Event::EventsCleared => {
+            Event::RedrawRequested(_) => {
                 surface_view.enter_frame();
             }
             _ => (),

@@ -3,10 +3,12 @@
 
 use idroid::geometry::plane::Plane;
 use idroid::vertex::{Pos, PosTex};
+use idroid::BufferObj;
+use wgpu::util::DeviceExt;
 use zerocopy::AsBytes;
 
 pub struct ClearColorNode {
-    vertex_buf: wgpu::Buffer,
+    vertex_buf: BufferObj,
     index_buf: wgpu::Buffer,
     index_count: usize,
     bind_group: wgpu::BindGroup,
@@ -14,23 +16,32 @@ pub struct ClearColorNode {
 }
 
 impl ClearColorNode {
-    pub fn new(sc_desc: &wgpu::SwapChainDescriptor, device: &mut wgpu::Device) -> Self {
+    pub fn new(app_view: &idroid::AppView, device: &wgpu::Device) -> Self {
         let bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
-            bindings: &[wgpu::BindGroupLayoutBinding {
+            label: None,
+            entries: &[wgpu::BindGroupLayoutEntry {
+                count: None,
                 binding: 0,
                 visibility: wgpu::ShaderStage::VERTEX,
-                ty: wgpu::BindingType::UniformBuffer { dynamic: false },
+                ty: wgpu::BindingType::Buffer {
+                    ty: wgpu::BufferBindingType::Uniform,
+                    has_dynamic_offset: false,
+                    min_binding_size: wgpu::BufferSize::new(0),
+                },
             }],
         });
 
         let mvp_size = std::mem::size_of::<[[f32; 4]; 4]>() as wgpu::BufferAddress;
-        let mvp_buf = idroid::utils::empty_uniform_buffer(device, mvp_size);
+        let mut encoder =
+            device.create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
+        let mvp_buf = idroid::MVPUniformObj::new((&app_view.sc_desc).into(), device, &mut encoder);
 
         let bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
             layout: &bind_group_layout,
-            bindings: &[wgpu::Binding {
+            label: None,
+            entries: &[wgpu::BindGroupEntry {
                 binding: 0,
-                resource: wgpu::BindingResource::Buffer { buffer: &mvp_buf, range: 0..mvp_size },
+                resource: mvp_buf.buffer.buffer.as_entire_binding(),
             }],
         });
 
@@ -38,49 +49,60 @@ impl ClearColorNode {
         let vertex_size = std::mem::size_of::<PosTex>();
         let (vertex_data, index_data) = Plane::new(1, 1).generate_vertices();
 
-        let vertex_buf =
-            device.create_buffer_with_data(&vertex_data.as_bytes(), wgpu::BufferUsage::VERTEX);
-        let index_buf =
-            device.create_buffer_with_data(&index_data.as_bytes(), wgpu::BufferUsage::INDEX);
+        let vertex_buf = BufferObj::create_buffer(
+            device,
+            Some(&vertex_data.as_bytes()),
+            None,
+            wgpu::BufferUsage::VERTEX,
+            Some("vertex buffer"),
+        );
+        let index_buf = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: Some("Index Buffer"),
+            contents: &index_data.as_bytes(),
+            usage: wgpu::BufferUsage::INDEX,
+        });
 
         // Create the render pipeline
         let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
+            label: None,
+            push_constant_ranges: &[],
             bind_group_layouts: &[&bind_group_layout],
         });
 
-        let clear_shader =
-            idroid::shader::Shader::new("clear_color", device, env!("CARGO_MANIFEST_DIR"));
+        let clear_shader = idroid::shader::Shader::new("clear_color", device);
         let color_alpha_blend = idroid::utils::color_alpha_blend();
         let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
-            layout: &pipeline_layout,
-            vertex_stage: clear_shader.vertex_stage(),
-            fragment_stage: clear_shader.fragment_stage(),
-            rasterization_state: Some(wgpu::RasterizationStateDescriptor {
-                front_face: wgpu::FrontFace::Ccw,
-                cull_mode: wgpu::CullMode::None,
-                depth_bias: 0,
-                depth_bias_slope_scale: 0.0,
-                depth_bias_clamp: 0.0,
+            label: None,
+            layout: Some(&pipeline_layout),
+            vertex: wgpu::VertexState {
+                module: &clear_shader.vs_module,
+                entry_point: "main",
+                buffers: &[wgpu::VertexBufferLayout {
+                    array_stride: std::mem::size_of::<PosTex>() as wgpu::BufferAddress,
+                    step_mode: wgpu::InputStepMode::Vertex,
+                    attributes: &PosTex::vertex_attributes(0),
+                }],
+            },
+            fragment: Some(wgpu::FragmentState {
+                module: &clear_shader.fs_module.unwrap(),
+                entry_point: "main",
+                targets: &[wgpu::ColorTargetState {
+                    format: app_view.sc_desc.format,
+                    blend: Some(idroid::utils::default_blend()),
+                    write_mask: wgpu::ColorWrite::ALL,
+                }],
             }),
-            primitive_topology: wgpu::PrimitiveTopology::TriangleList,
-            color_states: &[wgpu::ColorStateDescriptor {
-                format: sc_desc.format,
-                color_blend: color_alpha_blend.0,
-                alpha_blend: color_alpha_blend.1,
-                write_mask: wgpu::ColorWrite::ALL,
-            }],
-            // ??????
-            depth_stencil_state: None,
-            index_format: wgpu::IndexFormat::Uint32,
-            vertex_buffers: &[wgpu::VertexBufferDescriptor {
-                stride: vertex_size as wgpu::BufferAddress,
-                step_mode: wgpu::InputStepMode::Vertex,
-                attributes: &PosTex::attri_descriptor(0),
-            }],
-            sample_count: 1,
-            sample_mask: !0,
-            alpha_to_coverage_enabled: false,
+            primitive: wgpu::PrimitiveState {
+                topology: wgpu::PrimitiveTopology::TriangleList,
+                front_face: wgpu::FrontFace::Ccw,
+                cull_mode: Some(wgpu::Face::Back),
+                polygon_mode: wgpu::PolygonMode::Fill,
+                ..Default::default()
+            },
+            depth_stencil: None,
+            multisample: wgpu::MultisampleState::default(),
         });
+        app_view.queue.submit(Some(encoder.finish()));
         ClearColorNode {
             vertex_buf,
             index_buf,
@@ -91,29 +113,31 @@ impl ClearColorNode {
     }
 
     pub fn clear_color(
-        &self, frame: &wgpu::SwapChainOutput, device: &mut wgpu::Device, queue: &mut wgpu::Queue,
+        &self, frame: &wgpu::SwapChainFrame, device: &mut wgpu::Device, queue: &mut wgpu::Queue,
     ) {
         let mut encoder =
-            device.create_command_encoder(&wgpu::CommandEncoderDescriptor { todo: 0 });
+            device.create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
         {
             let mut rpass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
-                color_attachments: &[wgpu::RenderPassColorAttachmentDescriptor {
-                    attachment: &frame.view,
+                label: None,
+                color_attachments: &[wgpu::RenderPassColorAttachment {
+                    view: &frame.output.view,
                     resolve_target: None,
-                    load_op: wgpu::LoadOp::Clear,
-                    store_op: wgpu::StoreOp::Store,
-                    clear_color: idroid::utils::clear_color(),
+                    ops: wgpu::Operations {
+                        load: wgpu::LoadOp::Clear(idroid::utils::clear_color()),
+                        store: true,
+                    },
                 }],
                 depth_stencil_attachment: None,
             });
-            rpass.set_index_buffer(&self.index_buf, 0);
-            rpass.set_vertex_buffers(0, &[(&self.vertex_buf, 0)]);
+            rpass.set_index_buffer(self.index_buf.slice(..), wgpu::IndexFormat::Uint32);
+            rpass.set_vertex_buffer(0, self.vertex_buf.buffer.slice(..));
             rpass.set_pipeline(&self.pipeline);
             rpass.set_bind_group(0, &self.bind_group, &[]);
 
             rpass.draw_indexed(0..self.index_count as u32, 0, 0..1);
         }
 
-        queue.submit(&[encoder.finish()]);
+        queue.submit(Some(encoder.finish()));
     }
 }

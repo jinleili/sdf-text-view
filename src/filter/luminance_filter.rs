@@ -1,6 +1,7 @@
 use crate::filter::OneInOneOut;
 use crate::PicInfoUniform;
 use std::ops::{Deref, DerefMut};
+use wgpu::util::DeviceExt;
 use zerocopy::AsBytes;
 
 #[allow(dead_code)]
@@ -17,21 +18,22 @@ impl LuminanceFilter {
     ) -> Self {
         let offset_stride = std::mem::size_of::<PicInfoUniform>() as wgpu::BufferAddress;
         let uniform_size = offset_stride * 1;
-        let output_view = idroid::texture::empty(device, wgpu::TextureFormat::R8Unorm, extent);
+        let output_view = idroid::texture::empty(device, wgpu::TextureFormat::R8Unorm, extent, Some(wgpu::TextureUsage::SAMPLED | wgpu::TextureUsage::STORAGE));
 
         let one_in_out = OneInOneOut::new(
             device,
             src_view,
             &output_view,
             extent,
-            device.create_buffer_with_data(
-                &[PicInfoUniform {
+            device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: None,
+                contents: &[PicInfoUniform {
                     info: [extent.width as i32, extent.height as i32, 0, 0],
                     any: [0; 60],
                 }]
                 .as_bytes(),
-                wgpu::BufferUsage::UNIFORM | wgpu::BufferUsage::COPY_DST,
-            ),
+                usage: wgpu::BufferUsage::UNIFORM | wgpu::BufferUsage::COPY_DST,
+            }),
             uniform_size,
             "filter/luminance",
         );

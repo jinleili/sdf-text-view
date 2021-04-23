@@ -1,4 +1,4 @@
-use idroid::{texture, utils::HUD, SurfaceView};
+use idroid::{math::TouchPoint, texture, utils::HUD, SurfaceView};
 
 use super::{
     clear_node::ClearColorNode, compute_node::SDFComputeNode, filter::CannyEdgeDetection,
@@ -26,7 +26,7 @@ impl SDFTextView {
     pub fn new(app_view: AppView) -> Self {
         let mut app_view = app_view;
         let hud = HUD::new();
-        let clear_color_node = ClearColorNode::new(&app_view.sc_desc, &mut app_view.device);
+        let clear_color_node = ClearColorNode::new(&app_view, &app_view.device);
         let instance = SDFTextView {
             app_view,
             hud,
@@ -55,10 +55,9 @@ impl SDFTextView {
     fn create_nodes(&mut self, encoder: &mut wgpu::CommandEncoder) {
         let fs = FileSystem::new(env!("CARGO_MANIFEST_DIR"));
         let path = fs.get_texture_file_path(&self.image.as_ref().unwrap());
-        let (texture_view, texture_extent, _sampler) = texture::from_path(
+        let (_, texture_view, texture_extent, _sampler) = texture::from_path(
             path,
-            &mut self.app_view.device,
-            encoder,
+            &mut self.app_view,
             true,
             if self.need_auto_detect { false } else { true },
         );
@@ -81,18 +80,13 @@ impl SDFTextView {
             SDFComputeNode::new(&mut self.app_view.device, encoder, output_view, texture_extent);
 
         let mut render_node = SDFRenderNode::new(
-            &self.app_view.sc_desc,
-            &mut self.app_view.device,
+            &self.app_view,
+            &self.app_view.device,
             output_view,
             texture_extent,
         );
         // update mvp matrix
-        render_node.update_scale(
-            &self.app_view.sc_desc,
-            &mut self.app_view.device,
-            &mut self.app_view.queue,
-            1.0,
-        );
+        render_node.update_scale(&self.app_view.sc_desc, &mut self.app_view.device, encoder, 1.0);
 
         self.compute_node = Some(compute_node);
         self.render_node = Some(render_node);
@@ -103,31 +97,45 @@ impl SDFTextView {
 }
 
 impl SurfaceView for SDFTextView {
-    fn touch_moved(&mut self, _position: idroid::math::Position) {}
+    fn touch_start(&mut self, point: TouchPoint) {}
+    fn touch_moved(&mut self, point: TouchPoint) {}
+    fn touch_end(&mut self, point: TouchPoint) {}
 
     fn resize(&mut self) {
         println!("resize()--");
         if let Some(render_node) = &mut self.render_node {
+            let mut encoder = self
+                .app_view
+                .device
+                .create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
             render_node.update_scale(
                 &self.app_view.sc_desc,
                 &mut self.app_view.device,
-                &mut self.app_view.queue,
+                &mut encoder,
                 1.0,
             );
+            self.app_view.queue.submit(Some(encoder.finish()));
+
             self.app_view.update_swap_chain();
             self.need_draw = true;
             self.enter_frame();
         }
     }
 
-    fn scale(&mut self, scale: f32) {
+    fn pintch_start(&mut self, location: idroid::math::TouchPoint, scale: f32) {}
+    fn pintch_changed(&mut self, location: idroid::math::TouchPoint, scale: f32) {
         if let Some(render_node) = &mut self.render_node {
+            let mut encoder = self
+                .app_view
+                .device
+                .create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
             render_node.update_scale(
                 &self.app_view.sc_desc,
                 &mut self.app_view.device,
-                &mut self.app_view.queue,
+                &mut encoder,
                 scale,
             );
+            self.app_view.queue.submit(Some(encoder.finish()));
             self.need_draw = true;
         }
     }
@@ -135,7 +143,11 @@ impl SurfaceView for SDFTextView {
     fn enter_frame(&mut self) {
         if self.need_draw == false {
             if self.need_clear_color && self.clear_count < 3 {
-                let frame = self.app_view.swap_chain.get_next_texture().expect("swap_chain.get_next_texture() timeout");
+                let frame = self
+                    .app_view
+                    .swap_chain
+                    .get_current_frame()
+                    .expect("swap_chain.get_next_texture() timeout");
                 {
                     self.clear_color_node.clear_color(
                         &frame,
@@ -151,7 +163,7 @@ impl SurfaceView for SDFTextView {
         let mut encoder = self
             .app_view
             .device
-            .create_command_encoder(&wgpu::CommandEncoderDescriptor { todo: 0 });
+            .create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
 
         let _ = match (&mut self.compute_node, &mut self.render_node) {
             (Some(compute_node), Some(render_node)) => {
@@ -168,7 +180,11 @@ impl SurfaceView for SDFTextView {
                     println!("sdf cost: {:?}", self.hud.stop_frame_timer());
                 }
 
-                let frame = self.app_view.swap_chain.get_next_texture().expect("swap_chain.get_next_texture() timeout");
+                let frame = self
+                    .app_view
+                    .swap_chain
+                    .get_current_frame()
+                    .expect("swap_chain.get_next_texture() timeout");
                 {
                     render_node.begin_render_pass(&frame, &mut encoder);
                     // draw for all swap_chain frame textures, then, stop to draw frame until resize() or rotate() fn called.
@@ -178,15 +194,15 @@ impl SurfaceView for SDFTextView {
                         self.draw_count = 0;
                     }
                 }
-                self.app_view.queue.submit(&[encoder.finish()]);
+                self.app_view.queue.submit(Some(encoder.finish()));
             }
             (_, _) => {
                 self.create_nodes(&mut encoder);
-                self.app_view.queue.submit(&[encoder.finish()]);
+                self.app_view.queue.submit(Some(encoder.finish()));
             }
         };
 
-        // self.app_view.device.get_queue().submit(&[encoder.finish()]);
+        // self.app_view.device.get_queue().submit(Some(encoder.finish()));
     }
 }
 

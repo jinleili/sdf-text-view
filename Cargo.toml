@@ -1,6 +1,6 @@
 [package]
 name = "sdf-text-view"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["li jinlei <grenlight@icloud.com>"]
 edition = "2018"
 
@@ -14,36 +14,32 @@ default = []
 
 [dependencies]
 libc = "*"
-wgpu = { git = "https://github.com/gfx-rs/wgpu-rs", rev = "44fa1bc2fa208fa92f80944253e0da56cb7ac1fe"  }
+wgpu = { git = "https://github.com/gfx-rs/wgpu-rs", version = "0.7",  rev = "1806a5bd4d0a8740774969c92f51ad9a906a2e24" }
 # wgpu = { path = "../../wgpu-rs" }
 # uni-view = { path="../idroid/uni-view" }
 # idroid = { path="../idroid/idroid" }
-uni-view = { git = "https://github.com/grenlight/idroid", rev = "09b0ccd58d3953af4f9a7d4d731229aef1f81ecb" }
-idroid = { git = "https://github.com/grenlight/idroid", rev = "09b0ccd58d3953af4f9a7d4d731229aef1f81ecb" }
+uni-view = { git = "https://github.com/grenlight/idroid", rev = "71ea76387f0491d0a2ea58caf106c6c3f124b2eb" }
+idroid = { git = "https://github.com/grenlight/idroid", rev = "71ea76387f0491d0a2ea58caf106c6c3f124b2eb" }
 
 nalgebra-glm = "*"
-image = "0.22.1"
+image = "0.23"
 lazy_static = "*"
-zerocopy = "0.2"
+zerocopy = "0.4"
 
 [target.'cfg(any(target_os = "macos", target_os = "windows", target_os = "linux"))'.dependencies]
-shaderc = "0.6.1"
+shaderc = "0.7"
 objc = "*"
-winit = "0.20.0-alpha4"
+winit = { version = "0.24", features = ["web-sys"] }
 raw-window-handle = "0.3"
 
 [build-dependencies]
-shaderc = "0.6.1"
+shaderc = "0.7"
 
 [dev-dependencies]
 env_logger = "0.7"
 lazy_static = "*"
 palette = "0.4"
 rand = "0.6"
-
-[patch."https://github.com/gfx-rs/wgpu"]
-wgn = {git = "https://github.com/grenlight/wgpu", package = "wgpu-native", rev = "7a57b4590b8a0ea1f608d54b901f09593f0f3d3c"}
-wgc = {git = "https://github.com/grenlight/wgpu", package = "wgpu-core", rev = "7a57b4590b8a0ea1f608d54b901f09593f0f3d3c"}
 
 # [patch.crates-io]
 # # fixed bug: https://github.com/gfx-rs/gfx/issues/3086

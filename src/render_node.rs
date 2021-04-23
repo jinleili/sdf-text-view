@@ -1,21 +1,21 @@
 use idroid::geometry::plane::Plane;
-use idroid::texture;
-use idroid::utils::MVPUniform;
 use idroid::vertex::{Pos, PosTex};
+use idroid::{texture, BufferObj, MVPUniform, MVPUniformObj};
 
 use nalgebra_glm as glm;
+use wgpu::util::DeviceExt;
 use wgpu::Extent3d;
 use zerocopy::{AsBytes, FromBytes};
 
 pub struct SDFRenderNode {
     extent: Extent3d,
     scale: f32,
-    vertex_buf: wgpu::Buffer,
+    vertex_buf: BufferObj,
     index_buf: wgpu::Buffer,
     index_count: usize,
     bind_group_outline: wgpu::BindGroup,
     bind_group_stroke: wgpu::BindGroup,
-    mvp_buf: wgpu::Buffer,
+    mvp_buf: MVPUniformObj,
     pipeline: wgpu::RenderPipeline,
 }
 
@@ -28,97 +28,97 @@ pub struct DrawUniform {
 
 impl SDFRenderNode {
     pub fn new(
-        sc_desc: &wgpu::SwapChainDescriptor, device: &mut wgpu::Device,
-        src_view: &wgpu::TextureView, extent: Extent3d,
+        app_view: &idroid::AppView, device: &wgpu::Device, src_view: &wgpu::TextureView,
+        extent: Extent3d,
     ) -> Self {
         let sampler = texture::bilinear_sampler(device);
 
         let bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
-            bindings: &[
-                wgpu::BindGroupLayoutBinding {
+            label: None,
+            entries: &[
+                wgpu::BindGroupLayoutEntry {
+                    count: None,
                     binding: 0,
                     visibility: wgpu::ShaderStage::VERTEX,
-                    ty: wgpu::BindingType::UniformBuffer { dynamic: false },
-                },
-                wgpu::BindGroupLayoutBinding {
-                    binding: 1,
-                    visibility: wgpu::ShaderStage::FRAGMENT,
-                    ty: wgpu::BindingType::SampledTexture {
-                        multisampled: false,
-                        dimension: wgpu::TextureViewDimension::D2,
+                    ty: wgpu::BindingType::Buffer {
+                        ty: wgpu::BufferBindingType::Uniform,
+                        has_dynamic_offset: false,
+                        min_binding_size: wgpu::BufferSize::new(0),
                     },
                 },
-                wgpu::BindGroupLayoutBinding {
+                wgpu::BindGroupLayoutEntry {
+                    count: None,
+                    binding: 1,
+                    visibility: wgpu::ShaderStage::FRAGMENT,
+                    ty: wgpu::BindingType::Texture {
+                        sample_type: wgpu::TextureSampleType::Float { filterable: true },
+                        view_dimension: wgpu::TextureViewDimension::D2,
+                        multisampled: false,
+                    },
+                },
+                wgpu::BindGroupLayoutEntry {
+                    count: None,
                     binding: 2,
                     visibility: wgpu::ShaderStage::FRAGMENT,
-                    ty: wgpu::BindingType::Sampler,
+                    ty: wgpu::BindingType::Sampler { comparison: false, filtering: true },
                 },
-                wgpu::BindGroupLayoutBinding {
+                wgpu::BindGroupLayoutEntry {
+                    count: None,
                     binding: 3,
                     visibility: wgpu::ShaderStage::FRAGMENT,
-                    ty: wgpu::BindingType::UniformBuffer { dynamic: false },
+                    ty: wgpu::BindingType::Buffer {
+                        ty: wgpu::BufferBindingType::Uniform,
+                        has_dynamic_offset: false,
+                        min_binding_size: wgpu::BufferSize::new(0),
+                    },
                 },
             ],
         });
         let mvp_size = std::mem::size_of::<[[f32; 4]; 4]>() as wgpu::BufferAddress;
-        let mvp_buf = idroid::utils::empty_uniform_buffer(device, mvp_size);
+ let mut encoder =
+            device.create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
+        let mvp_buf = idroid::MVPUniformObj::new((&app_view.sc_desc).into(), device, &mut encoder);
 
-        let draw_buf = idroid::utils::create_uniform_buffer(
+        let draw_buf = idroid::BufferObj::create_uniform_buffer(
             device,
-            DrawUniform { stroke_color: [0.14, 0.14, 0.14, 1.0], mask_n_gamma: [0.70, 0.0] },
+            &DrawUniform { stroke_color: [0.14, 0.14, 0.14, 1.0], mask_n_gamma: [0.70, 0.0] },
         );
 
         let bind_group_outline = device.create_bind_group(&wgpu::BindGroupDescriptor {
             layout: &bind_group_layout,
-            bindings: &[
-                wgpu::Binding {
-                    binding: 0,
-                    resource: wgpu::BindingResource::Buffer {
-                        buffer: &mvp_buf,
-                        range: 0..(std::mem::size_of::<MVPUniform>() as wgpu::BufferAddress),
-                    },
-                },
-                wgpu::Binding {
+            label: None,
+            entries: &[
+                wgpu::BindGroupEntry { binding: 0, resource: mvp_buf.buffer.buffer.as_entire_binding() },
+                wgpu::BindGroupEntry {
                     binding: 1,
                     resource: wgpu::BindingResource::TextureView(src_view),
                 },
-                wgpu::Binding { binding: 2, resource: wgpu::BindingResource::Sampler(&sampler) },
-                wgpu::Binding {
-                    binding: 3,
-                    resource: wgpu::BindingResource::Buffer {
-                        buffer: &draw_buf,
-                        range: 0..(std::mem::size_of::<DrawUniform>() as wgpu::BufferAddress),
-                    },
+                wgpu::BindGroupEntry {
+                    binding: 2,
+                    resource: wgpu::BindingResource::Sampler(&sampler),
                 },
+                wgpu::BindGroupEntry { binding: 3, resource: draw_buf.buffer.as_entire_binding() },
             ],
         });
 
-        let draw_buf_stroke = idroid::utils::create_uniform_buffer(
+        let draw_buf_stroke = BufferObj::create_uniform_buffer(
             device,
-            DrawUniform { stroke_color: [0.97, 0.92, 0.80, 1.0], mask_n_gamma: [0.75, 0.75] },
+            &DrawUniform { stroke_color: [0.97, 0.92, 0.80, 1.0], mask_n_gamma: [0.75, 0.75] },
         );
         let bind_group_stroke = device.create_bind_group(&wgpu::BindGroupDescriptor {
             layout: &bind_group_layout,
-            bindings: &[
-                wgpu::Binding {
-                    binding: 0,
-                    resource: wgpu::BindingResource::Buffer {
-                        buffer: &mvp_buf,
-                        range: 0..(std::mem::size_of::<MVPUniform>() as wgpu::BufferAddress),
-                    },
-                },
-                wgpu::Binding {
+            label: None,
+            entries: &[
+                wgpu::BindGroupEntry { binding: 0, resource: mvp_buf.buffer.buffer.as_entire_binding() },
+                wgpu::BindGroupEntry {
                     binding: 1,
                     resource: wgpu::BindingResource::TextureView(src_view),
                 },
-                wgpu::Binding { binding: 2, resource: wgpu::BindingResource::Sampler(&sampler) },
-                wgpu::Binding {
-                    binding: 3,
-                    resource: wgpu::BindingResource::Buffer {
-                        buffer: &draw_buf_stroke,
-                        range: 0..(std::mem::size_of::<DrawUniform>() as wgpu::BufferAddress),
-                    },
+                wgpu::BindGroupEntry {
+                    binding: 2,
+                    resource: wgpu::BindingResource::Sampler(&sampler),
                 },
+                wgpu::BindGroupEntry { binding: 3, resource: draw_buf_stroke.buffer.as_entire_binding() },
             ],
         });
 
@@ -126,49 +126,59 @@ impl SDFRenderNode {
         let vertex_size = std::mem::size_of::<PosTex>();
         let (vertex_data, index_data) = Plane::new(1, 1).generate_vertices();
 
-        let vertex_buf = device
-            .create_buffer_with_data(&vertex_data.as_bytes(), wgpu::BufferUsage::VERTEX);
-        let index_buf = device
-            .create_buffer_with_data(&index_data.as_bytes(), wgpu::BufferUsage::INDEX);
-            
+        let vertex_buf = BufferObj::create_buffer(
+            device,
+            Some(&vertex_data.as_bytes()),
+            None,
+            wgpu::BufferUsage::VERTEX,
+            Some("vertex buffer"),
+        );
+        let index_buf = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+            label: Some("Index Buffer"),
+            contents: &index_data.as_bytes(),
+            usage: wgpu::BufferUsage::INDEX,
+        });
         // Create the render pipeline
-        let shader = idroid::shader::Shader::new("sdf/text", device, env!("CARGO_MANIFEST_DIR"));
+        let shader = idroid::shader::Shader::new("sdf/text", device);
         let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
+            label: None,
+            push_constant_ranges: &[],
             bind_group_layouts: &[&bind_group_layout],
         });
 
         let color_alpha_blend = idroid::utils::color_alpha_blend();
         let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
-            layout: &pipeline_layout,
-            vertex_stage: shader.vertex_stage(),
-            fragment_stage: shader.fragment_stage(),
-            rasterization_state: Some(wgpu::RasterizationStateDescriptor {
-                front_face: wgpu::FrontFace::Ccw,
-                cull_mode: wgpu::CullMode::None,
-                depth_bias: 0,
-                depth_bias_slope_scale: 0.0,
-                depth_bias_clamp: 0.0,
+            label: None,
+            layout: Some(&pipeline_layout),
+            vertex: wgpu::VertexState {
+                module: &shader.vs_module,
+                entry_point: "main",
+                buffers: &[wgpu::VertexBufferLayout {
+                    array_stride: std::mem::size_of::<PosTex>() as wgpu::BufferAddress,
+                    step_mode: wgpu::InputStepMode::Vertex,
+                    attributes: &PosTex::vertex_attributes(0),
+                }],
+            },
+            fragment: Some(wgpu::FragmentState {
+                module: &shader.fs_module.unwrap(),
+                entry_point: "main",
+                targets: &[wgpu::ColorTargetState {
+                    format: app_view.sc_desc.format,
+                    blend: Some(idroid::utils::default_blend()),
+                    write_mask: wgpu::ColorWrite::ALL,
+                }],
             }),
-            primitive_topology: wgpu::PrimitiveTopology::TriangleList,
-            color_states: &[wgpu::ColorStateDescriptor {
-                format: sc_desc.format,
-                color_blend: color_alpha_blend.0,
-                alpha_blend: color_alpha_blend.1,
-                write_mask: wgpu::ColorWrite::ALL,
-            }],
-            // ??????
-            depth_stencil_state: None,
-            index_format: wgpu::IndexFormat::Uint32,
-            vertex_buffers: &[wgpu::VertexBufferDescriptor {
-                stride: vertex_size as wgpu::BufferAddress,
-                step_mode: wgpu::InputStepMode::Vertex,
-                attributes: &PosTex::attri_descriptor(0),
-            }],
-            sample_count: 1,
-            sample_mask: !0,
-            alpha_to_coverage_enabled: false,
+            primitive: wgpu::PrimitiveState {
+                topology: wgpu::PrimitiveTopology::TriangleList,
+                front_face: wgpu::FrontFace::Ccw,
+                cull_mode: Some(wgpu::Face::Back),
+                polygon_mode: wgpu::PolygonMode::Fill,
+                ..Default::default()
+            },
+            depth_stencil: None,
+            multisample: wgpu::MultisampleState::default(),
         });
-
+        app_view.queue.submit(Some(encoder.finish()));
         SDFRenderNode {
             extent,
             scale: 1.0,
@@ -184,7 +194,7 @@ impl SDFRenderNode {
 
     pub fn update_scale(
         &mut self, sc_desc: &wgpu::SwapChainDescriptor, device: &mut wgpu::Device,
-        queue: &mut wgpu::Queue, scale: f32,
+        encoder: &mut wgpu::CommandEncoder, scale: f32,
     ) {
         let fovy: f32 = 75.0 / 180.0 * std::f32::consts::PI;
         let radian: glm::TVec1<f32> = glm::vec1(fovy);
@@ -225,25 +235,26 @@ impl SDFRenderNode {
         vm_matrix = glm::scale(&vm_matrix, &glm::vec3(self.scale, self.scale, 1.0));
 
         let mvp: [[f32; 4]; 4] = (p_matrix * vm_matrix).into();
-        idroid::utils::update_uniform(device, queue, mvp, &self.mvp_buf);
+        self.mvp_buf.buffer.update_buffer(encoder, device, &mvp);
     }
 
     pub fn begin_render_pass(
-        &self, frame: &wgpu::SwapChainOutput, encoder: &mut wgpu::CommandEncoder,
+        &self, frame: &wgpu::SwapChainFrame, encoder: &mut wgpu::CommandEncoder,
     ) {
         let mut rpass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
-            color_attachments: &[wgpu::RenderPassColorAttachmentDescriptor {
-                attachment: &frame.view,
+            label: None,
+            color_attachments: &[wgpu::RenderPassColorAttachment {
+                view: &frame.output.view,
                 resolve_target: None,
-                load_op: wgpu::LoadOp::Clear,
-                store_op: wgpu::StoreOp::Store,
-                // clear_color: wgpu::Color { r: 145.0 / 255.0, g: 115.0 / 255.0, b: 105.0 / 255.0, a: 1.0 },
-                clear_color: idroid::utils::clear_color(),
+                ops: wgpu::Operations {
+                    load: wgpu::LoadOp::Clear(idroid::utils::clear_color()),
+                    store: true,
+                },
             }],
             depth_stencil_attachment: None,
         });
-        rpass.set_index_buffer(&self.index_buf, 0);
-        rpass.set_vertex_buffers(0, &[(&self.vertex_buf, 0)]);
+        rpass.set_index_buffer(self.index_buf.slice(..), wgpu::IndexFormat::Uint32);
+        rpass.set_vertex_buffer(0, self.vertex_buf.buffer.slice(..));
 
         rpass.set_pipeline(&self.pipeline);
 

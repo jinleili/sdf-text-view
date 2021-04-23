@@ -1,5 +1,6 @@
 use crate::filter::{GaussianBlurFilter, LuminanceFilter, OneInOneOut};
 use crate::{PicInfoUniform, PicInfoUniform2};
+use wgpu::util::DeviceExt;
 use zerocopy::AsBytes;
 
 #[allow(dead_code)]
@@ -18,7 +19,7 @@ impl CannyEdgeDetection {
         device: &mut wgpu::Device, encoder: &mut wgpu::CommandEncoder,
         src_view: &wgpu::TextureView, extent: wgpu::Extent3d,
     ) -> Self {
-        let output_view = idroid::texture::empty(device, wgpu::TextureFormat::R8Unorm, extent);
+        let output_view = idroid::texture::empty(device, wgpu::TextureFormat::R8Unorm, extent, Some(wgpu::TextureUsage::SAMPLED | wgpu::TextureUsage::STORAGE));
 
         let luminance_filter = LuminanceFilter::new(device, encoder, src_view, extent);
         let blur_filter = GaussianBlurFilter::new(
@@ -34,20 +35,21 @@ impl CannyEdgeDetection {
         let uniform_size = offset_stride * 1;
 
         let sobel_output_view =
-            idroid::texture::empty(device, wgpu::TextureFormat::Rgba8Unorm, extent);
+            idroid::texture::empty(device, wgpu::TextureFormat::Rgba8Unorm, extent, Some(wgpu::TextureUsage::SAMPLED | wgpu::TextureUsage::STORAGE));
         let sobel_edge_detection = OneInOneOut::new(
             device,
             &output_view,
             &sobel_output_view,
             extent,
-            device.create_buffer_with_data(
-                &[PicInfoUniform {
+            device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: None,
+                contents: &[PicInfoUniform {
                     info: [extent.width as i32, extent.height as i32, 0, 0],
                     any: [0; 60],
                 }]
                 .as_bytes(),
-                wgpu::BufferUsage::UNIFORM | wgpu::BufferUsage::COPY_DST,
-            ),
+                usage: wgpu::BufferUsage::UNIFORM | wgpu::BufferUsage::COPY_DST,
+            }),
             uniform_size,
             "filter/sobel_edge_detection",
         );
@@ -57,15 +59,16 @@ impl CannyEdgeDetection {
             &sobel_output_view,
             &output_view,
             extent,
-            device.create_buffer_with_data(
-                &[PicInfoUniform2 {
+            device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: None,
+                contents: &[PicInfoUniform2 {
                     info: [extent.width as i32, extent.height as i32, 0, 0],
                     threshold: [0.1, 0.4, 0.0, 0.0],
                     any: [0; 56],
                 }]
                 .as_bytes(),
-                wgpu::BufferUsage::UNIFORM | wgpu::BufferUsage::COPY_DST,
-            ),
+                usage: wgpu::BufferUsage::UNIFORM | wgpu::BufferUsage::COPY_DST,
+            }),
             uniform_size,
             "filter/non_maximum_suppression",
         );
@@ -75,14 +78,15 @@ impl CannyEdgeDetection {
             &luminance_filter.output_view,
             &output_view,
             extent,
-            device.create_buffer_with_data(
-                &[PicInfoUniform {
+            device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+                label: None,
+                contents: &[PicInfoUniform {
                     info: [extent.width as i32, extent.height as i32, 0, 0],
                     any: [0; 60],
                 }]
                 .as_bytes(),
-                wgpu::BufferUsage::UNIFORM | wgpu::BufferUsage::COPY_DST,
-            ),
+                usage: wgpu::BufferUsage::UNIFORM | wgpu::BufferUsage::COPY_DST,
+            }),
             uniform_size,
             "filter/weak_pixel_inclusion",
         );
