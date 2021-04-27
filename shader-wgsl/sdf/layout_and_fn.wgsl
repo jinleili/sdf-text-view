@@ -6,6 +6,7 @@ struct InfoUniform {
     // info[2] = 0 | 1 (iter by y, x), = 1 (init edt), = 2 (save final distance to input_pic's r channel)
     // info[3] = 0 | 1 ( front or background distance fields)
      info: vec4<i32>;
+     padding: [[stride(16)]] array<vec4<i32>, 15>;
 };
 
 [[block]]
@@ -18,16 +19,16 @@ struct StoreInt {
     data: [[stride(4)]] array<i32>;
 };
 
-[[group(0), binding(0)]] var<uniform> params: InfoUniform;
+[[group(1), binding(0)]] var<uniform> params: InfoUniform;
 // g_front = front distance fields, g_background = background distance fields
 // Cannot reuse block name within the same shader
-[[group(0), binding(1)]] var<storage> g_front: [[access(read_write)]] StoreFloat;
-[[group(0), binding(2)]] var<storage> g_background: [[access(read_write)]] StoreFloat;
-[[group(0), binding(3)]] var<storage> v: [[access(read_write)]] StoreInt;
-[[group(0), binding(4)]] var<storage> z: [[access(read_write)]] StoreFloat;
+[[group(0), binding(0)]] var<storage> g_front: [[access(read_write)]] StoreFloat;
+[[group(0), binding(1)]] var<storage> g_background: [[access(read_write)]] StoreFloat;
+[[group(0), binding(2)]] var<storage> v: [[access(read_write)]] StoreInt;
+[[group(0), binding(3)]] var<storage> z: [[access(read_write)]] StoreFloat;
 
-[[group(0), binding(5)]] var input_pic: [[access(read)]] texture_storage_2d<r32float>;
-[[group(0), binding(6)]] var output_pic: [[access(write)]] texture_storage_2d<r32float>;
+[[group(0), binding(4)]] var input_pic: [[access(read)]] texture_storage_2d<r32float>;
+[[group(0), binding(5)]] var output_pic: [[access(write)]] texture_storage_2d<r32float>;
 
 let INF: f32 = 1.0E10;
 

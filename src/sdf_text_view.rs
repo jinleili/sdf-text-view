@@ -1,13 +1,10 @@
 use idroid::{math::TouchPoint, node::BufferlessFullscreenNode, utils::HUD, SurfaceView};
 
-use super::{
-    clear_node::ClearColorNode, compute_node::SDFComputeNode, filter::CannyEdgeDetection,
-    render_node::SDFRenderNode,
-};
+use super::{compute_node::SDFComputeNode, filter::CannyEdgeDetection, render_node::SDFRenderNode};
 use uni_view::{fs::FileSystem, AppView, GPUContext};
 
 pub struct SDFTextView {
-    app_view: AppView,
+    pub app_view: AppView,
     hud: HUD,
     image: Option<String>,
     compute_node: Option<SDFComputeNode>,
@@ -26,11 +23,9 @@ impl SDFTextView {
     pub fn new(app_view: AppView) -> Self {
         let mut app_view = app_view;
         let hud = HUD::new();
-        println!("--01");
 
         let shader = idroid::shader2::create_shader_module(&app_view.device, "clear_color", None);
         let clear_color_node = BufferlessFullscreenNode::new(&app_view, vec![], vec![], &shader);
-        println!("--02");
 
         let instance = SDFTextView {
             app_view,
@@ -58,13 +53,11 @@ impl SDFTextView {
     }
 
     fn create_nodes(&mut self, encoder: &mut wgpu::CommandEncoder) {
-        println!("--0");
         let (_, texture_view, texture_extent) = idroid::load_texture::into_format_r32float(
             &self.image.as_ref().unwrap(),
             &mut self.app_view,
             wgpu::TextureUsage::COPY_DST | wgpu::TextureUsage::STORAGE,
         );
-        println!("--1");
 
         let src_view = if self.need_auto_detect {
             let edge_detection = CannyEdgeDetection::new(
@@ -87,7 +80,6 @@ impl SDFTextView {
             Some(wgpu::TextureUsage::SAMPLED | wgpu::TextureUsage::STORAGE),
         )
         .1;
-        println!("--2");
 
         let compute_node = SDFComputeNode::new(
             &mut self.app_view.device,
@@ -96,7 +88,6 @@ impl SDFTextView {
             &output_view,
             texture_extent,
         );
-        println!("--3");
 
         let mut render_node =
             SDFRenderNode::new(&self.app_view, &self.app_view.device, &output_view, texture_extent);
@@ -136,8 +127,8 @@ impl SurfaceView for SDFTextView {
         }
     }
 
-    fn pintch_start(&mut self, location: idroid::math::TouchPoint, scale: f32) {}
-    fn pintch_changed(&mut self, location: idroid::math::TouchPoint, scale: f32) {
+    fn pintch_start(&mut self, _location: idroid::math::TouchPoint, _scale: f32) {}
+    fn pintch_changed(&mut self, _location: idroid::math::TouchPoint, scale: f32) {
         if let Some(render_node) = &mut self.render_node {
             let mut encoder = self
                 .app_view
@@ -155,6 +146,8 @@ impl SurfaceView for SDFTextView {
     }
 
     fn enter_frame(&mut self) {
+        println!("enter_frame...");
+
         if self.need_draw == false {
             if self.need_clear_color && self.clear_count < 3 {
                 let frame = self
@@ -176,6 +169,8 @@ impl SurfaceView for SDFTextView {
                     self.clear_count += 1;
                 }
             }
+            println!("return...");
+
             return;
         }
 
@@ -183,7 +178,7 @@ impl SurfaceView for SDFTextView {
             .app_view
             .device
             .create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
-        let _ = match (&mut self.compute_node, &mut self.render_node) {
+        match (&mut self.compute_node, &mut self.render_node) {
             (Some(compute_node), Some(render_node)) => {
                 if self.need_cal_sdf {
                     self.hud.start_frame_timer();
@@ -197,7 +192,7 @@ impl SurfaceView for SDFTextView {
                     self.need_cal_sdf = false;
                     println!("sdf cost: {:?}", self.hud.stop_frame_timer());
                 }
-
+                println!("draw...");
                 let frame = self
                     .app_view
                     .swap_chain
@@ -214,7 +209,7 @@ impl SurfaceView for SDFTextView {
                 }
                 self.app_view.queue.submit(Some(encoder.finish()));
             }
-            (_, _) => {
+            (..) => {
                 self.create_nodes(&mut encoder);
                 self.app_view.queue.submit(Some(encoder.finish()));
             }

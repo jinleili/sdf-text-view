@@ -6,7 +6,6 @@ use std::{os::raw::c_char, ffi::CStr};
 pub use idroid::utils::{depth_stencil, matrix_helper};
 pub use uni_view::*;
 
-mod clear_node;
 mod compute_node;
 mod filter;
 mod render_node;

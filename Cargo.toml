@@ -1,6 +1,6 @@
 [package]
 name = "sdf-text-view"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["li jinlei <grenlight@icloud.com>"]
 edition = "2018"
 
@@ -36,7 +36,6 @@ raw-window-handle = "0.3"
 shaderc = "0.7"
 
 [dev-dependencies]
-env_logger = "0.7"
 lazy_static = "*"
 palette = "0.4"
 rand = "0.6"

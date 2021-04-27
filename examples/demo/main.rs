@@ -1,22 +1,12 @@
-extern crate idroid;
 use idroid::{math::Position, math::TouchPoint, SurfaceView};
-
-extern crate uni_view;
-use uni_view::AppView;
-
-extern crate sdf_text_view;
 use sdf_text_view::SDFTextView;
-
-extern crate lazy_static;
-extern crate objc;
+use uni_view::AppView;
 
 fn main() {
     use winit::event::{
         ElementState, Event, KeyboardInput, MouseScrollDelta, VirtualKeyCode, WindowEvent,
     };
-    use winit::{event_loop::EventLoop, window::Window};
-
-    env_logger::init();
+    use winit::{event_loop::ControlFlow, event_loop::EventLoop, window::Window};
 
     let events_loop = EventLoop::new();
     let window = Window::new(&events_loop).unwrap();
@@ -29,15 +19,15 @@ fn main() {
 
     let mut surface_view = SDFTextView::new(v);
     surface_view.bundle_image("math3.png".to_string(), false);
-    // winit 0.20.0-alpha3 不会主动触发 WindowEvent::Resized 事件了
 
     events_loop.run(move |event, _, control_flow| {
         *control_flow = if cfg!(feature = "metal-auto-capture") {
-            winit::event_loop::ControlFlow::Exit
+            ControlFlow::Exit
         } else {
-            winit::event_loop::ControlFlow::Poll
+            ControlFlow::Poll
         };
         match event {
+            Event::MainEventsCleared => surface_view.app_view.view.request_redraw(),
             Event::WindowEvent { event: WindowEvent::Resized(_size), .. } => {
                 surface_view.resize();
             }

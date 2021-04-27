@@ -148,19 +148,18 @@ impl SDFRenderNode {
             usage: wgpu::BufferUsage::INDEX,
         });
         // Create the render pipeline
-        let shader = idroid::shader::Shader::new("sdf/text", device);
+        let shader = idroid::shader2::create_shader_module(device, "sdf/text", None);
         let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
             label: None,
             push_constant_ranges: &[],
             bind_group_layouts: &[&bind_group_layout],
         });
 
-        let color_alpha_blend = idroid::utils::color_alpha_blend();
         let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
             label: None,
             layout: Some(&pipeline_layout),
             vertex: wgpu::VertexState {
-                module: &shader.vs_module,
+                module: &shader,
                 entry_point: "main",
                 buffers: &[wgpu::VertexBufferLayout {
                     array_stride: std::mem::size_of::<PosTex>() as wgpu::BufferAddress,
@@ -169,7 +168,7 @@ impl SDFRenderNode {
                 }],
             },
             fragment: Some(wgpu::FragmentState {
-                module: &shader.fs_module.unwrap(),
+                module: &shader,
                 entry_point: "main",
                 targets: &[wgpu::ColorTargetState {
                     format: app_view.sc_desc.format,
