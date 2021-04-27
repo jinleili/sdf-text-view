@@ -1,4 +1,3 @@
-// 通用 vs
 struct VertexOutput {
   [[location(0)]] uv : vec2<f32>;
   [[builtin(position)]] position : vec4<f32>;
@@ -44,13 +43,13 @@ fn lerp(a: vec4<f32>, b: vec4<f32>, w: f32) -> vec4<f32>{
 
 [[stage(fragment)]] 
 fn main(in : VertexOutput) -> [[location(0)]] vec4<f32> {
-    // let tex_gray: f32 = textureSample(sdf_texture, sdf_sampler, in.uv).r;
-    // // // 反转一下数值
-    // // tex_gray = (1.0 - tex_gray);
+    var tex_gray: f32 = textureSample(sdf_texture, sdf_sampler, in.uv).r;
+    // 反转一下数值
+    // tex_gray = (1.0 - tex_gray);
 
-    // let alpha: f32 = aastep(tex_gray, draw_uniform.mask_n_gamma[0]);
-    // let stroke_color: vec4<f32> = vec4<f32>(draw_uniform.stroke_color.rgb, alpha);
-    let stroke_color: vec4<f32> = vec4<f32>(0.0, 0.1, 0.2, 1.0);
+    let alpha: f32 = aastep(tex_gray, draw_uniform.mask_n_gamma[0]);
+    let stroke_color: vec4<f32> = vec4<f32>(draw_uniform.stroke_color.rgb, alpha);
+    // let stroke_color: vec4<f32> = vec4<f32>(0.0, 0.1, 0.2, 1.0);
   
     return stroke_color;
 }

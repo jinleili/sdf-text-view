@@ -18,7 +18,7 @@ fn main() {
     let v = AppView::new(window);
 
     let mut surface_view = SDFTextView::new(v);
-    surface_view.bundle_image("math3.png".to_string(), false);
+    surface_view.bundle_image("math1.png".to_string(), false);
 
     events_loop.run(move |event, _, control_flow| {
         *control_flow = if cfg!(feature = "metal-auto-capture") {

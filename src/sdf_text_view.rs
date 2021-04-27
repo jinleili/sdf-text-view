@@ -146,8 +146,6 @@ impl SurfaceView for SDFTextView {
     }
 
     fn enter_frame(&mut self) {
-        println!("enter_frame...");
-
         if self.need_draw == false {
             if self.need_clear_color && self.clear_count < 3 {
                 let frame = self
@@ -169,8 +167,6 @@ impl SurfaceView for SDFTextView {
                     self.clear_count += 1;
                 }
             }
-            println!("return...");
-
             return;
         }
 
@@ -192,7 +188,6 @@ impl SurfaceView for SDFTextView {
                     self.need_cal_sdf = false;
                     println!("sdf cost: {:?}", self.hud.stop_frame_timer());
                 }
-                println!("draw...");
                 let frame = self
                     .app_view
                     .swap_chain
