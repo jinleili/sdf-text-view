@@ -696,7 +696,7 @@ dependencies = [
 [[package]]
 name = "gfx-auxil"
 version = "0.8.0"
-source = "git+https://github.com/gfx-rs/gfx?rev=69991710a968e1e846148cdba425077e00b6febe#69991710a968e1e846148cdba425077e00b6febe"
+source = "git+https://github.com/gfx-rs/gfx?rev=46735bb079997257b4e5d8e813e6ed9c71aefd3e#46735bb079997257b4e5d8e813e6ed9c71aefd3e"
 dependencies = [
  "fxhash",
  "gfx-hal",
@@ -706,7 +706,7 @@ dependencies = [
 [[package]]
 name = "gfx-backend-dx11"
 version = "0.7.0"
-source = "git+https://github.com/gfx-rs/gfx?rev=69991710a968e1e846148cdba425077e00b6febe#69991710a968e1e846148cdba425077e00b6febe"
+source = "git+https://github.com/gfx-rs/gfx?rev=46735bb079997257b4e5d8e813e6ed9c71aefd3e#46735bb079997257b4e5d8e813e6ed9c71aefd3e"
 dependencies = [
  "arrayvec",
  "bitflags",
@@ -727,7 +727,7 @@ dependencies = [
 [[package]]
 name = "gfx-backend-dx12"
 version = "0.7.0"
-source = "git+https://github.com/gfx-rs/gfx?rev=69991710a968e1e846148cdba425077e00b6febe#69991710a968e1e846148cdba425077e00b6febe"
+source = "git+https://github.com/gfx-rs/gfx?rev=46735bb079997257b4e5d8e813e6ed9c71aefd3e#46735bb079997257b4e5d8e813e6ed9c71aefd3e"
 dependencies = [
  "arrayvec",
  "bit-set",
@@ -748,7 +748,7 @@ dependencies = [
 [[package]]
 name = "gfx-backend-empty"
 version = "0.7.0"
-source = "git+https://github.com/gfx-rs/gfx?rev=69991710a968e1e846148cdba425077e00b6febe#69991710a968e1e846148cdba425077e00b6febe"
+source = "git+https://github.com/gfx-rs/gfx?rev=46735bb079997257b4e5d8e813e6ed9c71aefd3e#46735bb079997257b4e5d8e813e6ed9c71aefd3e"
 dependencies = [
  "gfx-hal",
  "log",
@@ -758,7 +758,7 @@ dependencies = [
 [[package]]
 name = "gfx-backend-gl"
 version = "0.7.0"
-source = "git+https://github.com/gfx-rs/gfx?rev=69991710a968e1e846148cdba425077e00b6febe#69991710a968e1e846148cdba425077e00b6febe"
+source = "git+https://github.com/gfx-rs/gfx?rev=46735bb079997257b4e5d8e813e6ed9c71aefd3e#46735bb079997257b4e5d8e813e6ed9c71aefd3e"
 dependencies = [
  "arrayvec",
  "bitflags",
@@ -779,7 +779,7 @@ dependencies = [
 [[package]]
 name = "gfx-backend-metal"
 version = "0.7.0"
-source = "git+https://github.com/gfx-rs/gfx?rev=69991710a968e1e846148cdba425077e00b6febe#69991710a968e1e846148cdba425077e00b6febe"
+source = "git+https://github.com/gfx-rs/gfx?rev=46735bb079997257b4e5d8e813e6ed9c71aefd3e#46735bb079997257b4e5d8e813e6ed9c71aefd3e"
 dependencies = [
  "arrayvec",
  "bitflags",
@@ -803,7 +803,7 @@ dependencies = [
 [[package]]
 name = "gfx-backend-vulkan"
 version = "0.7.0"
-source = "git+https://github.com/gfx-rs/gfx?rev=69991710a968e1e846148cdba425077e00b6febe#69991710a968e1e846148cdba425077e00b6febe"
+source = "git+https://github.com/gfx-rs/gfx?rev=46735bb079997257b4e5d8e813e6ed9c71aefd3e#46735bb079997257b4e5d8e813e6ed9c71aefd3e"
 dependencies = [
  "arrayvec",
  "ash",
@@ -823,7 +823,7 @@ dependencies = [
 [[package]]
 name = "gfx-hal"
 version = "0.7.0"
-source = "git+https://github.com/gfx-rs/gfx?rev=69991710a968e1e846148cdba425077e00b6febe#69991710a968e1e846148cdba425077e00b6febe"
+source = "git+https://github.com/gfx-rs/gfx?rev=46735bb079997257b4e5d8e813e6ed9c71aefd3e#46735bb079997257b4e5d8e813e6ed9c71aefd3e"
 dependencies = [
  "bitflags",
  "naga",
@@ -926,7 +926,6 @@ checksum = "b9e0384b61958566e926dc50660321d12159025e767c18e043daf26b70104c39"
 [[package]]
 name = "idroid"
 version = "0.2.6"
-source = "git+https://github.com/grenlight/idroid?rev=71ea76387f0491d0a2ea58caf106c6c3f124b2eb#71ea76387f0491d0a2ea58caf106c6c3f124b2eb"
 dependencies = [
  "futures",
  "image",
@@ -1239,7 +1238,7 @@ dependencies = [
 [[package]]
 name = "naga"
 version = "0.3.1"
-source = "git+https://github.com/gfx-rs/naga?tag=gfx-22#9cd6fd9c205a57824644d0baedc6c15997be1e36"
+source = "git+https://github.com/gfx-rs/naga?tag=gfx-23#4a5ff9a0538510ff3c3efa171941bfb44fc1be9c"
 dependencies = [
  "bit-set",
  "bitflags",
@@ -1700,9 +1699,9 @@ dependencies = [
 
 [[package]]
 name = "profiling"
-version = "0.1.10"
+version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b0c71198452babfbba7419e716d29853c462d59da73c41485ab7dc8b4dc0c4be"
+checksum = "8ae26a2370f2cf9a28cd570017aee216af883f02230ef8aea27b77f90e5654ef"
 
 [[package]]
 name = "quick-error"
@@ -1887,7 +1886,7 @@ dependencies = [
 [[package]]
 name = "range-alloc"
 version = "0.1.2"
-source = "git+https://github.com/gfx-rs/gfx?rev=69991710a968e1e846148cdba425077e00b6febe#69991710a968e1e846148cdba425077e00b6febe"
+source = "git+https://github.com/gfx-rs/gfx?rev=46735bb079997257b4e5d8e813e6ed9c71aefd3e#46735bb079997257b4e5d8e813e6ed9c71aefd3e"
 
 [[package]]
 name = "raw-window-handle"
@@ -2264,7 +2263,6 @@ checksum = "6d2783fe2d6b8c1101136184eb41be8b1ad379e4657050b8aaff0c79ee7575f9"
 [[package]]
 name = "uni-view"
 version = "0.2.6"
-source = "git+https://github.com/grenlight/idroid?rev=71ea76387f0491d0a2ea58caf106c6c3f124b2eb#71ea76387f0491d0a2ea58caf106c6c3f124b2eb"
 dependencies = [
  "core-graphics 0.19.0",
  "futures",
@@ -2477,7 +2475,7 @@ checksum = "d8b77fdfd5a253be4ab714e4ffa3c49caf146b4de743e97510c0656cf90f1e8e"
 [[package]]
 name = "wgpu"
 version = "0.7.0"
-source = "git+https://github.com/gfx-rs/wgpu-rs?rev=1806a5bd4d0a8740774969c92f51ad9a906a2e24#1806a5bd4d0a8740774969c92f51ad9a906a2e24"
+source = "git+https://github.com/gfx-rs/wgpu-rs?rev=048551cba3419c50937192a85fb716c03c0ebf4b#048551cba3419c50937192a85fb716c03c0ebf4b"
 dependencies = [
  "arrayvec",
  "js-sys",
@@ -2497,7 +2495,7 @@ dependencies = [
 [[package]]
 name = "wgpu-core"
 version = "0.7.0"
-source = "git+https://github.com/gfx-rs/wgpu?rev=523ef2dfec0bf18c696bc53fea252fd6fa7350c6#523ef2dfec0bf18c696bc53fea252fd6fa7350c6"
+source = "git+https://github.com/gfx-rs/wgpu?rev=13015c8621daade1decb7e1083b7e0f73eeab6c7#13015c8621daade1decb7e1083b7e0f73eeab6c7"
 dependencies = [
  "arrayvec",
  "bitflags",
@@ -2526,7 +2524,7 @@ dependencies = [
 [[package]]
 name = "wgpu-types"
 version = "0.7.0"
-source = "git+https://github.com/gfx-rs/wgpu?rev=523ef2dfec0bf18c696bc53fea252fd6fa7350c6#523ef2dfec0bf18c696bc53fea252fd6fa7350c6"
+source = "git+https://github.com/gfx-rs/wgpu?rev=13015c8621daade1decb7e1083b7e0f73eeab6c7#13015c8621daade1decb7e1083b7e0f73eeab6c7"
 dependencies = [
  "bitflags",
 ]

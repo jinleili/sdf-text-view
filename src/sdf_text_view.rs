@@ -1,4 +1,4 @@
-use idroid::{math::TouchPoint, texture, utils::HUD, SurfaceView};
+use idroid::{math::TouchPoint, node::BufferlessFullscreenNode, utils::HUD, SurfaceView};
 
 use super::{
     clear_node::ClearColorNode, compute_node::SDFComputeNode, filter::CannyEdgeDetection,
@@ -13,7 +13,7 @@ pub struct SDFTextView {
     compute_node: Option<SDFComputeNode>,
     render_node: Option<SDFRenderNode>,
     edge_detection: Option<CannyEdgeDetection>,
-    clear_color_node: ClearColorNode,
+    clear_color_node: BufferlessFullscreenNode,
     need_clear_color: bool,
     clear_count: u8,
     need_cal_sdf: bool,
@@ -26,7 +26,12 @@ impl SDFTextView {
     pub fn new(app_view: AppView) -> Self {
         let mut app_view = app_view;
         let hud = HUD::new();
-        let clear_color_node = ClearColorNode::new(&app_view, &app_view.device);
+        println!("--01");
+
+        let shader = idroid::shader2::create_shader_module(&app_view.device, "clear_color", None);
+        let clear_color_node = BufferlessFullscreenNode::new(&app_view, vec![], vec![], &shader);
+        println!("--02");
+
         let instance = SDFTextView {
             app_view,
             hud,
@@ -53,16 +58,15 @@ impl SDFTextView {
     }
 
     fn create_nodes(&mut self, encoder: &mut wgpu::CommandEncoder) {
-        let fs = FileSystem::new(env!("CARGO_MANIFEST_DIR"));
-        let path = fs.get_texture_file_path(&self.image.as_ref().unwrap());
-        let (_, texture_view, texture_extent, _sampler) = texture::from_path(
-            path,
+        println!("--0");
+        let (_, texture_view, texture_extent) = idroid::load_texture::into_format_r32float(
+            &self.image.as_ref().unwrap(),
             &mut self.app_view,
-            true,
-            if self.need_auto_detect { false } else { true },
+            wgpu::TextureUsage::COPY_DST | wgpu::TextureUsage::STORAGE,
         );
+        println!("--1");
 
-        let output_view = if self.need_auto_detect {
+        let src_view = if self.need_auto_detect {
             let edge_detection = CannyEdgeDetection::new(
                 &mut self.app_view.device,
                 encoder,
@@ -76,15 +80,26 @@ impl SDFTextView {
             &texture_view
         };
 
-        let compute_node =
-            SDFComputeNode::new(&mut self.app_view.device, encoder, output_view, texture_extent);
+        let output_view = idroid::load_texture::empty(
+            &mut self.app_view.device,
+            wgpu::TextureFormat::R32Float,
+            texture_extent,
+            Some(wgpu::TextureUsage::SAMPLED | wgpu::TextureUsage::STORAGE),
+        )
+        .1;
+        println!("--2");
 
-        let mut render_node = SDFRenderNode::new(
-            &self.app_view,
-            &self.app_view.device,
-            output_view,
+        let compute_node = SDFComputeNode::new(
+            &mut self.app_view.device,
+            encoder,
+            src_view,
+            &output_view,
             texture_extent,
         );
+        println!("--3");
+
+        let mut render_node =
+            SDFRenderNode::new(&self.app_view, &self.app_view.device, &output_view, texture_extent);
         // update mvp matrix
         render_node.update_scale(&self.app_view.sc_desc, &mut self.app_view.device, encoder, 1.0);
 
@@ -97,12 +112,11 @@ impl SDFTextView {
 }
 
 impl SurfaceView for SDFTextView {
-    fn touch_start(&mut self, point: TouchPoint) {}
-    fn touch_moved(&mut self, point: TouchPoint) {}
-    fn touch_end(&mut self, point: TouchPoint) {}
+    fn touch_start(&mut self, _point: TouchPoint) {}
+    fn touch_moved(&mut self, _point: TouchPoint) {}
+    fn touch_end(&mut self, _point: TouchPoint) {}
 
     fn resize(&mut self) {
-        println!("resize()--");
         if let Some(render_node) = &mut self.render_node {
             let mut encoder = self
                 .app_view
@@ -149,11 +163,16 @@ impl SurfaceView for SDFTextView {
                     .get_current_frame()
                     .expect("swap_chain.get_next_texture() timeout");
                 {
-                    self.clear_color_node.clear_color(
-                        &frame,
-                        &mut self.app_view.device,
-                        &mut self.app_view.queue,
+                    let mut encoder = self
+                        .app_view
+                        .device
+                        .create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
+                    self.clear_color_node.draw(
+                        &frame.output.view,
+                        &mut encoder,
+                        wgpu::LoadOp::Clear(wgpu::Color::BLACK),
                     );
+                    self.app_view.queue.submit(Some(encoder.finish()));
                     self.clear_count += 1;
                 }
             }
@@ -164,7 +183,6 @@ impl SurfaceView for SDFTextView {
             .app_view
             .device
             .create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
-
         let _ = match (&mut self.compute_node, &mut self.render_node) {
             (Some(compute_node), Some(render_node)) => {
                 if self.need_cal_sdf {

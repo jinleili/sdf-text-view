@@ -6,13 +6,15 @@ layout(set = 0, binding = 0) uniform InfoUniform
     // info[3] = 0 | 1 ( front or background distance fields)
     ivec4 info;
 };
-layout(binding = 1, r8) uniform image2D input_pic;
 // g_front = front distance fields, g_background = background distance fields
 // Cannot reuse block name within the same shader
-layout(set = 0, binding = 2) buffer EDTFront { float g_front[]; };
-layout(set = 0, binding = 3) buffer EDTBackground { float g_background[]; };
-layout(set = 0, binding = 4) buffer EDTTempV { int v[]; };
-layout(set = 0, binding = 5) buffer EDTTempZ { float z[]; };
+layout(set = 0, binding = 1) buffer EDTFront { float g_front[]; };
+layout(set = 0, binding = 2) buffer EDTBackground { float g_background[]; };
+layout(set = 0, binding = 3) buffer EDTTempV { int v[]; };
+layout(set = 0, binding = 4) buffer EDTTempZ { float z[]; };
+
+layout(binding = 5, r32f) uniform readonly image2D input_pic;
+layout(binding = 6, r32f) uniform writeonly image2D output_pic;
 
 const float INF = 1.0E10;
 

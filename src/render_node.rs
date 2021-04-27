@@ -1,6 +1,6 @@
 use idroid::geometry::plane::Plane;
 use idroid::vertex::{Pos, PosTex};
-use idroid::{texture, BufferObj, MVPUniform, MVPUniformObj};
+use idroid::{BufferObj, MVPUniform, MVPUniformObj};
 
 use nalgebra_glm as glm;
 use wgpu::util::DeviceExt;
@@ -31,7 +31,7 @@ impl SDFRenderNode {
         app_view: &idroid::AppView, device: &wgpu::Device, src_view: &wgpu::TextureView,
         extent: Extent3d,
     ) -> Self {
-        let sampler = texture::bilinear_sampler(device);
+        let sampler = idroid::load_texture::bilinear_sampler(device);
 
         let bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
             label: None,
@@ -75,7 +75,7 @@ impl SDFRenderNode {
             ],
         });
         let mvp_size = std::mem::size_of::<[[f32; 4]; 4]>() as wgpu::BufferAddress;
- let mut encoder =
+        let mut encoder =
             device.create_command_encoder(&wgpu::CommandEncoderDescriptor { label: None });
         let mvp_buf = idroid::MVPUniformObj::new((&app_view.sc_desc).into(), device, &mut encoder);
 
@@ -88,7 +88,10 @@ impl SDFRenderNode {
             layout: &bind_group_layout,
             label: None,
             entries: &[
-                wgpu::BindGroupEntry { binding: 0, resource: mvp_buf.buffer.buffer.as_entire_binding() },
+                wgpu::BindGroupEntry {
+                    binding: 0,
+                    resource: mvp_buf.buffer.buffer.as_entire_binding(),
+                },
                 wgpu::BindGroupEntry {
                     binding: 1,
                     resource: wgpu::BindingResource::TextureView(src_view),
@@ -109,7 +112,10 @@ impl SDFRenderNode {
             layout: &bind_group_layout,
             label: None,
             entries: &[
-                wgpu::BindGroupEntry { binding: 0, resource: mvp_buf.buffer.buffer.as_entire_binding() },
+                wgpu::BindGroupEntry {
+                    binding: 0,
+                    resource: mvp_buf.buffer.buffer.as_entire_binding(),
+                },
                 wgpu::BindGroupEntry {
                     binding: 1,
                     resource: wgpu::BindingResource::TextureView(src_view),
@@ -118,7 +124,10 @@ impl SDFRenderNode {
                     binding: 2,
                     resource: wgpu::BindingResource::Sampler(&sampler),
                 },
-                wgpu::BindGroupEntry { binding: 3, resource: draw_buf_stroke.buffer.as_entire_binding() },
+                wgpu::BindGroupEntry {
+                    binding: 3,
+                    resource: draw_buf_stroke.buffer.as_entire_binding(),
+                },
             ],
         });
 

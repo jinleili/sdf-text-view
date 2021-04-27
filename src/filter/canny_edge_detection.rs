@@ -19,7 +19,13 @@ impl CannyEdgeDetection {
         device: &mut wgpu::Device, encoder: &mut wgpu::CommandEncoder,
         src_view: &wgpu::TextureView, extent: wgpu::Extent3d,
     ) -> Self {
-        let output_view = idroid::texture::empty(device, wgpu::TextureFormat::R8Unorm, extent, Some(wgpu::TextureUsage::SAMPLED | wgpu::TextureUsage::STORAGE));
+        let output_view = idroid::load_texture::empty(
+            device,
+            wgpu::TextureFormat::R32Float,
+            extent,
+            Some(wgpu::TextureUsage::SAMPLED | wgpu::TextureUsage::STORAGE),
+        )
+        .1;
 
         let luminance_filter = LuminanceFilter::new(device, encoder, src_view, extent);
         let blur_filter = GaussianBlurFilter::new(
@@ -34,8 +40,13 @@ impl CannyEdgeDetection {
         let offset_stride: wgpu::BufferAddress = 256;
         let uniform_size = offset_stride * 1;
 
-        let sobel_output_view =
-            idroid::texture::empty(device, wgpu::TextureFormat::Rgba8Unorm, extent, Some(wgpu::TextureUsage::SAMPLED | wgpu::TextureUsage::STORAGE));
+        let sobel_output_view = idroid::load_texture::empty(
+            device,
+            wgpu::TextureFormat::Rgba8Unorm,
+            extent,
+            Some(wgpu::TextureUsage::SAMPLED | wgpu::TextureUsage::STORAGE),
+        )
+        .1;
         let sobel_edge_detection = OneInOneOut::new(
             device,
             &output_view,

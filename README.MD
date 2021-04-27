@@ -43,11 +43,11 @@ Improved algorithm: [Felzenszwalb/Huttenlocher distance transform](http://cs.bro
 ### On macOS
 ```
 # macOS
-cargo run --example demo
+RUST_BACKTRACE=full cargo run --example demo
 # windows (not tested!)
-cargo run --example demo
+RUST_BACKTRACE=full cargo run --example demo
 # linux  (not tested!)
-cargo run --example demo
+RUST_BACKTRACE=full cargo run --example demo
 ```
 ### On iOS 
 ```
@@ -84,3 +84,6 @@ cargo run input.png output.png
 - [ ] Use Android ```SurfaceView``` to Run on Android device
 - [ ] Improve screen rotate on iOS device
 - [ ] Scrollable when scaled model projection  over the viewport boundaries
+
+## License
+[MIT](https://opensource.org/licenses/MIT)
