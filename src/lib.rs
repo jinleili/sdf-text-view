@@ -7,7 +7,6 @@ pub use idroid::utils::{depth_stencil, matrix_helper};
 pub use uni_view::*;
 
 mod compute_node;
-mod filter;
 mod render_node;
 
 mod sdf_text_view;

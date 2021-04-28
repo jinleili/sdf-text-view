@@ -17,6 +17,6 @@ fn main([[builtin(vertex_index)]] vertexIndex: u32) -> VertexOutput {
 [[group(0), binding(1)]] var sampler0: sampler;
 
 [[stage(fragment)]] 
-fn main(in : VertexOutput) -> [[location(0)]] vec4<f32> {
+fn main() -> [[location(0)]] vec4<f32> {
   return vec4<f32>(0.0, 0.0, 0.0, 1.0);
 }

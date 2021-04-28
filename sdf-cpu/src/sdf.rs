@@ -15,7 +15,6 @@ pub struct SDF {
     img: GrayImage,
     img_size: (u32, u32),
     pixel_count: usize,
-    long_edge_pixel: usize,
     f: Vec<f32>,
 }
 
@@ -39,7 +38,6 @@ impl SDF {
             outline,
             img,
             img_size,
-            long_edge_pixel,
             pixel_count,
             f,
         }

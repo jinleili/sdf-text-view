@@ -9,7 +9,7 @@ pub struct SDFComputeNode {
     xy_pipeline: wgpu::ComputePipeline,
     x_pipeline: wgpu::ComputePipeline,
     y_pipeline: wgpu::ComputePipeline,
-    offset_stride: wgpu::BufferAddress,
+    offset_stride: wgpu::DynamicOffset,
     threadgroup_count: (u32, u32),
     pub sdf_buffer: idroid::BufferObj,
     pub staging_buffer: wgpu::Buffer,
@@ -22,7 +22,7 @@ impl SDFComputeNode {
     ) -> Self {
         let img_size = (extent.width * extent.height) as u64;
 
-        let offset_stride = std::mem::size_of::<PicInfoUniform>() as wgpu::BufferAddress;
+        let offset_stride = 256 as wgpu::DynamicOffset;
         let uniform_buffer = idroid::BufferObj::create_uniforms_buffer(
             device,
             &[
@@ -59,7 +59,7 @@ impl SDFComputeNode {
 
         let sdf_range = (img_size * 4) as wgpu::BufferAddress;
         let sdf_front =
-            idroid::BufferObj::create_empty_storage_buffer(device, sdf_range, false, None);
+            idroid::BufferObj::create_empty_storage_buffer(device, sdf_range, false, Some("sdf_front"));
         let staging_buffer = device.create_buffer(&wgpu::BufferDescriptor {
             size: sdf_range,
             usage: wgpu::BufferUsage::MAP_READ | wgpu::BufferUsage::COPY_DST,
@@ -67,12 +67,12 @@ impl SDFComputeNode {
             mapped_at_creation: false,
         });
         let sdf_background =
-            idroid::BufferObj::create_empty_storage_buffer(device, sdf_range, false, None);
+            idroid::BufferObj::create_empty_storage_buffer(device, sdf_range, false, Some("sdf_background"));
 
         let v_buffer =
-            idroid::BufferObj::create_empty_storage_buffer(device, sdf_range, false, None);
+            idroid::BufferObj::create_empty_storage_buffer(device, sdf_range, false, Some("v_buffer"));
         let z_range = ((extent.width + 1) * (extent.height + 1) * 4) as wgpu::BufferAddress;
-        let z_buffer = idroid::BufferObj::create_empty_storage_buffer(device, z_range, false, None);
+        let z_buffer = idroid::BufferObj::create_empty_storage_buffer(device, z_range, false, Some("z_buffer"));
 
         let visibilitys: Vec<wgpu::ShaderStage> = [wgpu::ShaderStage::COMPUTE; 6].to_vec();
         let setting_node = BindingGroupSettingNode::new(
@@ -152,7 +152,7 @@ impl SDFComputeNode {
         cpass.set_bind_group(
             1,
             &self.dynamic_node.bind_group,
-            &[self.offset_stride as wgpu::DynamicOffset * 3],
+            &[self.offset_stride * 3],
         );
         cpass.dispatch(self.threadgroup_count.0, 1, 1);
 
@@ -160,7 +160,7 @@ impl SDFComputeNode {
         cpass.set_bind_group(
             1,
             &self.dynamic_node.bind_group,
-            &[self.offset_stride as wgpu::DynamicOffset],
+            &[self.offset_stride],
         );
         cpass.dispatch(self.threadgroup_count.0, 1, 1);
 
@@ -169,7 +169,7 @@ impl SDFComputeNode {
         cpass.set_bind_group(
             1,
             &self.dynamic_node.bind_group,
-            &[self.offset_stride as wgpu::DynamicOffset * 4],
+            &[self.offset_stride * 4],
         );
         cpass.dispatch(1, self.threadgroup_count.1, 1);
 
@@ -177,7 +177,7 @@ impl SDFComputeNode {
         cpass.set_bind_group(
             1,
             &self.dynamic_node.bind_group,
-            &[self.offset_stride as wgpu::DynamicOffset * 2],
+            &[self.offset_stride * 2],
         );
         cpass.dispatch(1, self.threadgroup_count.1, 1);
 
@@ -186,7 +186,7 @@ impl SDFComputeNode {
         cpass.set_bind_group(
             1,
             &self.dynamic_node.bind_group,
-            &[self.offset_stride as wgpu::DynamicOffset * 5],
+            &[self.offset_stride * 5],
         );
         cpass.dispatch(self.threadgroup_count.0, self.threadgroup_count.1, 1);
     }

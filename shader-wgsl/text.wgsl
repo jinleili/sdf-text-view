@@ -21,14 +21,20 @@ fn main(
 struct DrawUniform {
     stroke_color: vec4<f32>;
     mask_n_gamma: vec2<f32>;
+    // when not alignment, Xcode debug cause crash
+    _padding: [[stride(4)]] array<f32, 58>;
 };
 
 [[group(0), binding(1)]] var sdf_texture : texture_2d<f32>;
 [[group(0), binding(2)]] var sdf_sampler : sampler;
-[[group(0), binding(3)]] var<uniform> draw_uniform : DrawUniform;
+
+[[group(1), binding(0)]] var<uniform> draw_uniform : DrawUniform;
 
 // 反走样
 fn aastep(value: f32, mask: f32) -> f32 {
+    // glsl spec: Available only in the fragment shader, these functions return the partial derivative of expression p with respect to the window
+    // x coordinate (for dFdx*) and y coordinate (for dFdy*).
+    // wgsl 里叫 dpdx, dpdy
     let afwidth: f32 = length(vec2<f32>(dpdx(value), dpdy(value))) * 0.70710678118654757  ;
     return smoothStep(mask - afwidth, mask + afwidth, value);
 }

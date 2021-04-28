@@ -41,12 +41,11 @@ fn get_pixel_index2(uv: vec2<i32>) -> i32 {
 }
 
 fn get_f(index: i32) -> f32 {
-    return 0.0;
-    // if (params.info.w == 1) {
-    //     return g_background.data[u32(index)];
-    // } else {
-    //     return g_front.data[u32(index)];
-    // }
+    if (params.info.w == 1) {
+        return g_background.data[index];
+    } else {
+        return g_front.data[index];
+    }
 }
 
 fn update_sdf(index: i32, val: f32) {
