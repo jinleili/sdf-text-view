@@ -885,6 +885,7 @@ checksum = "b9e0384b61958566e926dc50660321d12159025e767c18e043daf26b70104c39"
 [[package]]
 name = "idroid"
 version = "0.2.6"
+source = "git+https://github.com/grenlight/idroid?rev=0cdf9f5000c0e4512bd55a4d40876ec65726b9b8#0cdf9f5000c0e4512bd55a4d40876ec65726b9b8"
 dependencies = [
  "futures",
  "image",
@@ -1197,7 +1198,7 @@ dependencies = [
 [[package]]
 name = "naga"
 version = "0.3.1"
-source = "git+https://github.com/gfx-rs/naga?tag=gfx-23#4a5ff9a0538510ff3c3efa171941bfb44fc1be9c"
+source = "git+https://github.com/grenlight/naga?rev=fd561da44cb3fdbe770dc2350cc7118a48a5dc3c#fd561da44cb3fdbe770dc2350cc7118a48a5dc3c"
 dependencies = [
  "bit-set",
  "bitflags",
@@ -2188,6 +2189,7 @@ checksum = "6d2783fe2d6b8c1101136184eb41be8b1ad379e4657050b8aaff0c79ee7575f9"
 [[package]]
 name = "uni-view"
 version = "0.2.6"
+source = "git+https://github.com/grenlight/idroid?rev=0cdf9f5000c0e4512bd55a4d40876ec65726b9b8#0cdf9f5000c0e4512bd55a4d40876ec65726b9b8"
 dependencies = [
  "core-graphics 0.19.0",
  "futures",

@@ -21,7 +21,6 @@ fn main(
 struct DrawUniform {
     stroke_color: vec4<f32>;
     mask_n_gamma: vec4<f32>;
-    // when not alignment, Xcode debug cause crash
     _padding: [[stride(16)]] array<vec4<f32>, 14>;
 };
 
@@ -30,11 +29,7 @@ struct DrawUniform {
 
 [[group(1), binding(0)]] var<uniform> draw_uniform : DrawUniform;
 
-// 反走样
 fn aastep(value: f32, mask: f32) -> f32 {
-    // glsl spec: Available only in the fragment shader, these functions return the partial derivative of expression p with respect to the window
-    // x coordinate (for dFdx*) and y coordinate (for dFdy*).
-    // wgsl 里叫 dpdx, dpdy
     let afwidth: f32 = length(vec2<f32>(dpdx(value), dpdy(value))) * 0.70710678118654757  ;
     return smoothStep(mask - afwidth, mask + afwidth, value);
 }
@@ -50,12 +45,9 @@ fn lerp(a: vec4<f32>, b: vec4<f32>, w: f32) -> vec4<f32>{
 [[stage(fragment)]] 
 fn main(in : VertexOutput) -> [[location(0)]] vec4<f32> {
     var tex_gray: f32 = textureSample(sdf_texture, sdf_sampler, in.uv).r;
-    // 反转一下数值
-    // tex_gray = (1.0 - tex_gray);
 
     let alpha: f32 = aastep(tex_gray, draw_uniform.mask_n_gamma[0]);
     let stroke_color: vec4<f32> = vec4<f32>(draw_uniform.stroke_color.rgb, alpha);
-    // let stroke_color: vec4<f32> = vec4<f32>(0.0, 0.1, 0.2, 1.0);
   
     return stroke_color;
 }

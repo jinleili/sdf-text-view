@@ -14,8 +14,10 @@ struct app_view {
     void *view;
     // 获取 CAMetalLayer
     void *metal_layer;
-//   z float (*screen_scale)(void);
-//    struct view_size (*get_inner_size)(void);
+    int maximum_frames;
+    const char *temporary_directory;
+    //   z float (*screen_scale)(void);
+    void (*callback_to_swift)(int32_t arg);
 };
 
 struct view_size {
@@ -26,7 +28,19 @@ struct view_size {
 struct TouchPoint {
     float x;
     float y;
+    // 方位角
+    float azimuth_angle;
+    // 倾斜角
+    float altitude_angle;
     float force;
+    float stamp;
+    float distance;
+    float interval;
+    float speed;
+    // -1: 无压感， 0: touch 结束点, 1: pencil, 2: 3D touch
+    int ty;
+    float stamp_scale;
+    
 };
 
 struct RustByteSlice {

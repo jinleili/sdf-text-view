@@ -73,13 +73,6 @@ cd sdf-generator
 cargo run input.png output.png
 ```
 
-## When things go wrong
-- SDFTextView use ```shaderc-rs``` compile glsl to spirv, which need your compute installed ```Pathon``` 3: [wgpu-rs/pull/44](https://github.com/gfx-rs/wgpu-rs/pull/44);
-- When build for iOS, ```build.rs``` will compile the specified .glsl to shader-gen/*.spv, rename glsl file maybe also need modify build.rs;
-- When resizing window or rotate iOS device, the window screen flickering, because gfx filling the screen with black color when recreate a swap_chain, waiting for official repair;
-
-
-
 ## To do list
 - [ ] Use Android ```SurfaceView``` to Run on Android device
 - [ ] Improve screen rotate on iOS device

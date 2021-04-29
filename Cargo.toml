@@ -16,10 +16,10 @@ default = []
 libc = "*"
 wgpu = { git = "https://github.com/gfx-rs/wgpu-rs", version = "0.7",  rev = "048551cba3419c50937192a85fb716c03c0ebf4b" }
 # wgpu = { path = "../../wgpu-rs" }
-uni-view = { path="../idroid/uni-view" }
-idroid = { path="../idroid/idroid" }
-# uni-view = { git = "https://github.com/grenlight/idroid", rev = "71ea76387f0491d0a2ea58caf106c6c3f124b2eb" }
-# idroid = { git = "https://github.com/grenlight/idroid", rev = "71ea76387f0491d0a2ea58caf106c6c3f124b2eb" }
+# uni-view = { path="../idroid/uni-view" }
+# idroid = { path="../idroid/idroid" }
+uni-view = { git = "https://github.com/grenlight/idroid", rev = "0cdf9f5000c0e4512bd55a4d40876ec65726b9b8" }
+idroid = { git = "https://github.com/grenlight/idroid", rev = "0cdf9f5000c0e4512bd55a4d40876ec65726b9b8" }
 
 nalgebra-glm = "*"
 image = "0.23"
@@ -32,15 +32,11 @@ objc = "*"
 winit = { version = "0.24", features = ["web-sys"] }
 raw-window-handle = "0.3"
 
-[build-dependencies]
-shaderc = "0.7"
-
 [dev-dependencies]
 lazy_static = "*"
 palette = "0.4"
 rand = "0.6"
 
-# [patch.crates-io]
-# # fixed bug: https://github.com/gfx-rs/gfx/issues/3086
-# gfx-backend-metal = { git = "https://github.com/gfx-rs/gfx", rev = "8bd4f0d1f8ccc3875183ccb4b621023edb0ed94a" }
-# gfx-hal = { git = "https://github.com/gfx-rs/gfx",  rev = "8bd4f0d1f8ccc3875183ccb4b621023edb0ed94a"}
+# fixed issue: https://github.com/gfx-rs/naga/issues/795 , waiting for 'gfx-24'
+[patch."https://github.com/gfx-rs/naga"]
+naga = {git = "https://github.com/grenlight/naga", rev = "fd561da44cb3fdbe770dc2350cc7118a48a5dc3c"}

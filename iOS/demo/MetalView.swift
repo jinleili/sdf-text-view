@@ -29,13 +29,8 @@ class MetalView: UIView {
         // https://tomisacat.xyz/tech/2017/06/17/scale-nativescale-contentsscale.html
         layer.contentsScale = UIScreen.main.nativeScale
         layer.removeAllAnimations()
+        self.contentScaleFactor = UIScreen.main.nativeScale
     }
     
-    func appView() -> app_view {
-        self.contentScaleFactor = UIScreen.main.nativeScale
-        let ownedPointer = UnsafeMutableRawPointer(Unmanaged.passRetained(self).toOpaque())
-        let metalLayer = UnsafeMutableRawPointer(Unmanaged.passRetained(self.layer).toOpaque())
-        return app_view(view: ownedPointer, metal_layer: metalLayer)
-    }
     
 }

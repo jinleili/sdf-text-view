@@ -23,10 +23,42 @@ class MetalController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        
         // 在 viewDidLoad 里创建 wgpu 绘制对象会报 iOSurface 为 nil 的错误
         if drawObj == nil {
             if let metalView = self.view as? MetalView {
-                drawObj = create_sdf_view(metalView.appView())
+                if let metalLayer = metalView.layer as? CAMetalLayer {
+                    if let device = metalLayer.device {
+                        if device.supportsFeatureSet(.iOS_GPUFamily2_v1) {
+                            print("iOS_GPUFamily2_v1")
+                        }
+                        if device.supportsFeatureSet(.iOS_GPUFamily2_v2) {
+                            print("iOS_GPUFamily2_v2")
+                        }
+                        if device.supportsFeatureSet(.iOS_GPUFamily2_v3) {
+                            print("iOS_GPUFamily2_v3")
+                        }
+                        if device.supportsFeatureSet(.iOS_GPUFamily1_v3) {
+                            print("iOS_GPUFamily1_v3")
+                        }
+                        if device.supportsFamily(.apple3) {
+                            print("apple3")
+                        }
+                        if device.supportsFamily(.apple3) {
+                            print("apple3")
+                        }
+                        if device.supportsFamily(.apple3) {
+                            print("apple3")
+                        }
+                    }
+                    
+                }
+                
+                let ownedPointer = UnsafeMutableRawPointer(Unmanaged.passRetained(metalView).toOpaque())
+                let metalLayer = UnsafeMutableRawPointer(Unmanaged.passRetained(metalView.layer).toOpaque())
+                let maximumFrames = UIScreen.main.maximumFramesPerSecond
+                let av = app_view(view: ownedPointer, metal_layer: metalLayer,maximum_frames: Int32(maximumFrames), temporary_directory: temporary_directory, callback_to_swift: callback_to_swift)
+                drawObj = create_sdf_view(av)
                 sdf_view_set_bundle_image(drawObj, UnsafeMutablePointer(mutating: "math0.png"))
 
                 displayLink = CADisplayLink.init(target: self, selector: #selector(enterFrame))
@@ -48,11 +80,15 @@ class MetalController: UIViewController {
         }
         enter_frame(obj)
     }
+    
+    func generateTouchPoint(_ p: CGPoint) -> TouchPoint {
+        return TouchPoint(x: Float(p.x), y: Float(p.y), azimuth_angle: 0.0, altitude_angle: 0.0, force: 0.0, stamp: 0.0, distance: 0.0, interval: 0.0, speed: 0.0, ty: 0, stamp_scale: 0.0)
+    }
 
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         if let obj = self.drawObj {
             let p = touches.first!.location(in: self.view)
-            let tp = TouchPoint(x: Float(p.x), y: Float(p.y), force: 0.0)
+            let tp = generateTouchPoint(p)
             touch_move(obj, tp)
         }
     }
@@ -78,7 +114,9 @@ class MetalController: UIViewController {
             let s = gestureRecognizer.scale
             if let obj = self.drawObj {
                 self.displayLink?.isPaused = false
-                scale(obj, Float(s))
+                let p = gestureRecognizer.location(in: self.view)
+                let location = generateTouchPoint(p)
+                pintch_changed(obj, location, Float(s))
                 self.displayLink?.isPaused = false
             }
             gestureRecognizer.scale = 1.0

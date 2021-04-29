@@ -52,7 +52,7 @@ impl SDFTextView {
             &self.image.as_ref().unwrap(),
             &mut self.app_view,
             wgpu::TextureUsage::COPY_DST | wgpu::TextureUsage::STORAGE,
-            Some("original")
+            Some("original"),
         );
 
         let src_view = &texture_view;
@@ -187,8 +187,6 @@ impl SurfaceView for SDFTextView {
                 self.app_view.queue.submit(Some(encoder.finish()));
             }
         };
-
-        // self.app_view.device.get_queue().submit(Some(encoder.finish()));
     }
 }
 

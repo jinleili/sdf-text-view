@@ -1,9 +1,7 @@
 use idroid::geometry::plane::Plane;
-use idroid::vertex::{Pos, PosTex};
-use idroid::{node::ImageNodeBuilder, node::ImageViewNode, BufferObj, MVPUniform, MVPUniformObj};
+use idroid::{node::ImageNodeBuilder, node::ImageViewNode, MVPUniformObj};
 
 use nalgebra_glm as glm;
-use wgpu::util::DeviceExt;
 use wgpu::Extent3d;
 use zerocopy::{AsBytes, FromBytes};
 
@@ -56,7 +54,7 @@ impl SDFRenderNode {
 
         let shader = idroid::shader2::create_shader_module(device, "text", None);
         let builder =
-            ImageNodeBuilder::new(vec![(src_view, wgpu::TextureFormat::Rgba8Unorm, None)], &shader)
+            ImageNodeBuilder::new(vec![(src_view, wgpu::TextureFormat::R32Float, None)], &shader)
                 .with_samplers(vec![&sampler])
                 .with_vertices_and_indices((vertex_data, index_data))
                 .with_shader_states(shader_stages)

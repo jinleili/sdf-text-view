@@ -20,15 +20,7 @@ pub struct PicInfoUniform {
     any: [i32; 60],
 }
 
-#[derive(Copy, Clone, AsBytes, FromBytes)]
-#[repr(C)]
-pub struct PicInfoUniform2 {
-    info: [i32; 4],
-    threshold: [f32; 4],
-    any: [i32; 56],
-}
-
-#[cfg(not(target_os = "macos"))]
+#[cfg(target_os = "ios")]
 #[no_mangle]
 pub extern "C" fn create_sdf_view(view: uni_view::AppViewObj) -> *mut libc::c_void {
     let rust_view = uni_view::AppView::new(view);
@@ -36,7 +28,7 @@ pub extern "C" fn create_sdf_view(view: uni_view::AppViewObj) -> *mut libc::c_vo
     idroid::box_obj(obj)
 }
 
-#[cfg(not(target_os = "macos"))]
+#[cfg(target_os = "ios")]
 #[no_mangle]
 pub unsafe extern "C" fn sdf_view_set_bundle_image(
     obj: *mut libc::c_void, image_name: *mut c_char,
@@ -48,6 +40,6 @@ pub unsafe extern "C" fn sdf_view_set_bundle_image(
     };
 
     let mut obj: Box<Box<SDFTextView>> = Box::from_raw(obj as *mut _);
-    obj.bundle_image(name.to_string(), false);
+    obj.bundle_image(name.to_string());
     let _ = Box::into_raw(obj) as *mut libc::c_void;
 }

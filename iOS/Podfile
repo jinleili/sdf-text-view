@@ -3,12 +3,9 @@ use_frameworks!
 
 target "demo" do
 project  "demo.xcodeproj"
-# 官方正在开发 5.0，目前是 beta7 (20190731)
-#pod 'Alamofire'
 
-# https://github.com/onevcat/Kingfisher/wiki/Kingfisher-5.0-Migration-Guide
-pod 'Kingfisher', '~> 5.7.0'
-pod 'SnapKit', '~> 5.0.0'
+#pod 'Kingfisher', '~> 6.3.0'
+pod 'SnapKit', '~> 5.0.1'
 #
 #pod 'RxSwift', '~> 5.0.0'
 #pod 'RxCocoa', '~> 5.0.0'

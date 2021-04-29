@@ -1,7 +1,5 @@
 use crate::PicInfoUniform;
 use idroid::node::{BindingGroupSettingNode, DynamicBindingGroupNode};
-use wgpu::util::DeviceExt;
-use zerocopy::AsBytes;
 
 pub struct SDFComputeNode {
     setting_node: BindingGroupSettingNode,
@@ -58,23 +56,41 @@ impl SDFComputeNode {
         );
 
         let sdf_range = (img_size * 4) as wgpu::BufferAddress;
-        let sdf_front =
-            idroid::BufferObj::create_empty_storage_buffer(device, sdf_range, false, Some("sdf_front"));
+        let sdf_front = idroid::BufferObj::create_empty_storage_buffer(
+            device,
+            sdf_range,
+            false,
+            Some("sdf_front"),
+        );
         let staging_buffer = device.create_buffer(&wgpu::BufferDescriptor {
             size: sdf_range,
             usage: wgpu::BufferUsage::MAP_READ | wgpu::BufferUsage::COPY_DST,
             label: None,
             mapped_at_creation: false,
         });
-        let sdf_background =
-            idroid::BufferObj::create_empty_storage_buffer(device, sdf_range, false, Some("sdf_background"));
+        let sdf_background = idroid::BufferObj::create_empty_storage_buffer(
+            device,
+            sdf_range,
+            false,
+            Some("sdf_background"),
+        );
 
-        let v_buffer =
-            idroid::BufferObj::create_empty_storage_buffer(device, sdf_range, false, Some("v_buffer"));
+        let v_buffer = idroid::BufferObj::create_empty_storage_buffer(
+            device,
+            sdf_range,
+            false,
+            Some("v_buffer"),
+        );
         let z_range = ((extent.width + 1) * (extent.height + 1) * 4) as wgpu::BufferAddress;
-        let z_buffer = idroid::BufferObj::create_empty_storage_buffer(device, z_range, false, Some("z_buffer"));
+        let z_buffer = idroid::BufferObj::create_empty_storage_buffer(
+            device,
+            z_range,
+            false,
+            Some("z_buffer"),
+        );
 
         let visibilitys: Vec<wgpu::ShaderStage> = [wgpu::ShaderStage::COMPUTE; 6].to_vec();
+        println!("0");
         let setting_node = BindingGroupSettingNode::new(
             device,
             vec![],
@@ -149,45 +165,25 @@ impl SDFComputeNode {
 
         cpass.set_pipeline(&self.x_pipeline);
         // step background y
-        cpass.set_bind_group(
-            1,
-            &self.dynamic_node.bind_group,
-            &[self.offset_stride * 3],
-        );
+        cpass.set_bind_group(1, &self.dynamic_node.bind_group, &[self.offset_stride * 3]);
         cpass.dispatch(self.threadgroup_count.0, 1, 1);
 
         // step front y
-        cpass.set_bind_group(
-            1,
-            &self.dynamic_node.bind_group,
-            &[self.offset_stride],
-        );
+        cpass.set_bind_group(1, &self.dynamic_node.bind_group, &[self.offset_stride]);
         cpass.dispatch(self.threadgroup_count.0, 1, 1);
 
         cpass.set_pipeline(&self.y_pipeline);
         // step background x
-        cpass.set_bind_group(
-            1,
-            &self.dynamic_node.bind_group,
-            &[self.offset_stride * 4],
-        );
+        cpass.set_bind_group(1, &self.dynamic_node.bind_group, &[self.offset_stride * 4]);
         cpass.dispatch(1, self.threadgroup_count.1, 1);
 
         // step front x
-        cpass.set_bind_group(
-            1,
-            &self.dynamic_node.bind_group,
-            &[self.offset_stride * 2],
-        );
+        cpass.set_bind_group(1, &self.dynamic_node.bind_group, &[self.offset_stride * 2]);
         cpass.dispatch(1, self.threadgroup_count.1, 1);
 
         // final output
         cpass.set_pipeline(&self.xy_pipeline);
-        cpass.set_bind_group(
-            1,
-            &self.dynamic_node.bind_group,
-            &[self.offset_stride * 5],
-        );
+        cpass.set_bind_group(1, &self.dynamic_node.bind_group, &[self.offset_stride * 5]);
         cpass.dispatch(self.threadgroup_count.0, self.threadgroup_count.1, 1);
     }
 }
