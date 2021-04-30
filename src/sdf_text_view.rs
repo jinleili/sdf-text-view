@@ -59,7 +59,7 @@ impl SDFTextView {
 
         let output_view = idroid::load_texture::empty(
             &mut self.app_view.device,
-            wgpu::TextureFormat::R32Float,
+            wgpu::TextureFormat::Rgba8Unorm,
             texture_extent,
             Some(wgpu::TextureUsage::SAMPLED | wgpu::TextureUsage::STORAGE),
         )

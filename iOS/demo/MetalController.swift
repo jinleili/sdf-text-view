@@ -41,15 +41,20 @@ class MetalController: UIViewController {
                         if device.supportsFeatureSet(.iOS_GPUFamily1_v3) {
                             print("iOS_GPUFamily1_v3")
                         }
-                        if device.supportsFamily(.apple3) {
-                            print("apple3")
+                        if #available(iOS 13.0, *) {
+                            if device.supportsFamily(.apple3) {
+                                print("apple3")
+                            }
+                            if device.supportsFamily(.apple3) {
+                                print("apple3")
+                            }
+                            if device.supportsFamily(.apple3) {
+                                print("apple3")
+                            }
+                        } else {
+                            // Fallback on earlier versions
                         }
-                        if device.supportsFamily(.apple3) {
-                            print("apple3")
-                        }
-                        if device.supportsFamily(.apple3) {
-                            print("apple3")
-                        }
+                        
                     }
                     
                 }

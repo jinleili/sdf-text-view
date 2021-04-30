@@ -3,7 +3,7 @@
 struct InfoUniform {
     // info[0] = pic.width ;
     // info[1] = pic.height;
-    // info[2] = 0 | 1 (iter by y, x), = 1 (init edt), = 2 (save final distance to input_pic's r channel)
+    // info[2] = 0 | 1 (iter by y, x), = 2 (init edt), = 3 (save final distance to input_pic's r channel)
     // info[3] = 0 | 1 ( front or background distance fields)
      info: vec4<i32>;
      padding: [[stride(16)]] array<vec4<i32>, 15>;
@@ -28,9 +28,9 @@ struct StoreInt {
 [[group(0), binding(3)]] var<storage> z: [[access(read_write)]] StoreFloat;
 
 [[group(0), binding(4)]] var input_pic: [[access(read)]] texture_storage_2d<r32float>;
-[[group(0), binding(5)]] var output_pic: [[access(write)]] texture_storage_2d<r32float>;
+[[group(0), binding(5)]] var output_pic: [[access(write)]] texture_storage_2d<rgba8unorm>;
 
-let INF: f32 = 1.0E10;
+let INF: f32 = 9999.0;
 
 fn get_pixel_index(x: i32, y: i32) -> i32 {
     return y * params.info.x + x;
@@ -72,7 +72,7 @@ fn sdf1d(offset: i32, stride: i32, len: i32, offset_z: i32, stride_z: i32) {
     var s: f32 = 0.0;
 
     // 1D squared distance transform
-    for (var q: i32 = 0; q < len; q = q + 1) {
+    for (var q: i32 = 1; q < len; q = q + 1) {
         let pixel_index_q: i32 = offset + q * stride;
         let f0: f32 = get_f(pixel_index_q) + f32(q * q);
         loop {
@@ -80,6 +80,8 @@ fn sdf1d(offset: i32, stride: i32, len: i32, offset_z: i32, stride_z: i32) {
             // porabola q and k intersect at s
             s = (f0 - get_f(r * stride + offset) - f32(r * r)) / f32(2 * (q - r));
             // since z.data[0] = -INF, k will not less than 0
+            // if (s <= z.data[offset_z + k * stride_z]) {
+            //     k = k - 1;
             if (s <= z.data[offset_z + k * stride_z] && --k > (-1)) {
                 continue;
             } else {

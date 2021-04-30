@@ -9,11 +9,11 @@ fn main() {
     use winit::{event_loop::ControlFlow, event_loop::EventLoop, window::Window};
 
     let events_loop = EventLoop::new();
-    let window = Window::new(&events_loop).unwrap();
-    // window.set_max_dimensions(Some((400_u32, 700_u32).into()));
-    // window.set_inner_size((900_u32, 600_u32).into());
-    // window.set_max_inner_size(Some((2800_u32, 1850_u32).into()));
-    window.set_title("SDF Text View");
+    let size = winit::dpi::Size::Logical(winit::dpi::LogicalSize { width: 913.0, height: 546.0 });
+
+    let builder =
+        winit::window::WindowBuilder::new().with_inner_size(size).with_title("SDF Text View");
+    let window = builder.build(&events_loop).unwrap();
 
     let v = AppView::new(window);
 
@@ -27,7 +27,7 @@ fn main() {
             ControlFlow::Poll
         };
         match event {
-            Event::MainEventsCleared => surface_view.app_view.view.request_redraw(),
+            Event::RedrawEventsCleared => surface_view.app_view.view.request_redraw(),
             Event::WindowEvent { event: WindowEvent::Resized(_size), .. } => {
                 surface_view.resize();
             }

@@ -103,7 +103,7 @@ impl SDFComputeNode {
                 ),
                 (
                     des_view,
-                    wgpu::TextureFormat::R32Float,
+                    wgpu::TextureFormat::Rgba8Unorm,
                     Some(wgpu::StorageTextureAccess::WriteOnly),
                 ),
             ],

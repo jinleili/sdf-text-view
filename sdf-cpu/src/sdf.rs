@@ -107,7 +107,7 @@ impl SDF {
             for y in 0..height {
                 self.f[y] = grid[self.img_index(x, y)];
             }
-            let d = self.edt1d(grid, height);
+            let d = self.edt1d(height);
             for y in 0..height {
                 grid[self.img_index(x, y)] = d[y];
             }
@@ -117,14 +117,14 @@ impl SDF {
             for x in 0..width {
                 self.f[x] = grid[self.img_index(x, y)];
             }
-            let d = self.edt1d(grid, width);
+            let d = self.edt1d(width);
             for x in 0..width {
                 grid[self.img_index(x, y)] = d[x];
             }
         }
     }
 
-    fn edt1d(&mut self, grid: &mut Vec<f32>, length: usize) -> Vec<f32> {
+    fn edt1d(&mut self, length: usize) -> Vec<f32> {
         let (mut k, mut s, mut r) = (0_usize, 0.0_f32, 0_usize);
 
         let mut v = vec![0_usize; length];
