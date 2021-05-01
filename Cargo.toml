@@ -16,10 +16,10 @@ default = []
 libc = "*"
 wgpu = { git = "https://github.com/gfx-rs/wgpu-rs", version = "0.8",  rev = "9e4c98ccbe4e980f75a20cd00450a60ef361c16e" }
 # wgpu = { path = "../../wgpu-rs" }
-uni-view = { path="../idroid/uni-view" }
-idroid = { path="../idroid/idroid" }
-# uni-view = { git = "https://github.com/grenlight/idroid", rev = "0cdf9f5000c0e4512bd55a4d40876ec65726b9b8" }
-# idroid = { git = "https://github.com/grenlight/idroid", rev = "0cdf9f5000c0e4512bd55a4d40876ec65726b9b8" }
+# uni-view = { path="../idroid/uni-view" }
+# idroid = { path="../idroid/idroid" }
+uni-view = { git = "https://github.com/grenlight/idroid", rev = "0cdf9f5000c0e4512bd55a4d40876ec65726b9b8" }
+idroid = { git = "https://github.com/grenlight/idroid", rev = "0cdf9f5000c0e4512bd55a4d40876ec65726b9b8" }
 
 nalgebra-glm = "*"
 image = "0.23"
@@ -27,7 +27,6 @@ lazy_static = "*"
 zerocopy = "0.4"
 
 [target.'cfg(any(target_os = "macos", target_os = "windows", target_os = "linux"))'.dependencies]
-shaderc = "0.7"
 objc = "*"
 winit = { version = "0.24", features = ["web-sys"] }
 raw-window-handle = "0.3"
