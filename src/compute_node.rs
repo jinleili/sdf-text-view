@@ -49,6 +49,7 @@ impl SDFComputeNode {
                     any: [0; 60],
                 },
             ],
+            Some("uniform_buffer"),
         );
         let dynamic_node = DynamicBindingGroupNode::new(
             device,

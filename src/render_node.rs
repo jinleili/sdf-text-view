@@ -50,6 +50,7 @@ impl SDFRenderNode {
                     padding: [0.0; 58],
                 },
             ],
+            Some("dynamic_buf")
         );
 
         let shader = idroid::shader2::create_shader_module(device, "text", None);

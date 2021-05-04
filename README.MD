@@ -43,11 +43,11 @@ Improved algorithm: [Felzenszwalb/Huttenlocher distance transform](http://cs.bro
 ### On macOS
 ```
 # macOS
-RUST_BACKTRACE=full cargo run --example demo
+RUST_BACKTRACE=full cargo run --example sdf
 # windows (not tested!)
-RUST_BACKTRACE=full cargo run --example demo
+RUST_BACKTRACE=full cargo run --example sdf
 # linux  (not tested!)
-RUST_BACKTRACE=full cargo run --example demo
+RUST_BACKTRACE=full cargo run --example sdf
 ```
 ### On iOS 
 ```

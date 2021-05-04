@@ -23,7 +23,16 @@ impl SDFTextView {
         let hud = HUD::new();
 
         let shader = idroid::shader2::create_shader_module(&app_view.device, "clear_color", None);
-        let clear_color_node = BufferlessFullscreenNode::new(&app_view, vec![], vec![], &shader);
+        let clear_color_node = BufferlessFullscreenNode::new(
+            &app_view.device,
+            wgpu::TextureFormat::Rgba8Unorm,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            None,
+            &shader,
+        );
 
         let instance = SDFTextView {
             app_view,
