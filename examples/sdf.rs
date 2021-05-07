@@ -15,7 +15,7 @@ fn main() {
         winit::window::WindowBuilder::new().with_inner_size(size).with_title("SDF Text View");
     let window = builder.build(&events_loop).unwrap();
 
-    let v = AppView::new(window);
+    let v = pollster::block_on(AppView::new(window));
 
     let mut surface_view = SDFTextView::new(v);
     surface_view.bundle_image("txt1.png".to_string());

@@ -15,16 +15,18 @@ default = []
 [dependencies]
 libc = "*"
 wgpu = { git = "https://github.com/gfx-rs/wgpu-rs", version = "0.8",  rev = "9e4c98ccbe4e980f75a20cd00450a60ef361c16e" }
-# wgpu = { path = "../../wgpu-rs" }
 # uni-view = { path="../idroid/uni-view" }
 # idroid = { path="../idroid/idroid" }
-uni-view = { git = "https://github.com/grenlight/idroid", rev = "cdc0b2999a1e8fbfddb58fcaa2280deb520126ca" }
-idroid = { git = "https://github.com/grenlight/idroid", rev = "cdc0b2999a1e8fbfddb58fcaa2280deb520126ca" }
+uni-view = { git = "https://github.com/grenlight/idroid", rev = "305c125e6eecaea8d35b04217c20cf1166fd2677" }
+idroid = { git = "https://github.com/grenlight/idroid", rev = "305c125e6eecaea8d35b04217c20cf1166fd2677" }
 
 nalgebra-glm = "*"
 image = "0.23"
 lazy_static = "*"
 zerocopy = "0.4"
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+pollster = "0.2"
 
 [target.'cfg(any(target_os = "macos", target_os = "windows", target_os = "linux"))'.dependencies]
 objc = "*"

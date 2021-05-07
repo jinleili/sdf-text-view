@@ -1,4 +1,6 @@
 target/
+shader-preprocessed-wgsl/
+Cargo.lock
 **/*.rs.bk
 */.DS_STORE
 .idea/
